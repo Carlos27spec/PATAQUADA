@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
 
-import Header from './components/header.jsx'
-import Footer from './components/footer.jsx'
+import Header from './components/Header.jsx'
+import Footer from './components/Footer.jsx'
 
 import Home from './pages/home.jsx'
 import Servicos from './pages/servicos.jsx'
