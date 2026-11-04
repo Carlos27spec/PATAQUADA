@@ -30,7 +30,7 @@
 }
 
 .header__nav a {
-  font-family: "Bangers", "Impact", sans-serif;
+  font-family: "Chewy", "Impact", sans-serif;
   font-size: clamp(1.1rem, 1.8vw, 1.6rem);
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -59,8 +59,14 @@
   transition: color 0.15s;
 }
 
-.header__actions a:hover { color: #d66e2f; }
-.header__actions svg { width: 30px; height: 30px; }
+.header__actions a:hover {
+  color: #d66e2f;
+}
+
+.header__actions svg {
+  width: 30px;
+  height: 30px;
+}
 
 .header a:focus-visible,
 .header__toggle:focus-visible {
@@ -79,6 +85,7 @@
   border: 0;
   cursor: pointer;
 }
+
 .header__toggle span {
   width: 26px;
   height: 3px;
@@ -87,7 +94,9 @@
 }
 
 @media (max-width: 860px) {
-  .header__toggle { display: flex; }
+  .header__toggle {
+    display: flex;
+  }
 
   .header__menu {
     position: absolute;
@@ -102,7 +111,18 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
     display: none;
   }
-  .header__menu.is-open { display: flex; }
-  .header__nav { flex-direction: column; align-items: center; gap: 14px; }
-  .header__nav a { font-size: 1.6rem; }
+
+  .header__menu.is-open {
+    display: flex;
+  }
+
+  .header__nav {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .header__nav a {
+    font-size: 1.6rem;
+  }
 }
