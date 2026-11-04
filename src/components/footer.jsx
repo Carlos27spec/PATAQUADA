@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import logo from '../assets/Logo.png'
 
 function Footer() {
     return (
@@ -10,7 +11,7 @@ function Footer() {
                     <div className="footer-brand">
                         <div className="footer-brand-content">
                             <Link to="/" className="footer-logo">
-                                <img src="/images/logo-pataquada.png" alt="Logo PataQuada" />
+                                <img src={logo} alt="Logo PataQuada" />
                                 <span>Pata<span className="logo-destaque">Quada</span></span>
                             </Link>
 

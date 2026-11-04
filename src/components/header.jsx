@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import logo from '../assets/Logo.png'
 
 function Header() {
     const [menuAberto, setMenuAberto] = useState(false)
@@ -16,7 +17,7 @@ function Header() {
                     aria-label="PataQuada - Página inicial"
                     onClick={fecharMenu}
                 >
-                    <img src="/images/logo-pataquada.png" alt="Logo PataQuada" />
+                    <img src={logo} alt="Logo PataQuada" />
                     <span>Pata<span className="logo-destaque">Quada</span></span>
                 </Link>
 
