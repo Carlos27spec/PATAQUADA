@@ -1,192 +1,203 @@
 
 import 'dotenv/config';
 import express from 'express';
-import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
+import Database from 'better-sqlite3';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 
+// Configuração de caminhos
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Configuração do Express
 const app = express();
-const porta = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4000;
 
-// Configurações do Express
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Modelo de usuário
-const usuarioSchema = new mongoose.Schema(
-  {
-    nome: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    sobrenome: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
-    senha: {
-      type: String,
-      required: true,
-    },
-  },
-  { timestamps: true }
+// Criação automática da pasta do banco
+const databasePath = path.join(__dirname, 'database');
+
+if (!fs.existsSync(databasePath)) {
+    fs.mkdirSync(databasePath, { recursive: true });
+}
+
+// Conexão automática com SQLite
+const databaseName = process.env.DB_NAME || 'pataquada';
+const db = new Database(
+    path.join(databasePath, `${databaseName}.db`)
 );
 
-const Usuario = mongoose.model('Usuario', usuarioSchema);
+// Configurações do SQLite
+db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
+
+// Criação automática da tabela de usuários
+db.exec(`
+    CREATE TABLE IF NOT EXISTS usuarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        sobrenome TEXT NOT NULL,
+        email TEXT NOT NULL COLLATE NOCASE UNIQUE,
+        senha TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+`);
 
 // Cadastro de usuário
-app.post('/api/cadastro', async (req, res) => {
-  try {
-    const { nome, sobrenome, email, senha } = req.body;
+app.post(['/api/cadastro', '/cadastro'], async (req, res) => {
+    try {
+        const { nome, sobrenome, email, senha } = req.body;
 
-    if (
-      typeof nome !== 'string' ||
-      typeof sobrenome !== 'string' ||
-      typeof email !== 'string' ||
-      typeof senha !== 'string' ||
-      !nome.trim() ||
-      !sobrenome.trim() ||
-      !email.trim() ||
-      !senha
-    ) {
-      return res.status(400).json({
-        mensagem: 'Preencha todos os campos corretamente.',
-      });
+        if (!nome || !sobrenome || !email || !senha) {
+            return res.status(400).json({
+                mensagem: 'Preencha todos os campos.'
+            });
+        }
+
+        if (senha.length < 8) {
+            return res.status(400).json({
+                mensagem: 'A senha deve ter pelo menos 8 caracteres.'
+            });
+        }
+
+        const emailNormalizado = email.trim().toLowerCase();
+
+        const usuarioExistente = db.prepare(`
+            SELECT id FROM usuarios WHERE email = ?
+        `).get(emailNormalizado);
+
+        if (usuarioExistente) {
+            return res.status(409).json({
+                mensagem: 'Este e-mail já está cadastrado.'
+            });
+        }
+
+        const senhaHash = await bcrypt.hash(senha, 12);
+
+        const resultado = db.prepare(`
+            INSERT INTO usuarios (nome, sobrenome, email, senha)
+            VALUES (?, ?, ?, ?)
+        `).run(
+            nome.trim(),
+            sobrenome.trim(),
+            emailNormalizado,
+            senhaHash
+        );
+
+        return res.status(201).json({
+            mensagem: 'Usuário cadastrado com sucesso!',
+            id: resultado.lastInsertRowid
+        });
+
+    } catch (error) {
+        console.error('Erro ao cadastrar usuário:', error);
+
+        return res.status(500).json({
+            mensagem: 'Erro interno ao cadastrar usuário.'
+        });
     }
-
-    if (senha.length < 8) {
-      return res.status(400).json({
-        mensagem: 'A senha deve possuir pelo menos 8 caracteres.',
-      });
-    }
-
-    const emailNormalizado = email.trim().toLowerCase();
-
-    const usuarioExistente = await Usuario.findOne({
-      email: emailNormalizado,
-    });
-
-    if (usuarioExistente) {
-      return res.status(409).json({
-        mensagem: 'Este e-mail já está cadastrado.',
-      });
-    }
-
-    const senhaHash = await bcrypt.hash(senha, 12);
-
-    await Usuario.create({
-      nome: nome.trim(),
-      sobrenome: sobrenome.trim(),
-      email: emailNormalizado,
-      senha: senhaHash,
-    });
-
-    return res.status(201).json({
-      mensagem: 'Cadastro realizado com sucesso!',
-    });
-  } catch (erro) {
-    if (erro.code === 11000) {
-      return res.status(409).json({
-        mensagem: 'Este e-mail já está cadastrado.',
-      });
-    }
-
-    console.error('Erro ao cadastrar usuário:', erro);
-
-    return res.status(500).json({
-      mensagem: 'Não foi possível realizar o cadastro.',
-    });
-  }
 });
 
-// Login
-app.post('/api/login', async (req, res) => {
-  try {
-    const { email, senha } = req.body;
+// Login de usuário
+app.post(['/api/login', '/login'], async (req, res) => {
+    try {
+        const { email, senha } = req.body;
 
-    if (
-      typeof email !== 'string' ||
-      typeof senha !== 'string' ||
-      !email.trim() ||
-      !senha
-    ) {
-      return res.status(400).json({
-        mensagem: 'Informe o e-mail e a senha.',
-      });
+        if (!email || !senha) {
+            return res.status(400).json({
+                mensagem: 'Informe o e-mail e a senha.'
+            });
+        }
+
+        const emailNormalizado = email.trim().toLowerCase();
+
+        const usuario = db.prepare(`
+            SELECT * FROM usuarios WHERE email = ?
+        `).get(emailNormalizado);
+
+        if (!usuario) {
+            return res.status(401).json({
+                mensagem: 'E-mail ou senha incorretos.'
+            });
+        }
+
+        const senhaValida = await bcrypt.compare(
+            senha,
+            usuario.senha
+        );
+
+        if (!senhaValida) {
+            return res.status(401).json({
+                mensagem: 'E-mail ou senha incorretos.'
+            });
+        }
+
+        return res.status(200).json({
+            mensagem: 'Login realizado com sucesso!',
+            usuario: {
+                id: usuario.id,
+                nome: usuario.nome,
+                sobrenome: usuario.sobrenome,
+                email: usuario.email
+            }
+        });
+
+    } catch (error) {
+        console.error('Erro ao realizar login:', error);
+
+        return res.status(500).json({
+            mensagem: 'Erro interno ao realizar login.'
+        });
     }
-
-    const usuario = await Usuario.findOne({
-      email: email.trim().toLowerCase(),
-    });
-
-    if (
-      !usuario ||
-      !(await bcrypt.compare(senha, usuario.senha))
-    ) {
-      return res.status(401).json({
-        mensagem: 'E-mail ou senha inválidos.',
-      });
-    }
-
-    // O login é validado, mas ainda não cria uma sessão.
-    return res.status(200).json({
-      mensagem: 'Login validado com sucesso!',
-    });
-  } catch (erro) {
-    console.error('Erro ao realizar login:', erro);
-
-    return res.status(500).json({
-      mensagem: 'Não foi possível realizar o login.',
-    });
-  }
 });
 
-// Consulta de usuários
-app.get('/api/usuarios', async (req, res) => {
-  try {
-    const usuarios = await Usuario.find()
-      .select('-senha -__v')
-      .sort({ createdAt: -1 })
-      .lean();
+// Listagem de usuários
+app.get(['/api/usuarios', '/usuarios'], (req, res) => {
+    try {
+        const usuarios = db.prepare(`
+            SELECT
+                id,
+                nome,
+                sobrenome,
+                email,
+                created_at,
+                updated_at
+            FROM usuarios
+            ORDER BY created_at DESC
+        `).all();
 
-    return res.status(200).json(usuarios);
-  } catch (erro) {
-    console.error('Erro ao consultar usuários:', erro);
+        return res.status(200).json(usuarios);
 
-    return res.status(500).json({
-      mensagem: 'Não foi possível consultar os usuários.',
-    });
-  }
+    } catch (error) {
+        console.error('Erro ao listar usuários:', error);
+
+        return res.status(500).json({
+            mensagem: 'Erro interno ao listar usuários.'
+        });
+    }
 });
 
 // Inicialização do servidor
-async function iniciar() {
-  try {
-    if (!process.env.MONGO_URI) {
-      throw new Error(
-        'A variável MONGO_URI não foi definida no arquivo .env.'
-      );
-    }
+const server = app.listen(PORT, () => {
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
+    console.log(`Banco SQLite conectado: ${databaseName}.db`);
+});
 
-    await mongoose.connect(process.env.MONGO_URI);
+// Encerramento seguro
+function encerrarServidor() {
+    console.log('\nEncerrando servidor...');
 
-    console.log('Conectado ao MongoDB!');
-
-    app.listen(porta, () => {
-      console.log(`Express rodando em http://localhost:${porta}`);
-      console.log(`API de usuários: http://localhost:${porta}/api/usuarios`);
+    server.close(() => {
+        db.close();
+        console.log('Conexão com SQLite encerrada.');
+        process.exit(0);
     });
-  } catch (erro) {
-    console.error('Erro ao iniciar o servidor:', erro.message);
-    process.exit(1);
-  }
 }
 
-iniciar();
+process.on('SIGINT', encerrarServidor);
+process.on('SIGTERM', encerrarServidor);
