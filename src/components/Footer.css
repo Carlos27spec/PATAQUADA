@@ -1,0 +1,119 @@
+@import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
+
+.footer {
+  position: relative;
+  overflow: hidden;
+  padding: 48px clamp(20px, 5vw, 64px) 150px;
+  background: #f8eddb;
+  font-family: "Patrick Hand", "Comic Sans MS", cursive;
+  color: #3b3b44;
+}
+
+.footer__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* marca + slogan */
+.footer__brand { flex: 0 1 460px; }
+.footer__brand img { display: block; width: 100%; max-width: 440px; height: auto; }
+.footer__brand p {
+  margin: 8px 0 0 12px;
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  line-height: 1.45;
+}
+
+/* coluna da direita: separador vertical */
+.footer__info {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-left: 48px;
+  border-left: 2px solid #f1c791;
+  min-height: 150px;
+}
+
+.footer__nav { display: flex; flex-wrap: wrap; gap: 14px 40px; }
+.footer__nav a {
+  font-size: 1.35rem;
+  color: #3b3b44;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.footer__nav a:hover { color: #e88532; }
+
+.footer__social { display: flex; gap: 22px; }
+.footer__social a {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #f3bb82;
+  color: #2f2f36;
+  transition: transform 0.15s, background 0.15s;
+}
+.footer__social a:hover { background: #e88532; transform: translateY(-2px); }
+.footer__social svg { width: 22px; height: 22px; }
+
+
+.footer a:focus-visible {
+  outline: 3px solid #e88532;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.footer__credit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: auto 0 0 auto;
+  font-size: 1.1rem;
+}
+.footer__credit::before,
+.footer__credit::after {
+  content: "";
+  width: 42px;
+  height: 1px;
+  background: #f1c791;
+}
+.footer__credit::before { order: -1; }
+.footer__credit svg { width: 22px; height: 22px; color: #e88532; }
+
+/* onda e patinhas decorativas */
+.footer__wave {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 130px;
+}
+
+.footer__paw { position: absolute; z-index: 1; }
+.footer__paw--top   { top: 28px; right: 28px; width: 80px; color: #fbcd91; transform: rotate(10deg); }
+.footer__paw--brand { top: 190px; left: 80px; width: 44px; color: #fbcd91; transform: rotate(-12deg); }
+.footer__paw--left  { bottom: 32px; left: 28px; width: 46px; color: #e5a45c; transform: rotate(-15deg); }
+.footer__paw--right { bottom: 36px; right: 28px; width: 46px; color: #e5a45c; transform: rotate(15deg); }
+
+@media (max-width: 860px) {
+  .footer { padding-top: 36px; }
+  .footer__content { flex-direction: column; align-items: center; text-align: center; }
+  .footer__brand p { margin-left: 0; }
+  .footer__info {
+    align-items: center;
+    padding: 24px 0 0;
+    border-left: 0;
+    border-top: 2px solid #f1c791;
+    width: 100%;
+  }
+  .footer__nav { justify-content: center; }
+  .footer__credit { margin: 8px 0 0; }
+  .footer__paw--brand, .footer__paw--top { display: none; }
+}

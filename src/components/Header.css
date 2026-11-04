@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=Bangers&display=swap");
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 4px clamp(16px, 2vw, 28px);
+  background: #f8eddb;
+}
+
+.header__logo img {
+  display: block;
+  height: clamp(56px, 7vw, 92px);
+  width: auto;
+}
+
+.header__menu {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 5vw, 64px);
+}
+
+.header__nav {
+  display: flex;
+  gap: clamp(14px, 1.6vw, 24px);
+}
+
+.header__nav a {
+  font-family: "Bangers", "Impact", sans-serif;
+  font-size: clamp(1.1rem, 1.8vw, 1.6rem);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #111;
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 3px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.header__nav a:hover,
+.header__nav a.is-active {
+  color: #d66e2f;
+  border-color: #d66e2f;
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.header__actions a {
+  display: grid;
+  color: #111;
+  transition: color 0.15s;
+}
+
+.header__actions a:hover { color: #d66e2f; }
+.header__actions svg { width: 30px; height: 30px; }
+
+.header a:focus-visible,
+.header__toggle:focus-visible {
+  outline: 3px solid #d66e2f;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* botão hambúrguer (só no mobile) */
+.header__toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.header__toggle span {
+  width: 26px;
+  height: 3px;
+  border-radius: 2px;
+  background: #111;
+}
+
+@media (max-width: 860px) {
+  .header__toggle { display: flex; }
+
+  .header__menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 16px 24px;
+    background: #f8eddb;
+    border-top: 2px solid #fbcd91;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    display: none;
+  }
+  .header__menu.is-open { display: flex; }
+  .header__nav { flex-direction: column; align-items: center; gap: 14px; }
+  .header__nav a { font-size: 1.6rem; }
+}
