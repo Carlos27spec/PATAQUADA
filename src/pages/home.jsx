@@ -1,4 +1,4 @@
-import { useState, useEffect, } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import './home.css'
 import racao from '../assets/racao.png'
@@ -84,19 +84,22 @@ const servicos = [
     },
 ]
 
+const descricaoRacao =
+    'Ração nutritiva e balanceada para cães e gatos, com sabor irresistível e nutrientes essenciais para a saúde e energia do seu melhor amigo. Disponível em várias marcas e tamanhos.'
+
 const produtos = [
-    { id: 1, nome: 'Ração Pataquada 5kg', preco: 90, imagem: racao },
-    { id: 2, nome: 'Ração Pataquada 5kg', preco: 90, imagem: racao },
-    { id: 3, nome: 'Ração Pataquada 5kg', preco: 90, imagem: racao },
-    { id: 4, nome: 'Ração Pataquada 5kg', preco: 90, imagem: racao },
-    { id: 5, nome: 'Ração Pataquada 5kg', preco: 90, imagem: racao },
-    { id: 6, nome: 'Ração Pataquada 5kg', preco: 90, imagem: racao },
+    { id: 1, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
+    { id: 2, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
+    { id: 3, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
+    { id: 4, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
+    { id: 5, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
+    { id: 6, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
 ]
 
 const valores = [
-    { id: 1, titulo: 'Cuidado', texto: 'Tudo pensado para o bem-estar do seu pet.', cor: 'amarelo' },
-    { id: 2, titulo: 'Carinho', texto: 'Porque cada pet merece atenção especial.', cor: 'rosa' },
-    { id: 3, titulo: 'Praticidade', texto: 'Serviços e informações em um só lugar.', cor: 'verde' },
+    { id: 1, titulo: 'Cuidado', texto: 'Tudo pensado para o bem-estar do seu pet.', cor: 'amarelo', icone: <Pata /> },
+    { id: 2, titulo: 'Carinho', texto: 'Porque cada pet merece atenção especial.', cor: 'rosa', icone: <Coracao /> },
+    { id: 3, titulo: 'Praticidade', texto: 'Serviços e informações em um só lugar.', cor: 'verde', icone: <Estrela /> },
 ]
 
 const formatarPreco = (valor) =>
@@ -112,6 +115,22 @@ function Pata({ className = '' }) {
             <ellipse cx="15.2" cy="5.8" rx="2.1" ry="2.8" />
             <ellipse cx="19" cy="10" rx="2.1" ry="2.8" />
             <path d="M12.6 11c-3 0-6 3.2-6 5.9 0 1.9 1.4 2.8 3 2.8 1.3 0 2-.5 3-.5s1.7.5 3 .5c1.6 0 3-.9 3-2.8 0-2.7-3-5.9-6-5.9z" />
+        </svg>
+    )
+}
+
+function Coracao() {
+    return (
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+        </svg>
+    )
+}
+
+function Estrela() {
+    return (
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
         </svg>
     )
 }
@@ -178,7 +197,7 @@ function CarrosselBanner() {
                             <Pata className="pata-banner-3" />
 
                             <div className="banner-texto">
-                                <p className="banner-pre">BEM-VINDO AO</p>
+                                <p className="banner-pre">BEM-VINDO À</p>
                                 <p className="banner-marca">
                                     Pata<span>Quada</span>
                                 </p>
@@ -232,10 +251,11 @@ function SecaoServicos() {
         <section className="home-servicos">
             <Pata className="pata-servicos-1" />
             <Pata className="pata-servicos-2" />
+            <Pata className="pata-servicos-3" />
 
             <div className="home-container">
                 <p className="secao-pre">SERVIÇOS</p>
-                <h2 className="secao-titulo">Tudo para o bem estar do seu pet</h2>
+                <h2 className="secao-titulo">Tudo para o bem-estar do seu pet</h2>
 
                 <div className="servicos-grade">
                     {servicos.map((item) => (
@@ -256,56 +276,29 @@ function SecaoServicos() {
 
 /* ---------- 3. Mais vendidos (carrossel de produtos) ---------- */
 
-function useItensPorVista() {
-    const calcular = () =>
-        window.innerWidth <= 600 ? 1 : window.innerWidth <= 900 ? 2 : 3
-    const [itens, setItens] = useState(calcular)
-
-    useEffect(() => {
-        const aoRedimensionar = () => setItens(calcular())
-        window.addEventListener('resize', aoRedimensionar)
-        return () => window.removeEventListener('resize', aoRedimensionar)
-    }, [])
-
-    return itens
-}
-
 function CarrosselProdutos() {
-    const itensPorVista = useItensPorVista()
-    const [pagina, setPagina] = useState(0)
+    const total = produtos.length
+    const [atual, setAtual] = useState(0)
     const [pausado, setPausado] = useState(false)
-
-    // agrupa os produtos em "slides" (3, 2 ou 1 por vez, conforme a tela)
-    const slidesProdutos = []
-    for (let i = 0; i < produtos.length; i += itensPorVista) {
-        slidesProdutos.push(produtos.slice(i, i + itensPorVista))
-    }
-    const total = slidesProdutos.length
-    const atual = Math.min(pagina, total - 1)
 
     useEffect(() => {
         if (pausado) return
         const reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches
         if (reduzir) return
         const timer = setInterval(() => {
-            setPagina((p) => (Math.min(p, total - 1) + 1) % total)
+            setAtual((i) => (i + 1) % total)
         }, 6000)
         return () => clearInterval(timer)
     }, [pausado, total])
 
-    const anterior = () => setPagina((atual - 1 + total) % total)
-    const proximo = () => setPagina((atual + 1) % total)
+    const anterior = () => setAtual((i) => (i - 1 + total) % total)
+    const proximo = () => setAtual((i) => (i + 1) % total)
 
     return (
         <section className="home-produtos">
-            <Pata className="pata-produtos-1" />
-            <Pata className="pata-produtos-2" />
-            <Pata className="pata-produtos-3" />
-            <span className="mancha-produtos mancha-1" aria-hidden="true" />
-            <span className="mancha-produtos mancha-2" aria-hidden="true" />
-
             <div className="home-container">
-                <h2 className="produtos-titulo">Nossos Produtos mais vendidos</h2>
+                <p className="secao-pre">MAIS VENDIDOS</p>
+                <h2 className="secao-titulo">Tudo que seu pet ama!</h2>
 
                 <div
                     className="produtos-carrossel"
@@ -321,52 +314,37 @@ function CarrosselProdutos() {
                             className="produtos-trilho"
                             style={{ transform: `translateX(-${atual * 100}%)` }}
                         >
-                            {slidesProdutos.map((grupo, i) => (
-                                <div
-                                    key={i}
-                                    className="produtos-slide"
-                                    style={{ '--colunas': itensPorVista }}
+                            {produtos.map((produto, i) => (
+                                <article
+                                    key={produto.id}
+                                    className="produto-card"
                                     aria-hidden={i !== atual}
-                                    aria-label={`Slide ${i + 1} de ${total}`}
+                                    aria-label={`Produto ${i + 1} de ${total}`}
                                 >
-                                    {grupo.map((produto) => (
-                                        <article key={produto.id} className="produto-card">
-                                            <img src={produto.imagem} alt={produto.nome} />
-                                            <h3>{produto.nome}</h3>
-                                            <p className="produto-preco">{formatarPreco(produto.preco)}</p>
-                                            <button
-                                                type="button"
-                                                className="produto-botao"
-                                                tabIndex={i === atual ? 0 : -1}
-                                            >
-                                                Comprar Agora
-                                            </button>
-                                        </article>
-                                    ))}
-                                </div>
+                                    <img src={produto.imagem} alt={produto.nome} />
+                                    <div className="produto-info">
+                                        <h3>{produto.nome}</h3>
+                                        <p className="produto-descricao">{produto.descricao}</p>
+                                        <p className="produto-preco">{formatarPreco(produto.preco)}</p>
+                                        <button
+                                            type="button"
+                                            className="produto-botao"
+                                            tabIndex={i === atual ? 0 : -1}
+                                        >
+                                            Comprar Agora
+                                        </button>
+                                    </div>
+                                </article>
                             ))}
                         </div>
                     </div>
 
-                    <button type="button" className="carrossel-seta seta-esq" onClick={anterior} aria-label="Produtos anteriores">
+                    <button type="button" className="carrossel-seta seta-esq" onClick={anterior} aria-label="Produto anterior">
                         <SetaEsquerda />
                     </button>
-                    <button type="button" className="carrossel-seta seta-dir" onClick={proximo} aria-label="Próximos produtos">
+                    <button type="button" className="carrossel-seta seta-dir" onClick={proximo} aria-label="Próximo produto">
                         <SetaDireita />
                     </button>
-                </div>
-
-                <div className="produtos-pontos">
-                    {slidesProdutos.map((_, i) => (
-                        <button
-                            key={i}
-                            type="button"
-                            className={`banner-ponto${i === atual ? ' ativo' : ''}`}
-                            onClick={() => setPagina(i)}
-                            aria-label={`Ir para o slide ${i + 1} de produtos`}
-                            aria-current={i === atual}
-                        />
-                    ))}
                 </div>
             </div>
         </section>
@@ -378,7 +356,7 @@ function CarrosselProdutos() {
 function SecaoSobre() {
     return (
         <section id="sobre">
-            < Pata className="pata-sobre-1" />
+            <Pata className="pata-sobre-1" />
             <Pata className="pata-sobre-2" />
 
             <div className="sobre-imagem">
@@ -400,7 +378,7 @@ function SecaoSobre() {
                     {valores.map((v) => (
                         <li key={v.id}>
                             <span className={`valor-icone cor-${v.cor}`} aria-hidden="true">
-                                <Pata />
+                                {v.icone}
                             </span>
                             <div>
                                 <h3>{v.titulo}</h3>
@@ -410,7 +388,7 @@ function SecaoSobre() {
                     ))}
                 </ul>
             </div>
-        </section >
+        </section>
     )
 }
 
@@ -514,8 +492,8 @@ function Home() {
     return (
         <main className="home">
             <CarrosselBanner />
-            <SecaoServicos />
             <CarrosselProdutos />
+            <SecaoServicos />
             <SecaoSobre />
             <SecaoContato />
         </main>

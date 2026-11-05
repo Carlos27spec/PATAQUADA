@@ -1,34 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
+/* ========================================
+   HOME
+   Usa as variáveis do CSS geral (:root).
+   Aqui ficam só os valores exclusivos da home.
+   (carregue o geral.css ANTES deste arquivo)
+======================================== */
 
 .home {
-    --cor-azul: #2f3e5c;
-    --cor-laranja: #d96e36;
+    /* Exclusiva da home (não existe no geral) */
     --cor-laranja-claro: #ecaa57;
-    --cor-amarelo: #fcd576;
-    --cor-amarelo-forte: #fbd06b;
-    --cor-creme: #fbe3c6;
-    --cor-creme-claro: #f9eedc;
-    --cor-pessego: #fccb8c;
-    --cor-texto: #1d1d1d;
-    --fonte-titulo: 'Baloo 2', 'Segoe UI', sans-serif;
-    --fonte-texto: 'Quicksand', 'Segoe UI', sans-serif;
+
+    /* Aliases para variáveis equivalentes do geral */
+    --cor-creme-claro: var(--cor-bege);
+    --cor-texto: var(--cor-preto);
+
+    /* Mais escuro que o azul do geral, para dar contraste
+       com o texto sobre o fundo amarelo do banner.
+       Para usar o azul do geral, apague esta linha. */
+    --cor-azul: #2f3e5c;
 
     font-family: var(--fonte-texto);
     color: var(--cor-texto);
     overflow-x: hidden;
 }
 
-.home *,
-.home *::before,
-.home *::after {
-    box-sizing: border-box;
-}
-
 .home h1,
 .home h2,
 .home h3 {
-    font-family: var(--fonte-titulo);
-    font-weight: 800;
     margin: 0;
     line-height: 1.1;
 }
@@ -108,7 +105,7 @@
     position: relative;
     overflow: hidden;
     border-radius: 18px;
-    background: var(--cor-amarelo);
+    background: var(--cor-amarelo-claro);
 }
 
 .banner-trilho {
@@ -134,7 +131,7 @@
 
 .banner-pre {
     font-family: var(--fonte-titulo);
-    font-weight: 700;
+    font-weight: normal;
     letter-spacing: 0.18em;
     font-size: 0.8rem;
     color: var(--cor-azul);
@@ -142,7 +139,7 @@
 
 .banner-marca {
     font-family: var(--fonte-titulo);
-    font-weight: 800;
+    font-weight: normal;
     font-size: clamp(2.6rem, 6vw, 4.4rem);
     line-height: 1;
     color: var(--cor-azul);
@@ -154,7 +151,7 @@
 
 .banner-titulo {
     font-family: var(--fonte-texto);
-    font-weight: 500;
+    font-weight: normal;
     font-size: clamp(1rem, 1.8vw, 1.35rem);
     max-width: 22ch;
     margin: 10px 0 20px;
@@ -168,7 +165,7 @@
     background: #1f1f1f;
     color: #fff;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: normal;
     font-size: 0.9rem;
     padding: 10px 18px;
     border-radius: 10px;
@@ -247,20 +244,147 @@
     background: #1f1f1f;
 }
 
-/* ===== 2. serviços ===== */
+/* ===== 2. produtos (mais vendidos) ===== */
+.home-produtos {
+    position: relative;
+    background: var(--cor-creme);
+    padding: 24px 0 72px;
+    text-align: center;
+}
+
+.home-produtos .secao-titulo {
+    margin-bottom: 14px;
+}
+
+.produtos-carrossel {
+    position: relative;
+}
+
+.produtos-janela {
+    overflow: hidden;
+    border-radius: 48px;
+}
+
+.produtos-trilho {
+    display: flex;
+    transition: transform 0.6s ease;
+}
+
+.produto-card {
+    flex: 0 0 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 24px;
+    min-height: 405px;
+    padding: 32px 72px;
+    background: var(--cor-bege);
+    text-align: left;
+}
+
+.produto-card img {
+    justify-self: center;
+    height: 310px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.produto-info {
+    max-width: 340px;
+}
+
+.produto-card h3 {
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    margin-bottom: 20px;
+}
+
+.produto-descricao {
+    font-size: 1.05rem;
+    line-height: 1.35;
+}
+
+.produto-preco {
+    font-family: var(--fonte-titulo);
+    font-weight: normal;
+    font-size: 2rem;
+    text-align: center;
+    margin: 20px 0 12px;
+}
+
+.produto-botao {
+    display: block;
+    width: min(100%, 230px);
+    margin: 0 auto;
+    border: 0;
+    border-radius: 999px;
+    background: var(--cor-laranja);
+    color: #fff;
+    font-family: var(--fonte-texto);
+    font-weight: normal;
+    font-size: 1.15rem;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.produto-botao:hover {
+    filter: brightness(0.92);
+}
+
+/* setas laranjas, sem bolinha branca, dentro do card (como no design) */
+.produtos-carrossel .carrossel-seta {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    box-shadow: none;
+    color: var(--cor-laranja);
+}
+
+.produtos-carrossel .carrossel-seta:hover {
+    background: transparent;
+    color: var(--cor-marrom);
+}
+
+.produtos-carrossel .carrossel-seta svg {
+    width: 28px;
+    height: 28px;
+}
+
+.produtos-carrossel .seta-esq {
+    left: 14px;
+}
+
+.produtos-carrossel .seta-dir {
+    right: 14px;
+}
+
+/* ===== 3. serviços ===== */
 .home-servicos {
     position: relative;
     background: var(--cor-creme);
-    padding: 44px 0 56px;
+    padding: 48px 0 56px;
     text-align: center;
 }
 
 .secao-titulo {
     display: inline-block;
+    position: relative;
     font-size: clamp(1.4rem, 3vw, 1.9rem);
     margin: 6px 0 40px;
-    padding-bottom: 8px;
-    border-bottom: 3px solid var(--cor-laranja);
+    padding: 20px 20px 14px;
+}
+
+.secao-titulo::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 60px;
+    /* ajuste aqui o tamanho da linha */
+    height: 3px;
+    border-radius: 3px;
+    background: var(--cor-laranja);
 }
 
 .servicos-grade {
@@ -273,6 +397,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 30px 20px 20px;
 }
 
 .servico-icone {
@@ -316,7 +441,7 @@
 .servico-link {
     margin-top: 14px;
     font-family: var(--fonte-titulo);
-    font-weight: 700;
+    font-weight: normal;
     color: var(--cor-laranja);
     text-decoration: none;
 }
@@ -337,141 +462,13 @@
     height: 56px;
 }
 
-/* ===== 3. produtos ===== */
-.home-produtos {
-    position: relative;
-    overflow: hidden;
-    background: var(--cor-amarelo-forte);
-    padding: 20px 0 80px;
-}
-
-.mancha-produtos {
-    position: absolute;
-    background: var(--cor-laranja-claro);
-    border-radius: 50%;
-    opacity: 0.8;
-}
-
-.mancha-1 {
-    width: 420px;
-    height: 420px;
-    right: -80px;
-    top: 10px;
-}
-
-.mancha-2 {
-    width: 380px;
-    height: 300px;
-    left: -120px;
-    bottom: 60px;
-}
-
-.home-produtos .home-container {
-    position: relative;
-    z-index: 1;
-}
-
-.produtos-titulo {
-    text-align: center;
-    font-size: clamp(1.8rem, 4.5vw, 2.8rem);
-    margin-bottom: 32px;
-}
-
-.produtos-carrossel {
-    position: relative;
-    padding: 0 28px;
-}
-
-.produtos-janela {
-    overflow: hidden;
-    border-radius: 48px;
-}
-
-.produtos-trilho {
-    display: flex;
-    transition: transform 0.6s ease;
-}
-
-.produtos-slide {
-    flex: 0 0 100%;
-    display: grid;
-    grid-template-columns: repeat(var(--colunas, 3), 1fr);
-    gap: 24px;
-}
-
-.produtos-pontos {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 22px;
-}
-
-.produto-card {
-    background: var(--cor-creme);
-    border-radius: 48px;
-    padding: 24px 28px 28px;
-    text-align: left;
-}
-
-.produto-card img {
-    display: block;
-    height: 170px;
-    margin: 0 auto 8px;
-    object-fit: contain;
-}
-
-.produto-card h3 {
-    font-size: clamp(1.3rem, 2.4vw, 1.9rem);
-}
-
-.produto-preco {
-    font-family: var(--fonte-titulo);
-    font-weight: 800;
-    font-size: 1.8rem;
-    text-align: center;
-    margin: 12px 0;
-}
-
-.produto-botao {
-    display: block;
-    width: 100%;
-    border: 0;
-    border-radius: 999px;
-    background: var(--cor-laranja);
-    color: #fff;
-    font-family: var(--fonte-texto);
-    font-weight: 500;
-    font-size: 1.15rem;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: filter 0.2s;
-}
-
-.produto-botao:hover {
-    filter: brightness(0.92);
-}
-
-.produtos-carrossel .seta-esq {
-    left: -6px;
-}
-
-.produtos-carrossel .seta-dir {
-    right: -6px;
-}
-
-.pata-produtos-1 {
-    left: 6%;
-    top: 90px;
-}
-
-.pata-produtos-2 {
-    left: 38%;
-    top: 80px;
-}
-
-.pata-produtos-3 {
-    right: 8%;
-    bottom: 40px;
+.pata-servicos-3 {
+    right: 18%;
+    top: 100px;
+    width: 52px;
+    height: 52px;
+    color: #111;
+    opacity: 1;
 }
 
 /* ===== 4. sobre ===== */
@@ -527,6 +524,13 @@
     border-radius: 50%;
     display: grid;
     place-items: center;
+}
+
+/* ícones dos valores: pata, coração e estrela */
+.valor-icone svg {
+    width: 26px;
+    height: 26px;
+    color: #111;
 }
 
 .valor-icone .home-pata {
@@ -663,7 +667,7 @@
 .contato-status {
     min-height: 1.2em;
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: normal;
 }
 
 .pata-contato-1 {
@@ -709,6 +713,15 @@
         max-height: 220px;
     }
 
+    .produto-card {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        padding: 28px 56px 32px;
+    }
+
+    .produto-card img {
+        height: 220px;
+    }
 
     #sobre {
         grid-template-columns: 1fr;
@@ -738,9 +751,8 @@
         gap: 32px;
     }
 
-
-    .produtos-carrossel {
-        padding: 0 20px;
+    .produto-card {
+        padding: 24px 44px 28px;
     }
 
     .contato-caixa {
