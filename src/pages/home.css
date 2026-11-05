@@ -475,7 +475,7 @@
 }
 
 /* ===== 4. sobre ===== */
-.home-sobre {
+#sobre {
     position: relative;
     background: var(--cor-creme-claro);
     display: grid;
@@ -559,7 +559,7 @@
 }
 
 /* ===== 5. contato ===== */
-.home-contato {
+#contato {
     position: relative;
     background: var(--cor-pessego);
     display: grid;
@@ -710,7 +710,7 @@
     }
 
 
-    .home-sobre {
+    #sobre {
         grid-template-columns: 1fr;
         padding: 0 6% 40px;
     }
@@ -726,7 +726,7 @@
         grid-template-columns: 1fr;
     }
 
-    .home-contato {
+    #contato {
         grid-template-columns: 1fr;
         padding: 40px 6%;
     }

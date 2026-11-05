@@ -1,23 +1,49 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { SearchIcon, CartIcon, UserIcon } from "./Icons";
 import "./Header.css";
 
 const links = [
-  { to: "/", label: "Home", end: true },
+  { to: "/", label: "Home" },
   { to: "/servicos", label: "Serviços" },
   { to: "/shop", label: "Shop" },
-  { to: "/sobre", label: "Sobre" },
-  { to: "/contato", label: "Contato" },
+  { to: "/#sobre", label: "Sobre" },
+  { to: "/#contato", label: "Contato" },
 ];
+
+function separar(to) {
+  const [path, h = ""] = to.split("#");
+  return { path, hash: h ? `#${h}` : "" };
+}
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const { pathname, hash } = useLocation();
+
+  const estaAtivo = (to) => {
+    const alvo = separar(to);
+    return pathname === alvo.path && hash === alvo.hash;
+  };
+
+  const aoClicar = (to) => {
+    setOpen(false);
+    const alvo = separar(to);
+
+    if (pathname !== alvo.path) return;
+
+    if (alvo.hash) {
+      document
+        .getElementById(alvo.hash.slice(1))
+        ?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   return (
     <header className="header">
-      <Link to="/" className="header__logo" onClick={() => setOpen(false)}>
+      <Link to="/" className="header__logo" onClick={() => aoClicar("/")}>
         <img src={logo} alt="PataQuada" />
       </Link>
 
@@ -33,16 +59,15 @@ export default function Header() {
 
       <div id="menu-principal" className={`header__menu ${open ? "is-open" : ""}`}>
         <nav className="header__nav" aria-label="Principal">
-          {links.map(({ to, label, end }) => (
-            <NavLink
+          {links.map(({ to, label }) => (
+            <Link
               key={to}
               to={to}
-              end={end}
-              className={({ isActive }) => (isActive ? "is-active" : undefined)}
-              onClick={() => setOpen(false)}
+              className={estaAtivo(to) ? "is-active" : undefined}
+              onClick={() => aoClicar(to)}
             >
               {label}
-            </NavLink>
+            </Link>
           ))}
         </nav>
 

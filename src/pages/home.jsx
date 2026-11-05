@@ -1,7 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect, } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import './home.css'
 import racao from '../assets/racao.png'
+if ('scrollRestoration' in window.history) {
+    window.history.scrollRestoration = 'manual'
+}
+
 
 /* ---------- Dados (troque pelas informações reais / API depois) ---------- */
 
@@ -174,7 +178,7 @@ function CarrosselBanner() {
                             <Pata className="pata-banner-3" />
 
                             <div className="banner-texto">
-                                <p className="banner-pre">BEM-VINDO À</p>
+                                <p className="banner-pre">BEM-VINDO AO</p>
                                 <p className="banner-marca">
                                     Pata<span>Quada</span>
                                 </p>
@@ -373,8 +377,8 @@ function CarrosselProdutos() {
 
 function SecaoSobre() {
     return (
-        <section className="home-sobre">
-            <Pata className="pata-sobre-1" />
+        <section id="sobre">
+            < Pata className="pata-sobre-1" />
             <Pata className="pata-sobre-2" />
 
             <div className="sobre-imagem">
@@ -406,7 +410,7 @@ function SecaoSobre() {
                     ))}
                 </ul>
             </div>
-        </section>
+        </section >
     )
 }
 
@@ -437,7 +441,7 @@ function SecaoContato() {
     }
 
     return (
-        <section className="home-contato">
+        <section id="contato">
             <Pata className="pata-contato-1" />
             <Pata className="pata-contato-2" />
             <Pata className="pata-contato-3" />
@@ -495,6 +499,18 @@ function SecaoContato() {
 /* ---------- Página ---------- */
 
 function Home() {
+    const location = useLocation()
+
+    useEffect(() => {
+        if (!location.hash) {
+            window.scrollTo(0, 0)
+            return
+        }
+        const elemento = document.getElementById(location.hash.slice(1))
+        if (elemento) {
+            elemento.scrollIntoView({ behavior: "smooth" })
+        }
+    }, [location.hash])
     return (
         <main className="home">
             <CarrosselBanner />
