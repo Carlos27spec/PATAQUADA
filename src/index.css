@@ -30,6 +30,18 @@
     --largura-maxima: 1200px;
     --raio-padrao: 16px;
     --transicao-padrao: 0.2s ease;
+
+    #root {
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* tudo que não é header nem footer cresce e empurra o footer para baixo */
+    #root>*:not(.site-header):not(.site-footer) {
+        flex: 1;
+    }
 }
 
 /* ========================================
