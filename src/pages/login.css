@@ -1,0 +1,243 @@
+/* ========================================
+   LOGIN
+   Usa as variáveis do index.css (:root).
+   Header e footer vêm do layout geral.
+======================================== */
+
+.login {
+    position: relative;
+    overflow: hidden;
+    background: var(--cor-pessego);
+    padding: 40px 4% 90px;
+    text-align: center;
+}
+
+.login .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.login a:focus-visible,
+.login button:focus-visible {
+    outline: 3px solid var(--cor-laranja);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+
+/* ===== Título ===== */
+
+.login-titulo {
+    font-size: clamp(1.9rem, 4vw, 3.4rem);
+    line-height: 1.1;
+    margin-bottom: 32px;
+}
+
+/* ===== Área central (card + mascote) ===== */
+
+.login-area {
+    position: relative;
+    width: min(830px, 100%);
+    margin: 0 auto;
+}
+
+.login-mascote {
+    position: absolute;
+    right: calc(100% + 24px);
+    bottom: -89px;
+    width: clamp(150px, 19vw, 290px);
+    height: auto;
+    pointer-events: none;
+}
+
+/* ===== Card ===== */
+
+.login-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    align-items: center;
+    background: var(--cor-bege);
+    border-radius: 48px;
+    padding: 48px 32px 40px;
+    text-align: left;
+}
+
+/* ===== Formulário ===== */
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(100%, 380px);
+    margin: 0 auto;
+}
+
+/* ===== Campos ===== */
+
+.login-campo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 54px;
+    padding: 0 22px;
+    border-radius: 999px;
+    background: #fff;
+}
+
+.login-campo svg {
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    color: #111;
+}
+
+.login-campo input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-family: var(--fonte-texto);
+    font-size: 1.2rem;
+    color: var(--cor-preto);
+}
+
+.login-campo input::placeholder {
+    color: var(--cor-preto);
+    opacity: 0.8;
+}
+
+.login-campo:focus-within {
+    outline: 3px solid var(--cor-laranja);
+}
+
+/* ===== Esqueci minha senha ===== */
+
+.login-esqueci {
+    align-self: flex-start;
+    padding: 2px 0;
+    font-size: 1.15rem;
+    transition: color var(--transicao-padrao);
+}
+
+.login-esqueci:hover {
+    color: var(--cor-laranja);
+}
+
+/* ===== Botão entrar ===== */
+
+.login-entrar {
+    width: 100%;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-size: 1.3rem;
+}
+
+.login-entrar:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+/* ===== Mensagens ===== */
+
+.login-status {
+    min-height: 1.2em;
+    font-size: 0.95rem;
+    text-align: center;
+    color: var(--cor-marrom);
+}
+
+.login-cadastro {
+    text-align: center;
+    font-size: 1rem;
+}
+
+.login-cadastro a {
+    color: var(--cor-laranja);
+    text-decoration: underline;
+}
+
+.login-cadastro a:hover {
+    color: var(--cor-marrom);
+}
+
+/* ===== Patinhas decorativas ===== */
+
+.login-pata {
+    position: absolute;
+    color: var(--cor-laranja);
+    pointer-events: none;
+}
+
+.pata-login-1 {
+    left: 4%;
+    top: 36px;
+    width: 64px;
+    transform: rotate(-15deg);
+}
+
+.pata-login-2 {
+    left: 20%;
+    top: 100px;
+    width: 56px;
+    transform: rotate(-10deg);
+}
+
+.pata-login-3 {
+    right: 22%;
+    top: 80px;
+    width: 56px;
+    transform: rotate(15deg);
+}
+
+.pata-login-4 {
+    right: 7%;
+    top: 58%;
+    width: 84px;
+    transform: rotate(12deg);
+}
+
+/* ===== Responsivo ===== */
+
+@media (max-width: 1100px) {
+    .login-mascote {
+        display: none;
+    }
+}
+
+@media (max-width: 900px) {
+
+    .pata-login-2,
+    .pata-login-3,
+    .pata-login-4 {
+        display: none;
+    }
+}
+
+@media (max-width: 700px) {
+    .login {
+        padding: 32px 5% 56px;
+    }
+
+    .login-card {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        border-radius: 32px;
+        padding: 28px 24px 32px;
+    }
+
+    .login-form {
+        width: 100%;
+    }
+
+    .pata-login-1 {
+        width: 44px;
+    }
+}

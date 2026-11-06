@@ -72,9 +72,17 @@ export default function Header() {
         </nav>
 
         <div className="header__actions">
-          <Link to="/busca" aria-label="Buscar"><SearchIcon /></Link>
-          <Link to="/carrinho" aria-label="Carrinho"><CartIcon /></Link>
-          <Link to="/conta" aria-label="Minha conta"><UserIcon /></Link>
+          <Link to="/busca" aria-label="Buscar">
+            <SearchIcon />
+          </Link>
+
+          <Link to="/carrinho" aria-label="Carrinho">
+            <CartIcon />
+          </Link>
+
+          <Link to="/login" aria-label="Minha conta">
+            <UserIcon />
+          </Link>
         </div>
       </div>
     </header>
