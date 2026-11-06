@@ -76,7 +76,6 @@ function Consultas() {
                                 </div>
 
                                 <div>
-                                    <span>R$</span>
                                     <small>Valor:</small>
                                     <strong>
                                         {consulta.precoFormatado}

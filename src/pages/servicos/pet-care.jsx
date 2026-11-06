@@ -73,7 +73,6 @@ function PetCare() {
                                 </div>
 
                                 <div>
-                                    <span>R$</span>
                                     <small>Valor:</small>
                                     <strong>
                                         {servicoPrincipal.precoFormatado}
@@ -126,7 +125,6 @@ function PetCare() {
                                         </div>
 
                                         <div>
-                                            <span>R$</span>
                                             <small>Valor:</small>
                                             <strong>
                                                 {servico.precoFormatado}

@@ -3,62 +3,116 @@
 -- PATAQUADA
 -- CARGA INICIAL DE DADOS (DML)
 -- Banco: pataquadaDB
+-- Compatível com SQLite / DBeaver
 -- =========================================================
 
 PRAGMA foreign_keys = ON;
 
 BEGIN TRANSACTION;
 
+
 -- =========================================================
 -- 1. TIPOS DE USUÁRIO
 -- =========================================================
 
-INSERT OR IGNORE INTO tipo_usuario (nome, tipo, descricao)
-VALUES
-    ('Administrador', 'ADMIN', 'Acesso administrativo ao sistema'),
-    ('Cliente', 'CLIENTE', 'Acesso à área do cliente');
+INSERT INTO tipo_usuario (nome, tipo, descricao)
+SELECT d.nome, d.tipo, d.descricao
+FROM (
+    SELECT 'Administrador' AS nome, 'ADMIN' AS tipo,
+           'Acesso administrativo ao sistema' AS descricao
+    UNION ALL
+    SELECT 'Cliente', 'CLIENTE', 'Acesso à área do cliente'
+) d
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM tipo_usuario tu
+    WHERE tu.tipo = d.tipo
+);
+
 
 -- =========================================================
--- 2. PERMISSÕES
+-- 2. USUÁRIO ADMINISTRADOR
+-- =========================================================
+-- E-mail: admin@pataquada.com.br
+-- Usuário: admin
+-- Substitua <HASH_BCRYPT_AQUI> pelo hash da senha.
 -- =========================================================
 
-INSERT OR IGNORE INTO permissao_usuario (chave, descricao)
-VALUES
-    ('USUARIO_VISUALIZAR', 'Visualizar usuários'),
-    ('USUARIO_CADASTRAR', 'Cadastrar usuários'),
-    ('USUARIO_EDITAR', 'Editar usuários'),
-    ('USUARIO_EXCLUIR', 'Excluir usuários'),
+INSERT INTO usuarios (
+    nome,
+    sobrenome,
+    email,
+    id_tipo_usuario,
+    usuario,
+    senha,
+    telefone
+)
+SELECT
+    'Administrador',
+    'Pataquada',
+    'admin@pataquada.com.br',
+    tu.id,
+    'admin',
+    'admin',
+    NULL
+FROM tipo_usuario tu
+WHERE tu.tipo = 'ADMIN'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM usuarios u
+      WHERE u.email = 'admin@pataquada.com.br'
+  );
 
-    ('PRODUTO_VISUALIZAR', 'Visualizar produtos'),
-    ('PRODUTO_CADASTRAR', 'Cadastrar produtos'),
-    ('PRODUTO_EDITAR', 'Editar produtos'),
-    ('PRODUTO_EXCLUIR', 'Excluir produtos'),
-
-    ('SERVICO_VISUALIZAR', 'Visualizar serviços'),
-    ('SERVICO_CADASTRAR', 'Cadastrar serviços'),
-    ('SERVICO_EDITAR', 'Editar serviços'),
-    ('SERVICO_EXCLUIR', 'Excluir serviços'),
-
-    ('PEDIDO_VISUALIZAR', 'Visualizar pedidos'),
-    ('PEDIDO_GERENCIAR', 'Gerenciar pedidos'),
-
-    ('AGENDAMENTO_VISUALIZAR', 'Visualizar agendamentos'),
-    ('AGENDAMENTO_GERENCIAR', 'Gerenciar agendamentos'),
-
-    ('PLANO_VISUALIZAR', 'Visualizar planos'),
-    ('PLANO_GERENCIAR', 'Gerenciar planos'),
-
-    ('ASSINATURA_VISUALIZAR', 'Visualizar assinaturas'),
-    ('ASSINATURA_GERENCIAR', 'Gerenciar assinaturas'),
-
-    ('COBRANCA_VISUALIZAR', 'Visualizar cobranças'),
-    ('COBRANCA_GERENCIAR', 'Gerenciar cobranças');
 
 -- =========================================================
--- 3. PERMISSÕES DO ADMINISTRADOR
+-- 3. PERMISSÕES
 -- =========================================================
 
-INSERT OR IGNORE INTO permissao_tipo_usuario (
+INSERT INTO permissao_usuario (chave, descricao)
+SELECT d.chave, d.descricao
+FROM (
+    SELECT 'USUARIO_VISUALIZAR' AS chave, 'Visualizar usuários' AS descricao
+    UNION ALL SELECT 'USUARIO_CADASTRAR', 'Cadastrar usuários'
+    UNION ALL SELECT 'USUARIO_EDITAR', 'Editar usuários'
+    UNION ALL SELECT 'USUARIO_EXCLUIR', 'Excluir usuários'
+
+    UNION ALL SELECT 'PRODUTO_VISUALIZAR', 'Visualizar produtos'
+    UNION ALL SELECT 'PRODUTO_CADASTRAR', 'Cadastrar produtos'
+    UNION ALL SELECT 'PRODUTO_EDITAR', 'Editar produtos'
+    UNION ALL SELECT 'PRODUTO_EXCLUIR', 'Excluir produtos'
+
+    UNION ALL SELECT 'SERVICO_VISUALIZAR', 'Visualizar serviços'
+    UNION ALL SELECT 'SERVICO_CADASTRAR', 'Cadastrar serviços'
+    UNION ALL SELECT 'SERVICO_EDITAR', 'Editar serviços'
+    UNION ALL SELECT 'SERVICO_EXCLUIR', 'Excluir serviços'
+
+    UNION ALL SELECT 'PEDIDO_VISUALIZAR', 'Visualizar pedidos'
+    UNION ALL SELECT 'PEDIDO_GERENCIAR', 'Gerenciar pedidos'
+
+    UNION ALL SELECT 'AGENDAMENTO_VISUALIZAR', 'Visualizar agendamentos'
+    UNION ALL SELECT 'AGENDAMENTO_GERENCIAR', 'Gerenciar agendamentos'
+
+    UNION ALL SELECT 'PLANO_VISUALIZAR', 'Visualizar planos'
+    UNION ALL SELECT 'PLANO_GERENCIAR', 'Gerenciar planos'
+
+    UNION ALL SELECT 'ASSINATURA_VISUALIZAR', 'Visualizar assinaturas'
+    UNION ALL SELECT 'ASSINATURA_GERENCIAR', 'Gerenciar assinaturas'
+
+    UNION ALL SELECT 'COBRANCA_VISUALIZAR', 'Visualizar cobranças'
+    UNION ALL SELECT 'COBRANCA_GERENCIAR', 'Gerenciar cobranças'
+) d
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM permissao_usuario pu
+    WHERE pu.chave = d.chave
+);
+
+
+-- =========================================================
+-- 4. PERMISSÕES DO ADMINISTRADOR
+-- =========================================================
+
+INSERT INTO permissao_tipo_usuario (
     id_tipo_usuario,
     id_permissao
 )
@@ -67,13 +121,20 @@ SELECT
     pu.id
 FROM tipo_usuario tu
 CROSS JOIN permissao_usuario pu
-WHERE tu.nome = 'Administrador';
+WHERE tu.tipo = 'ADMIN'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM permissao_tipo_usuario ptu
+      WHERE ptu.id_tipo_usuario = tu.id
+        AND ptu.id_permissao = pu.id
+  );
+
 
 -- =========================================================
--- 4. PERMISSÕES DO CLIENTE
+-- 5. PERMISSÕES DO CLIENTE
 -- =========================================================
 
-INSERT OR IGNORE INTO permissao_tipo_usuario (
+INSERT INTO permissao_tipo_usuario (
     id_tipo_usuario,
     id_permissao
 )
@@ -81,7 +142,7 @@ SELECT
     tu.id,
     pu.id
 FROM tipo_usuario tu
-JOIN permissao_usuario pu
+INNER JOIN permissao_usuario pu
     ON pu.chave IN (
         'PRODUTO_VISUALIZAR',
         'SERVICO_VISUALIZAR',
@@ -90,95 +151,77 @@ JOIN permissao_usuario pu
         'ASSINATURA_VISUALIZAR',
         'COBRANCA_VISUALIZAR'
     )
-WHERE tu.nome = 'Cliente';
+WHERE tu.tipo = 'CLIENTE'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM permissao_tipo_usuario ptu
+      WHERE ptu.id_tipo_usuario = tu.id
+        AND ptu.id_permissao = pu.id
+  );
+
 
 -- =========================================================
--- 5. CATEGORIAS
+-- 6. CATEGORIAS
 -- =========================================================
 
-INSERT OR IGNORE INTO categorias_produto (nome, descricao)
-VALUES
-    ('Alimentação', 'Rações e alimentos para cães e gatos'),
-    ('Petiscos', 'Petiscos e snacks para animais'),
-    ('Higiene', 'Produtos de higiene e limpeza'),
-    ('Brinquedos', 'Brinquedos e itens recreativos'),
-    ('Acessórios', 'Coleiras, guias, camas e acessórios'),
-    ('Saúde e Bem-estar', 'Produtos de cuidado e bem-estar'),
-    ('Transporte', 'Caixas de transporte e bolsas'),
-    ('Banho e Tosa', 'Serviços de banho e tosa'),
-    ('Cuidados Veterinários', 'Serviços e consultas veterinárias');
+INSERT INTO categorias_produto (nome, descricao)
+SELECT d.nome, d.descricao
+FROM (
+    SELECT 'Alimentação' AS nome, 'Rações e alimentos para cães e gatos' AS descricao
+    UNION ALL SELECT 'Petiscos', 'Petiscos e snacks para animais'
+    UNION ALL SELECT 'Higiene', 'Produtos de higiene e limpeza'
+    UNION ALL SELECT 'Brinquedos', 'Brinquedos e itens recreativos'
+    UNION ALL SELECT 'Acessórios', 'Coleiras, guias, camas e acessórios'
+    UNION ALL SELECT 'Saúde e Bem-estar', 'Produtos de cuidado e bem-estar'
+    UNION ALL SELECT 'Transporte', 'Caixas de transporte e bolsas'
+    UNION ALL SELECT 'Banho e Tosa', 'Serviços de banho e tosa'
+    UNION ALL SELECT 'Cuidados Veterinários', 'Serviços e consultas veterinárias'
+) d
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM categorias_produto cp
+    WHERE cp.nome = d.nome
+);
+
 
 -- =========================================================
--- 6. SITUAÇÕES
+-- 7. SITUAÇÕES
 -- =========================================================
 
-INSERT OR IGNORE INTO situacao (nome, tipo, descricao)
-VALUES
-    -- Agendamentos
-    (
-        'Aguardando confirmação',
-        'AGENDAMENTO',
-        'Aguardando confirmação do agendamento'
-    ),
-    (
-        'Confirmado',
-        'AGENDAMENTO',
-        'Agendamento confirmado'
-    ),
-    (
-        'Em andamento',
-        'AGENDAMENTO',
-        'Atendimento em andamento'
-    ),
-    (
-        'Concluído',
-        'AGENDAMENTO',
-        'Atendimento concluído'
-    ),
-    (
-        'Cancelado',
-        'AGENDAMENTO',
-        'Agendamento cancelado'
-    ),
+INSERT INTO situacao (nome, tipo, descricao)
+SELECT d.nome, d.tipo, d.descricao
+FROM (
+    SELECT
+        'Aguardando confirmação' AS nome,
+        'AGENDAMENTO' AS tipo,
+        'Aguardando confirmação do agendamento' AS descricao
 
-    -- Assinaturas
-    (
-        'Pendente',
-        'ASSINATURA',
-        'Assinatura aguardando confirmação'
-    ),
-    (
-        'Ativa',
-        'ASSINATURA',
-        'Assinatura ativa'
-    ),
-    (
-        'Inadimplente',
-        'ASSINATURA',
-        'Assinatura com cobrança em atraso'
-    ),
-    (
-        'Suspensa',
-        'ASSINATURA',
-        'Assinatura suspensa temporariamente'
-    ),
-    (
-        'Encerrada',
-        'ASSINATURA',
-        'Assinatura encerrada'
-    ),
-    (
-        'Cancelada',
-        'ASSINATURA',
-        'Assinatura cancelada'
-    );
+    UNION ALL SELECT 'Confirmado', 'AGENDAMENTO', 'Agendamento confirmado'
+    UNION ALL SELECT 'Em andamento', 'AGENDAMENTO', 'Atendimento em andamento'
+    UNION ALL SELECT 'Concluído', 'AGENDAMENTO', 'Atendimento concluído'
+    UNION ALL SELECT 'Cancelado', 'AGENDAMENTO', 'Agendamento cancelado'
+
+    UNION ALL SELECT 'Pendente', 'ASSINATURA', 'Assinatura aguardando confirmação'
+    UNION ALL SELECT 'Ativa', 'ASSINATURA', 'Assinatura ativa'
+    UNION ALL SELECT 'Inadimplente', 'ASSINATURA', 'Assinatura com cobrança em atraso'
+    UNION ALL SELECT 'Suspensa', 'ASSINATURA', 'Assinatura suspensa temporariamente'
+    UNION ALL SELECT 'Encerrada', 'ASSINATURA', 'Assinatura encerrada'
+    UNION ALL SELECT 'Cancelada', 'ASSINATURA', 'Assinatura cancelada'
+) d
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM situacao s
+    WHERE s.nome = d.nome
+      AND s.tipo = d.tipo
+);
+
 
 -- =========================================================
--- 7. PRODUTOS
+-- 8. PRODUTOS
 -- Valores em centavos
 -- =========================================================
 
-INSERT OR IGNORE INTO produtos (
+INSERT INTO produtos (
     id_categoria_produto,
     nome,
     descricao,
@@ -189,11 +232,11 @@ INSERT OR IGNORE INTO produtos (
 )
 SELECT
     cp.id,
-    dados.nome,
-    dados.descricao,
-    dados.preco,
-    dados.estoque,
-    dados.imagem,
+    d.nome,
+    d.descricao,
+    d.preco,
+    d.estoque,
+    d.imagem,
     u.id
 FROM (
     SELECT
@@ -269,147 +312,191 @@ FROM (
         'Escova para Pelos',
         'Escova para cuidados com a pelagem',
         2590, 12, NULL
+) d
+INNER JOIN categorias_produto cp
+    ON cp.nome = d.categoria
+INNER JOIN usuarios u
+    ON u.email = 'admin@pataquada.com.br'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM produtos p
+    WHERE p.nome = d.nome
+      AND p.id_categoria_produto = cp.id
+);
 
-) AS dados
-
-JOIN categorias_produto cp
-    ON cp.nome = dados.categoria
-
-JOIN usuarios u
-    ON u.email = 'admin@pataquada.com.br';
 
 -- =========================================================
--- 8. SERVIÇOS
--- Duração em minutos e preço em centavos
+-- 9. PET-CARE / SERVIÇOS
+-- Valores em centavos
+-- Duração em minutos
 -- =========================================================
 
-INSERT OR IGNORE INTO servicos (
+INSERT INTO servicos (
     id_categoria_produto,
     nome,
     descricao,
     preco,
     duracao_media,
+    imagem,
     id_usuario_cadastro
 )
 SELECT
     cp.id,
-    dados.nome,
-    dados.descricao,
-    dados.preco,
-    dados.duracao,
+    d.nome,
+    d.descricao,
+    d.preco,
+    d.duracao_media,
+    NULL,
     u.id
 FROM (
     SELECT
         'Banho e Tosa' AS categoria,
-        'Banho para Cães Pequenos' AS nome,
-        'Banho completo para cães de pequeno porte' AS descricao,
-        5000 AS preco,
-        60 AS duracao
+        'Banho' AS nome,
+        'Banho completo com produtos adequados ao tipo de pelo e porte do pet.' AS descricao,
+        4500 AS preco,
+        60 AS duracao_media
 
     UNION ALL SELECT
         'Banho e Tosa',
-        'Banho para Cães Médios',
-        'Banho completo para cães de médio porte',
-        7000, 75
-
-    UNION ALL SELECT
-        'Banho e Tosa',
-        'Banho para Cães Grandes',
-        'Banho completo para cães de grande porte',
-        9000, 90
+        'Banho Premium',
+        'Banho especial com produtos premium, hidratação e finalização dos pelos.',
+        7500, 90
 
     UNION ALL SELECT
         'Banho e Tosa',
         'Tosa Higiênica',
-        'Tosa higiênica para cães',
-        4000, 45
+        'Remoção dos pelos em regiões que exigem maior cuidado com a higiene.',
+        3500, 40
 
     UNION ALL SELECT
         'Banho e Tosa',
         'Tosa Completa',
-        'Tosa completa para cães',
+        'Tosa realizada conforme o padrão desejado e as características do pet.',
         6500, 60
 
     UNION ALL SELECT
         'Banho e Tosa',
-        'Banho para Gatos',
-        'Banho especializado para gatos',
-        8000, 60
+        'Hidratação dos Pelos',
+        'Tratamento para hidratação e recuperação dos pelos.',
+        4000, 30
+
+    UNION ALL SELECT
+        'Banho e Tosa',
+        'Escovação de Pelos',
+        'Escovação para remoção de pelos soltos e prevenção de nós.',
+        2500, 30
+
+    UNION ALL SELECT
+        'Banho e Tosa',
+        'Corte de Unhas',
+        'Corte cuidadoso das unhas para manter o conforto e a mobilidade do pet.',
+        2000, 15
+
+    UNION ALL SELECT
+        'Banho e Tosa',
+        'Limpeza de Ouvidos',
+        'Higienização externa dos ouvidos com produtos apropriados.',
+        2000, 15
 
     UNION ALL SELECT
         'Cuidados Veterinários',
-        'Consulta Veterinária',
-        'Consulta veterinária geral',
-        12000, 60
+        'Avaliação de Saúde',
+        'Avaliação básica das condições gerais de saúde do pet.',
+        8000, 30
 
     UNION ALL SELECT
         'Cuidados Veterinários',
-        'Avaliação Veterinária',
-        'Avaliação geral do animal',
-        10000, 45
+        'Acompanhamento Preventivo',
+        'Acompanhamento periódico para monitoramento da saúde e bem-estar do pet.',
+        10000, 30
+) d
+INNER JOIN categorias_produto cp
+    ON cp.nome = d.categoria
+INNER JOIN usuarios u
+    ON u.email = 'admin@pataquada.com.br'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM servicos s
+    WHERE s.nome = d.nome
+      AND s.id_categoria_produto = cp.id
+);
 
-) AS dados
-
-JOIN categorias_produto cp
-    ON cp.nome = dados.categoria
-
-JOIN usuarios u
-    ON u.email = 'admin@pataquada.com.br';
 
 -- =========================================================
--- 9. TIPOS DE CONSULTA
+-- 10. TIPOS DE CONSULTA
 -- Valores em centavos
+-- Duração em minutos
 -- =========================================================
 
-INSERT OR IGNORE INTO tipos_consulta (
+INSERT INTO tipos_consulta (
     id_categoria_produto,
     nome,
     descricao,
     preco_minimo,
     preco_maximo,
+    duracao_media,
     id_usuario_cadastro
 )
 SELECT
     cp.id,
-    dados.nome,
-    dados.descricao,
-    dados.preco_minimo,
-    dados.preco_maximo,
+    d.nome,
+    d.descricao,
+    d.preco_minimo,
+    d.preco_maximo,
+    d.duracao_media,
     u.id
 FROM (
     SELECT
-        'Cuidados Veterinários' AS categoria,
         'Consulta Geral' AS nome,
-        'Consulta veterinária geral' AS descricao,
+        'Avaliação clínica geral do pet, incluindo análise do histórico, exame físico e orientações.' AS descricao,
         10000 AS preco_minimo,
-        18000 AS preco_maximo
+        18000 AS preco_maximo,
+        40 AS duracao_media
 
     UNION ALL SELECT
-        'Cuidados Veterinários',
         'Consulta de Retorno',
-        'Retorno para acompanhamento veterinário',
-        0, 10000
+        'Reavaliação do pet após consulta ou tratamento anterior.',
+        0, 10000, 20
 
     UNION ALL SELECT
-        'Cuidados Veterinários',
         'Avaliação Preventiva',
-        'Avaliação preventiva do animal',
-        8000, 15000
+        'Avaliação periódica para prevenção de doenças e acompanhamento da saúde.',
+        8000, 15000, 30
 
-) AS dados
+    UNION ALL SELECT
+        'Consulta Dermatológica',
+        'Avaliação de problemas de pele, pelos, alergias, coceiras e irritações.',
+        15000, 25000, 40
 
-JOIN categorias_produto cp
-    ON cp.nome = dados.categoria
+    UNION ALL SELECT
+        'Consulta Geriátrica',
+        'Acompanhamento de pets idosos, com foco na prevenção e controle de alterações relacionadas à idade.',
+        15000, 25000, 45
 
-JOIN usuarios u
-    ON u.email = 'admin@pataquada.com.br';
+    UNION ALL SELECT
+        'Consulta Nutricional',
+        'Avaliação alimentar e orientação nutricional conforme idade, porte e necessidades do pet.',
+        10000, 18000, 30
+) d
+INNER JOIN categorias_produto cp
+    ON cp.nome = 'Cuidados Veterinários'
+INNER JOIN usuarios u
+    ON u.email = 'admin@pataquada.com.br'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM tipos_consulta tc
+    WHERE tc.nome = d.nome
+      AND tc.id_categoria_produto = cp.id
+);
+
 
 -- =========================================================
--- 10. PLANOS DE ASSINATURA
+-- 11. PLANOS DE ASSINATURA
 -- Valores em centavos
+-- Cobrança recorrente mensal
 -- =========================================================
 
-INSERT OR IGNORE INTO plano (
+INSERT INTO plano (
     id_categoria_produto,
     nome,
     descricao,
@@ -418,80 +505,165 @@ INSERT OR IGNORE INTO plano (
     intervalo_cobranca_meses,
     duracao_meses,
     permite_renovacao,
+    imagem,
     id_usuario_cadastro
 )
 SELECT
     cp.id,
-    dados.nome,
-    dados.descricao,
-    dados.preco,
-    dados.tipo_cobranca,
-    dados.intervalo_cobranca_meses,
-    dados.duracao_meses,
-    dados.permite_renovacao,
+    d.nome,
+    d.descricao,
+    d.preco,
+    'RECORRENTE',
+    1,
+    NULL,
+    1,
+    NULL,
     u.id
 FROM (
     SELECT
-        'Saúde e Bem-estar' AS categoria,
-        'Plano Essencial' AS nome,
-        'Plano básico de benefícios para pets' AS descricao,
-        2990 AS preco,
-        'RECORRENTE' AS tipo_cobranca,
-        1 AS intervalo_cobranca_meses,
-        NULL AS duracao_meses,
-        1 AS permite_renovacao
+        'Essencial' AS nome,
+        'Plano de entrada para quem deseja manter os cuidados básicos do pet em dia. Inclui benefícios e condições especiais nos serviços participantes.' AS descricao,
+        2990 AS preco
 
     UNION ALL SELECT
-        'Saúde e Bem-estar',
-        'Plano Plus',
-        'Plano intermediário de benefícios para pets',
-        4990,
-        'RECORRENTE',
-        1,
-        NULL,
-        1
+        'Plus',
+        'Plano intermediário com benefícios ampliados, descontos em serviços de banho e tosa e condições especiais para consultas.',
+        4990
 
     UNION ALL SELECT
-        'Saúde e Bem-estar',
-        'Plano Premium',
-        'Plano completo de benefícios para pets',
-        7990,
-        'RECORRENTE',
-        1,
-        NULL,
-        1
+        'Premium',
+        'Plano completo com benefícios diferenciados, descontos ampliados e vantagens nos serviços e cuidados veterinários participantes.',
+        7990
+) d
+INNER JOIN categorias_produto cp
+    ON cp.nome = 'Saúde e Bem-estar'
+INNER JOIN usuarios u
+    ON u.email = 'admin@pataquada.com.br'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM plano p
+    WHERE p.nome = d.nome
+      AND p.id_categoria_produto = cp.id
+);
 
-) AS dados
 
-JOIN categorias_produto cp
-    ON cp.nome = dados.categoria
-
-JOIN usuarios u
-    ON u.email = 'admin@pataquada.com.br';
+-- =========================================================
+-- 12. FINALIZAÇÃO DA TRANSAÇÃO
+-- =========================================================
 
 COMMIT;
+--RETURN;
 
 -- =========================================================
--- 11. CONSULTA DOS DADOS INSERIDOS
+-- 13. CONFERÊNCIA DOS DADOS
 -- =========================================================
+/*
+-- Administrador
+SELECT
+    u.id,
+    u.nome,
+    u.sobrenome,
+    u.email,
+    u.usuario,
+    tu.nome AS tipo_usuario
+FROM usuarios u
+INNER JOIN tipo_usuario tu
+    ON tu.id = u.id_tipo_usuario
+WHERE u.email = 'admin@pataquada.com.br';
 
-SELECT * FROM tipo_usuario;
 
-SELECT * FROM permissao_usuario;
+-- Tipos de usuário
+SELECT *
+FROM tipo_usuario;
 
-SELECT * FROM permissao_tipo_usuario;
 
-SELECT * FROM categorias_produto;
+-- Permissões
+SELECT *
+FROM permissao_usuario;
 
-SELECT * FROM situacao;
 
-SELECT * FROM produtos;
+-- Permissões por tipo de usuário
+SELECT
+    tu.nome AS tipo_usuario,
+    pu.chave AS permissao,
+    pu.descricao
+FROM permissao_tipo_usuario ptu
+INNER JOIN tipo_usuario tu
+    ON tu.id = ptu.id_tipo_usuario
+INNER JOIN permissao_usuario pu
+    ON pu.id = ptu.id_permissao
+ORDER BY tu.nome, pu.chave;
 
-SELECT * FROM servicos;
 
-SELECT * FROM tipos_consulta;
+-- Categorias
+SELECT *
+FROM categorias_produto;
 
-SELECT * FROM plano;
+
+-- Situações
+SELECT *
+FROM situacao;
+
+
+-- Produtos
+SELECT
+    p.id,
+    p.nome,
+    p.descricao,
+    p.preco,
+    p.estoque,
+    cp.nome AS categoria
+FROM produtos p
+INNER JOIN categorias_produto cp
+    ON cp.id = p.id_categoria_produto
+ORDER BY cp.nome, p.nome;
+
+
+-- Serviços / Pet-care
+SELECT
+    s.id,
+    s.nome,
+    s.descricao,
+    s.preco,
+    s.duracao_media,
+    cp.nome AS categoria
+FROM servicos s
+INNER JOIN categorias_produto cp
+    ON cp.id = s.id_categoria_produto
+ORDER BY cp.nome, s.nome;
+
+
+-- Consultas
+SELECT
+    tc.id,
+    tc.nome,
+    tc.descricao,
+    tc.preco_minimo,
+    tc.preco_maximo,
+    tc.duracao_media,
+    cp.nome AS categoria
+FROM tipos_consulta tc
+INNER JOIN categorias_produto cp
+    ON cp.id = tc.id_categoria_produto
+ORDER BY tc.nome;
+
+
+-- Planos
+SELECT
+    p.id,
+    p.nome,
+    p.descricao,
+    p.preco,
+    p.tipo_cobranca,
+    p.intervalo_cobranca_meses,
+    p.duracao_meses,
+    p.permite_renovacao,
+    cp.nome AS categoria
+FROM plano p
+INNER JOIN categorias_produto cp
+    ON cp.id = p.id_categoria_produto
+ORDER BY p.preco;
+*/
 
 -- =========================================================
 -- FIM DA CARGA INICIAL
