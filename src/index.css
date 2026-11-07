@@ -32,6 +32,16 @@
     --raio-padrao: 16px;
     --transicao-padrao: 0.2s ease;
 
+    /* Tipografia adicional da página de serviços */
+    --fonte-tamanho-intermediario: 20px;
+    --fonte-tamanho-destaque: 30px;
+    --fonte-tamanho-icone-grande: 23px;
+    --fonte-tamanho-legenda: 11px;
+    --fonte-tamanho-card-titulo: 20px;
+    --fonte-tamanho-coracao: 27px;
+    --fonte-tamanho-subtitulo: 18px;
+    --fonte-tamanho-micro: 9px;
+
     #root {
         min-height: 100vh;
         min-height: 100dvh;
@@ -494,3 +504,4 @@ select {
         font-size: 11px;
     }
 }
+
