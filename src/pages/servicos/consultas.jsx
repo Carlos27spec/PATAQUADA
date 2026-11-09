@@ -1,9 +1,8 @@
-
-import { Link } from 'react-router-dom'
 import { useDadosPagina } from './servicos.js'
 import './servicos.css'
 
 import patinha from '../../assets/paw.png'
+import veterinaria from '../../assets/veterinaria-consultas.png'
 
 function Consultas() {
     const { dados, carregando, erro } = useDadosPagina('consultas')
@@ -11,19 +10,111 @@ function Consultas() {
     return (
         <section className="servicos-conteudo">
 
-            <div className="servicos-apresentacao">
+            {/* APRESENTAÇÃO PRINCIPAL */}
+            <div className="consultas-hero">
 
-                <div className="apresentacao-texto">
-                    <h1>Consultas</h1>
+                <img
+                    src={patinha}
+                    alt=""
+                    className="consultas-hero-patinha"
+                />
+
+                <div className="consultas-hero-texto">
+                    <h1>Consultas Veterinárias</h1>
+
                     <p>
-                        Cuidado e atenção para a saúde do seu melhor amigo.
+                        Na PataQuada, a saúde do seu pet
+                        <br />
+                        vem em primeiro lugar.
                     </p>
                 </div>
 
-                <span className="apresentacao-coracao">♡</span>
+                {/* patinha grande atrás da veterinária */}
+                <img
+                    src={patinha}
+                    alt=""
+                    className="consultas-hero-patona"
+                />
+
+                <img
+                    src={veterinaria}
+                    alt="Atendimento veterinário"
+                    className="consultas-hero-imagem"
+                />
 
             </div>
 
+
+            {/* BENEFÍCIOS */}
+            <div className="consultas-beneficios">
+
+                <div className="beneficio-item">
+                    <span className="beneficio-icone beneficio-check">
+                        ✓
+                    </span>
+
+                    <p>
+                        Atendimento
+                        <br />
+                        de qualidade
+                    </p>
+                </div>
+
+                <div className="beneficio-item">
+                    <img src={patinha} alt="" />
+
+                    <p>
+                        Diagnóstico
+                        <br />
+                        preciso
+                    </p>
+                </div>
+
+                <div className="beneficio-item">
+                    <span className="beneficio-icone beneficio-coracao">
+                        ♥
+                    </span>
+
+                    <p>
+                        Mais saúde e
+                        <br />
+                        bem-estar
+                    </p>
+                </div>
+
+                <div className="beneficio-item">
+                    <span className="beneficio-icone beneficio-relogio">
+                        ◷
+                    </span>
+
+                    <p>
+                        Agendamento
+                        <br />
+                        fácil e rápido
+                    </p>
+                </div>
+
+            </div>
+
+
+            {/* TÍTULO DOS TIPOS DE CONSULTA */}
+            <div className="consultas-titulo-secao">
+
+                <img src={patinha} alt="" />
+
+                <div>
+                    <h2>Nossos tipos de consulta</h2>
+
+                    <p>
+                        Cuidados de cada fase da vida do seu pet,
+                        com atenção e carinho!
+                    </p>
+                </div>
+
+            </div>
+
+
+            {/* MENSAGENS */}
             {carregando && (
                 <p className="servicos-mensagem">
                     Carregando consultas...
@@ -42,6 +133,8 @@ function Consultas() {
                 </p>
             )}
 
+
+            {/* CARDS DAS CONSULTAS */}
             {!carregando && !erro && dados.length > 0 && (
                 <div className="servicos-grid">
 
@@ -70,6 +163,7 @@ function Consultas() {
                                 <div>
                                     <span>◷</span>
                                     <small>Duração média:</small>
+
                                     <strong>
                                         {consulta.duracaoFormatada}
                                     </strong>
@@ -77,6 +171,7 @@ function Consultas() {
 
                                 <div>
                                     <small>Valor:</small>
+
                                     <strong>
                                         {consulta.precoFormatado}
                                     </strong>
@@ -84,12 +179,14 @@ function Consultas() {
 
                             </div>
 
-                            <Link
-                                to={`/agendamento?consulta=${consulta.id}`}
+                            <a
+                                href={consulta.whatsappUrl || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="btn servico-agendar"
                             >
                                 Agendar consulta →
-                            </Link>
+                            </a>
 
                         </article>
                     ))}
@@ -97,6 +194,8 @@ function Consultas() {
                 </div>
             )}
 
+
+            {/* CHAMADA FINAL */}
             <section className="servicos-chamada">
 
                 <img
@@ -107,6 +206,7 @@ function Consultas() {
 
                 <div>
                     <h2>A saúde do seu pet merece atenção!</h2>
+
                     <p>
                         Agende uma consulta e conte com profissionais
                         preparados para cuidar dele.

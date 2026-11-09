@@ -55,8 +55,6 @@ const IMAGENS_PADRAO = {
     ]),
 
     consultas: localizarImagem([
-        'consulta',
-        'veterin',
         'medico',
         'medica',
         'estetoscopio'
@@ -119,25 +117,51 @@ function formatarDuracao(minutos) {
     return `${restante}min`;
 }
 
-// Faixa de preços das consultas.
+// ========================================
+// FORMATAÇÃO DE PREÇO DAS CONSULTAS
+// ========================================
 
-function formatarFaixaPreco(minimo, maximo) {
+// Considera preço fixo ou faixa de preços.
+
+function formatarPrecoConsulta(item) {
+
+    // Preço fixo
+    if (
+        item.preco_fixo !== null &&
+        item.preco_fixo !== undefined &&
+        item.preco_fixo !== ''
+    ) {
+        return formatarPreco(item.preco_fixo);
+    }
+
+    const minimo = item.preco_minimo;
+    const maximo = item.preco_maximo;
+
+    // Nenhum preço informado
     if (minimo == null && maximo == null) {
         return 'Não informado';
     }
 
+    // Somente preço máximo
     if (minimo == null) {
         return `Até ${formatarPreco(maximo)}`;
     }
 
-    if (maximo == null || Number(minimo) === Number(maximo)) {
+    // Valores iguais: preço único
+    if (
+        maximo == null ||
+        Number(minimo) === Number(maximo)
+    ) {
         return formatarPreco(minimo);
     }
 
+    // Faixa de preços
     return `${formatarPreco(minimo)} até ${formatarPreco(maximo)}`;
 }
 
-// Cobrança dos planos.
+// ========================================
+// COBRANÇA DOS PLANOS
+// ========================================
 
 function formatarCobranca(plano) {
     if (plano.tipo_cobranca === 'UNICA') {
@@ -155,6 +179,61 @@ function formatarCobranca(plano) {
     }
 
     return `A cada ${intervalo} meses`;
+}
+
+// Texto exibido ao lado do preço (ex.: "R$ 89,90 /mês").
+
+function formatarPeriodoPreco(plano) {
+    if (plano.tipo_cobranca === 'UNICA') {
+        return '';
+    }
+
+    const intervalo = Number(plano.intervalo_cobranca_meses || 1);
+
+    if (intervalo === 1) {
+        return '/mês';
+    }
+
+    if (intervalo === 12) {
+        return '/ano';
+    }
+
+    return `/${intervalo} meses`;
+}
+
+// Benefícios do plano: aceita lista (array ou JSON)
+// ou texto separado por quebra de linha ou ponto e vírgula.
+
+function normalizarBeneficios(valor) {
+    let lista = valor;
+
+    if (typeof lista === 'string') {
+        const texto = lista.trim();
+
+        if (texto.startsWith('[')) {
+            try {
+                lista = JSON.parse(texto);
+            } catch {
+                lista = texto;
+            }
+        }
+    }
+
+    if (typeof lista === 'string') {
+        lista = lista.split(/\r?\n|;/);
+    }
+
+    if (!Array.isArray(lista)) {
+        return [];
+    }
+
+    return lista
+        .map(item =>
+            typeof item === 'string'
+                ? item.trim()
+                : item?.descricao || item?.nome || ''
+        )
+        .filter(Boolean);
 }
 
 // ========================================
@@ -250,6 +329,10 @@ function tratarServico(item) {
 // ========================================
 
 function tratarPlano(item) {
+    // Plano marcado como "Mais escolhido" (se a API enviar).
+    // Sem o campo, a página destaca o plano do meio.
+    const marcado = item.destaque ?? item.mais_escolhido;
+
     return {
         ...item,
         id: item.id,
@@ -258,9 +341,17 @@ function tratarPlano(item) {
         imagem: item.imagem || IMAGENS_PADRAO.planos,
         precoFormatado: formatarPreco(item.preco),
         cobrancaFormatada: formatarCobranca(item),
+        periodoPreco: formatarPeriodoPreco(item),
         duracaoFormatada: item.duracao_meses
             ? `${item.duracao_meses} meses`
-            : 'Sem prazo definido'
+            : 'Sem prazo definido',
+        beneficios: normalizarBeneficios(
+            item.beneficios ?? item.vantagens
+        ),
+        destaque:
+            marcado === null || marcado === undefined
+                ? undefined
+                : Boolean(Number(marcado))
     };
 }
 
@@ -274,10 +365,10 @@ function tratarConsulta(item) {
         id: item.id,
         nome: item.nome,
         descricao: item.descricao || 'Atendimento especializado para seu pet.',
-        precoFormatado: formatarFaixaPreco(
-            item.preco_minimo,
-            item.preco_maximo
-        ),
+
+        // Aceita preço fixo ou faixa de preços.
+        precoFormatado: formatarPrecoConsulta(item),
+
         duracaoFormatada: formatarDuracao(item.duracao_media),
 
         // A tabela tipos_consulta não possui coluna imagem.

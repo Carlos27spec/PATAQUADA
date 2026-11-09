@@ -1,9 +1,75 @@
-
 import { Link } from 'react-router-dom'
 import { useDadosPagina } from './servicos.js'
 import './servicos.css'
 
 import patinha from '../../assets/paw.png'
+
+/* ========================================
+   ÍCONES (SVG inline, herdam a cor do CSS)
+======================================== */
+
+function IconeRelogio() {
+    return (
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+            <circle
+                cx="24"
+                cy="24"
+                r="20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+            />
+            <path
+                d="M24 12v13l8 5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    )
+}
+
+function IconeMoeda() {
+    return (
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+            <circle cx="24" cy="24" r="22" fill="currentColor" />
+            <text
+                className="cifrao"
+                x="24"
+                y="33"
+                textAnchor="middle"
+                fontSize="28"
+                fontWeight="700"
+                fontFamily="Arial, sans-serif"
+            >
+                $
+            </text>
+        </svg>
+    )
+}
+
+function IconeCalendario() {
+    return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="4" />
+            <circle className="furo" cx="8" cy="9" r="1.4" />
+            <circle className="furo" cx="12" cy="9" r="1.4" />
+            <circle className="furo" cx="16" cy="9" r="1.4" />
+            <circle className="furo" cx="8" cy="13" r="1.4" />
+            <circle className="furo" cx="12" cy="13" r="1.4" />
+            <circle className="furo" cx="16" cy="13" r="1.4" />
+            <circle className="furo" cx="8" cy="17" r="1.4" />
+            <circle className="furo" cx="12" cy="17" r="1.4" />
+            <circle className="furo" cx="16" cy="17" r="1.4" />
+        </svg>
+    )
+}
+
+/* ========================================
+   PÁGINA
+======================================== */
 
 function PetCare() {
     const { dados, carregando, erro } = useDadosPagina('servicos')
@@ -14,16 +80,34 @@ function PetCare() {
     return (
         <section className="servicos-conteudo">
 
+            {/* APRESENTAÇÃO PRINCIPAL */}
             <div className="servicos-apresentacao">
 
+                <img
+                    src={patinha}
+                    alt=""
+                    className="apresentacao-patinha"
+                />
+
                 <div className="apresentacao-texto">
-                    <h1>Pet Care</h1>
-                    <p>Todo cuidado que seu pet merece, em um só lugar.</p>
+                    <h1>
+                        Cuidados para o seu pet
+                        <img src={patinha} alt="" />
+                    </h1>
+
+                    <p>
+                        Todo cuidado que seu pet
+                        <br />
+                        merece, em um só lugar.
+                    </p>
                 </div>
 
                 <span className="apresentacao-coracao">♡</span>
+
             </div>
 
+
+            {/* MENSAGENS */}
             {carregando && (
                 <p className="servicos-mensagem">
                     Carregando serviços...
@@ -42,61 +126,84 @@ function PetCare() {
                 </p>
             )}
 
+
             {!carregando && !erro && servicoPrincipal && (
                 <>
-                    <article className="servico-destaque">
+                    {/* SERVIÇO PRINCIPAL */}
+                    <div className="servico-destaque-wrap">
 
-                        <div className="destaque-imagem">
-                            <img
-                                src={servicoPrincipal.imagem || patinha}
-                                alt={servicoPrincipal.nome}
-                            />
-                        </div>
+                        <article className="servico-destaque">
 
-                        <div className="destaque-conteudo">
-
-                            <h2>
-                                <img src={patinha} alt="" />
-                                {servicoPrincipal.nome}
-                            </h2>
-
-                            <p>{servicoPrincipal.descricao}</p>
-
-                            <div className="destaque-informacoes">
-
-                                <div>
-                                    <span>◷</span>
-                                    <small>Duração média:</small>
-                                    <strong>
-                                        {servicoPrincipal.duracaoFormatada}
-                                    </strong>
-                                </div>
-
-                                <div>
-                                    <small>Valor:</small>
-                                    <strong>
-                                        {servicoPrincipal.precoFormatado}
-                                    </strong>
-                                </div>
-
+                            <div className="destaque-imagem">
+                                <img
+                                    src={servicoPrincipal.imagem || patinha}
+                                    alt={servicoPrincipal.nome}
+                                />
                             </div>
 
-                            <Link
-                                to={`/agendamento?servico=${servicoPrincipal.id}`}
-                                className="btn servico-agendar"
-                            >
-                                Agendar serviço →
-                            </Link>
+                            <div className="destaque-conteudo">
 
-                        </div>
-                    </article>
+                                <h2>
+                                    <img src={patinha} alt="" />
+                                    {servicoPrincipal.nome}
+                                </h2>
 
+                                <p>{servicoPrincipal.descricao}</p>
+
+                                <div className="destaque-informacoes">
+
+                                    <div>
+                                        <span className="info-icone">
+                                            <IconeRelogio />
+                                        </span>
+                                        <small>Duração média:</small>
+                                        <strong>
+                                            {servicoPrincipal.duracaoFormatada}
+                                        </strong>
+                                    </div>
+
+                                    <div>
+                                        <span className="info-icone">
+                                            <IconeMoeda />
+                                        </span>
+                                        <small>A partir de:</small>
+                                        <strong>
+                                            {servicoPrincipal.precoFormatado}
+                                        </strong>
+                                    </div>
+
+                                </div>
+
+                                <a
+                                    href={servicoPrincipal.whatsappUrl || '#'}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn servico-agendar"
+                                >
+                                    <IconeCalendario />
+                                    Agendar Serviço →
+                                </a>
+
+                            </div>
+                        </article>
+
+                        {/* patinha pendurada no canto do card */}
+                        <img
+                            src={patinha}
+                            alt=""
+                            className="servico-destaque-patinha"
+                        />
+
+                    </div>
+
+
+                    {/* DEMAIS SERVIÇOS */}
                     {outrosServicos.length > 0 && (
                         <div className="servicos-grid">
 
                             {outrosServicos.map(servico => (
                                 <article
-                                    className="servico-card"
+                                    className="servico-card petcare-card"
                                     key={servico.id}
                                 >
 
@@ -114,10 +221,12 @@ function PetCare() {
 
                                     <p>{servico.descricao}</p>
 
-                                    <div className="card-informacoes">
+                                    <div className="card-informacoes card-informacoes--icones">
 
                                         <div>
-                                            <span>◷</span>
+                                            <span className="info-icone">
+                                                <IconeRelogio />
+                                            </span>
                                             <small>Duração média:</small>
                                             <strong>
                                                 {servico.duracaoFormatada}
@@ -125,7 +234,10 @@ function PetCare() {
                                         </div>
 
                                         <div>
-                                            <small>Valor:</small>
+                                            <span className="info-icone">
+                                                <IconeMoeda />
+                                            </span>
+                                            <small>A partir de:</small>
                                             <strong>
                                                 {servico.precoFormatado}
                                             </strong>
@@ -133,12 +245,15 @@ function PetCare() {
 
                                     </div>
 
-                                    <Link
-                                        to={`/agendamento?servico=${servico.id}`}
+                                    <a
+                                        href={servico.whatsappUrl || '#'}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="btn servico-agendar"
                                     >
-                                        Agendar serviço →
-                                    </Link>
+                                        <IconeCalendario />
+                                        Agendar Serviço →
+                                    </a>
 
                                 </article>
                             ))}
@@ -148,6 +263,8 @@ function PetCare() {
                 </>
             )}
 
+
+            {/* CHAMADA FINAL */}
             <section className="servicos-chamada">
 
                 <img
@@ -169,6 +286,7 @@ function PetCare() {
                 </Link>
 
                 <span className="chamada-coracao">♡</span>
+                <span className="chamada-coracao chamada-coracao-2">♡</span>
 
             </section>
 

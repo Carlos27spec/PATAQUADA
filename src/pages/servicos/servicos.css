@@ -1,1233 +1,1482 @@
 /* ========================================
-
    SERVIÇOS - PATAQUADA
-
 ======================================== */
 
 .pagina-servicos {
-
     width: 100%;
-
     min-width: 0;
-
     box-sizing: border-box;
 
+    /* única cor que não existe no css principal:
+       caixa clara dentro dos cards de planos */
+    --cor-claro: #FCF2E3;
 }
 
 .pagina-servicos *,
-
 .pagina-servicos *::before,
-
 .pagina-servicos *::after {
-
     box-sizing: border-box;
-
 }
 
 /* ========================================
-
    SUBMENU
-
 ======================================== */
 
 .servicos-submenu {
-
     display: flex;
-
     justify-content: center;
-
     align-items: stretch;
-
     gap: 45px;
-
     min-height: 52px;
-
     width: 100%;
-
     padding-top: 5px;
-
-    background-color: var(--cor-bege);
-
+    background-color: var(--cor-creme);
 }
 
 .servicos-submenu a {
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     gap: 9px;
-
     padding: 11px 24px 12px;
-
     margin-bottom: 0;
-
     color: var(--cor-marrom);
-
     font-family: var(--fonte-titulo);
-
     font-size: 19px;
-
     font-weight: 600;
-
     text-decoration: none;
-
     border-radius: 15px 15px 0 0;
-
-    transition:
-
-        background-color 0.25s ease,
-
-        color 0.25s ease;
-
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Hover */
-
-.servicos-submenu a:hover {
-
-    background-color: var(--cor-creme);
-
-    color: var(--cor-laranja);
-
-}
-
-/* Página selecionada */
-
-.servicos-submenu a.ativo {
-
-    background-color: var(--cor-creme);
-
-    color: var(--cor-laranja);
-
-}
-
-/* Hover da página selecionada */
-
+.servicos-submenu a:hover,
+.servicos-submenu a.ativo,
 .servicos-submenu a.ativo:hover {
-
-    background-color: var(--cor-creme);
-
+    background-color: var(--cor-bege);
     color: var(--cor-laranja);
-
 }
-
-/* Ícones do submenu */
 
 .servicos-submenu a i {
-
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
-
     font-size: 21px;
-
     color: inherit;
-
     flex-shrink: 0;
-
 }
 
 .submenu-patinha {
-
     width: 19px;
-
     height: 19px;
-
     object-fit: contain;
-
     transform: rotate(25deg);
-
     flex-shrink: 0;
-
 }
 
 /* ========================================
-
    CONTEÚDO
-
 ======================================== */
 
 .servicos-conteudo {
-
     width: 100%;
-
     max-width: 1150px;
-
     margin: 0 auto;
-
     padding: 0 18px 25px;
-
     min-width: 0;
-
 }
 
-/* Fundo contínuo da área de conteúdo */
-
 .pagina-servicos {
-
-    background-color: var(--cor-creme);
-
+    background-color: var(--cor-bege);
 }
 
 /* ========================================
-
    APRESENTAÇÃO
-
 ======================================== */
 
 .servicos-apresentacao {
-
+    position: relative;
     display: flex;
-
     align-items: center;
-
-    justify-content: space-between;
-
-    gap: 12px;
-
+    justify-content: center;
     width: 100%;
-
-    min-height: 95px;
-
-    padding: 20px 35px;
-
+    min-height: 170px;
+    padding: 30px 140px 15px;
     text-align: center;
-
 }
 
 .apresentacao-patinha {
-
-    width: 28px;
-
-    height: 28px;
-
+    position: absolute;
+    top: 28px;
+    left: 70px;
+    width: 90px;
+    height: 90px;
     object-fit: contain;
-
-    flex-shrink: 0;
-
+    transform: rotate(-15deg);
 }
 
 .apresentacao-texto {
-
     flex: 1;
-
     min-width: 0;
-
 }
 
 .apresentacao-texto h1 {
-
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
     font-family: var(--fonte-titulo);
+    font-size: 42px;
+    line-height: 1.15;
+    margin: 0 0 12px;
+    color: var(--cor-preto);
+}
 
-    font-size: 25px;
-
-    margin: 0 0 5px;
-
-    color: var(--cor-marrom);
-
+.apresentacao-texto h1 img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    flex-shrink: 0;
+    transform: rotate(15deg);
 }
 
 .apresentacao-texto p {
-
-    font-size: 15px;
-
-    line-height: 1.4;
-
+    font-size: 24px;
+    line-height: 1.3;
     margin: 0;
-
-    color: var(--cor-marrom);
-
+    color: var(--cor-preto);
 }
 
 .apresentacao-coracao {
-
-    font-size: 30px;
-
-    color: var(--cor-laranja);
-
-    transform: rotate(-15deg);
-
-    flex-shrink: 0;
-
+    position: absolute;
+    top: 30px;
+    right: 90px;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--cor-preto);
+    transform: rotate(12deg);
 }
 
 /* ========================================
-
    MENSAGENS
-
 ======================================== */
 
 .servicos-mensagem {
-
     width: 100%;
-
     padding: 25px;
-
     margin: 15px 0;
-
     text-align: center;
-
-    background-color: var(--cor-creme);
-
+    background-color: var(--cor-bege);
     border-radius: 15px;
-
-    color: var(--cor-marrom);
-
+    color: var(--cor-preto);
     font-size: 14px;
-
 }
 
 .servicos-erro {
-
     border: 1px solid var(--cor-laranja);
-
 }
 
 /* ========================================
-
    CONTAINER DOS SERVIÇOS
-
 ======================================== */
 
 .servicos-grid {
-
     display: grid;
-
     grid-template-columns: repeat(3, minmax(0, 1fr));
-
     gap: 15px;
-
     width: 100%;
-
     align-items: stretch;
-
-    color: var(--cor-bege);
-
+    color: var(--cor-preto);
 }
 
 /* ========================================
-
    SERVIÇO PRINCIPAL
-
 ======================================== */
 
-.servico-destaque {
-
-    display: grid;
-
-    grid-template-columns: minmax(180px, 35%) minmax(0, 1fr);
-
-    align-items: center;
-
-    gap: 25px;
-
+.servico-destaque-wrap {
+    position: relative;
     width: 100%;
+    margin-bottom: 22px;
+}
 
-    min-height: 205px;
+/* patinha que "pendura" no canto do card principal */
+.servico-destaque-patinha {
+    position: absolute;
+    right: -14px;
+    bottom: -34px;
+    z-index: 2;
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    transform: rotate(-25deg);
+    pointer-events: none;
+}
 
-    padding: 18px 25px;
-
-    margin-bottom: 15px;
-
+.servico-destaque {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    align-items: center;
+    gap: 35px;
+    width: 100%;
+    min-height: 330px;
+    padding: 30px 55px 30px 35px;
     background-color: var(--cor-creme);
-
-    border-radius: 18px;
-
+    border-radius: 26px;
 }
 
 .destaque-imagem {
-
-    width: 175px;
-
-    height: 175px;
-
+    width: 290px;
+    height: 290px;
     justify-self: center;
-
     overflow: hidden;
-
     border-radius: 50%;
-
-    border: 3px solid var(--cor-branco);
-
-    background-color: var(--cor-pessego);
-
+    border: 5px solid var(--cor-branco);
+    background-color: var(--cor-bege);
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
 }
 
 .destaque-imagem img,
-
 .card-imagem img {
-
     width: 100%;
-
     height: 100%;
-
     object-fit: cover;
-
 }
 
 .destaque-conteudo {
-
     min-width: 0;
-
 }
 
 .destaque-conteudo h2 {
-
     display: flex;
-
     align-items: center;
-
-    gap: 8px;
-
+    gap: 12px;
     font-family: var(--fonte-titulo);
-
-    font-size: 24px;
-
-    color: var(--cor-marrom);
-
-    margin: 0 0 8px;
-
+    font-size: 34px;
+    line-height: 1.15;
+    color: var(--cor-preto);
+    margin: 0 0 12px;
 }
 
 .destaque-conteudo h2 img {
-
-    width: 19px;
-
-    height: 19px;
-
+    width: 40px;
+    height: 40px;
     object-fit: contain;
-
     flex-shrink: 0;
-
 }
 
 .destaque-conteudo > p {
+    font-size: 20px;
+    line-height: 1.4;
+    color: var(--cor-preto);
+    margin: 0 0 22px;
+}
 
-    font-size: 16px;
+/* ícones de duração e valor (SVG inline) */
+.info-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--cor-laranja);
+}
 
-    line-height: 1.5;
+.info-icone svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
 
-    color: var(--cor-marrom);
-
-    margin: 0 0 15px;
-
+.info-icone .cifrao {
+    fill: var(--cor-branco);
 }
 
 /* ========================================
-
    INFORMAÇÕES DO DESTAQUE
-
 ======================================== */
 
 .destaque-informacoes {
-
-    display: flex;
-
-    align-items: center;
-
-    flex-wrap: wrap;
-
-    gap: 25px;
-
-    margin-bottom: 13px;
-
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    margin: 0 0 22px;
 }
 
 .destaque-informacoes > div {
-
     display: grid;
-
-    grid-template-columns: 27px auto;
-
+    grid-template-columns: 54px auto;
+    grid-template-rows: auto auto;
     align-items: center;
-
-    column-gap: 10px;
-
+    justify-content: center;
+    column-gap: 12px;
+    row-gap: 2px;
+    padding: 4px 10px;
+    min-width: 0;
 }
 
-.destaque-informacoes span {
+.destaque-informacoes > div:first-child {
+    border-right: 1px solid var(--cor-laranja);
+}
 
+.destaque-informacoes .info-icone {
     grid-row: span 2;
-
-    font-size: 23px;
-
-    color: var(--cor-laranja);
-
+    width: 54px;
+    height: 54px;
 }
 
 .destaque-informacoes small {
-
-    font-size: 13px;
-
-    color: var(--cor-marrom);
-
+    font-size: 16px;
+    color: var(--cor-preto);
 }
 
 .destaque-informacoes strong {
-
     font-family: var(--fonte-titulo);
-
-    font-size: 16px;
-
-    color: var(--cor-marrom);
-
+    font-size: 28px;
+    line-height: 1.1;
+    color: var(--cor-preto);
 }
 
 /* ========================================
-
    CARDS
-
 ======================================== */
 
 .servico-card {
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     min-width: 0;
-
     min-height: 300px;
-
     height: 100%;
-
     padding: 15px 13px;
-
     border-radius: 18px;
-
-    background-color: var(--cor-creme);
-
+    background-color: var(--cor-bege);
     text-align: center;
-
 }
 
 .card-imagem {
-
     width: 100px;
-
     height: 100px;
-
     flex-shrink: 0;
-
     overflow: hidden;
-
     border-radius: 50%;
-
     border: 2px solid var(--cor-branco);
-
     background-color: var(--cor-pessego);
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     margin-bottom: 10px;
-
 }
 
 .servico-card h3 {
-
     display: flex;
-
     justify-content: center;
-
     align-items: center;
-
     gap: 6px;
-
     font-family: var(--fonte-titulo);
-
     font-size: 19px;
-
-    color: var(--cor-marrom);
-
+    color: var(--cor-preto);
     margin: 0 0 8px;
-
 }
 
 .servico-card h3 img {
-
     width: 15px;
-
     height: 15px;
-
     object-fit: contain;
-
     flex-shrink: 0;
-
 }
 
 .servico-card > p {
-
     font-size: 15px;
-
     line-height: 1.5;
-
-    color: var(--cor-marrom);
-
+    color: var(--cor-preto);
     margin: 0 0 12px;
-
     min-height: 45px;
-
 }
 
 /* ========================================
-
    INFORMAÇÕES DOS CARDS
-
 ======================================== */
 
 .card-informacoes {
-
     display: grid;
-
     grid-template-columns: 1fr 1fr;
-
-    color: var(--cor-bege);
-
+    color: var(--cor-preto);
     width: 100%;
-
     margin-top: auto;
-
     margin-bottom: 12px;
-
 }
 
 .card-informacoes > div {
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     justify-content: center;
-
     gap: 3px;
-
     min-width: 0;
-
 }
 
 .card-informacoes > div:first-child {
-
     border-right: 1px solid var(--cor-laranja);
-
 }
 
 .card-informacoes span {
-
     color: var(--cor-laranja);
-
     font-size: 16px;
-
 }
 
 .card-informacoes small {
-
     font-size: 13px;
-
-    color: var(--cor-marrom);
-
+    color: var(--cor-preto);
 }
 
 .card-informacoes strong {
-
     font-family: var(--fonte-titulo);
-
     font-size: 16px;
-
-    color: var(--cor-marrom);
-
+    color: var(--cor-preto);
 }
 
 /* ========================================
-
    BOTÕES
-
 ======================================== */
 
 .pagina-servicos .servico-agendar {
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
+    gap: 10px;
     width: 100%;
-
-    min-height: 35px;
-
-    padding: 8px 10px;
-
+    min-height: 46px;
+    padding: 10px 18px;
     margin-top: 5px;
-
-    font-size: 12px;
-
-    text-align: center;
-
-    text-decoration: none;
-
-    white-space: normal;
-
-    border-radius: 10px;
-
-}
-
-/* ========================================
-
-   PLANOS
-
-======================================== */
-
-.planos-grid {
-
-    align-items: stretch;
-
-}
-
-.plano-card {
-
-    min-height: 340px;
-
-}
-
-.plano-detalhes {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 8px;
-
-    width: 100%;
-
-    margin: 8px 0 12px;
-
-    padding-top: 10px;
-
-    border-top: 1px solid var(--cor-pessego);
-
-}
-
-.plano-detalhes > div {
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 3px;
-
-}
-
-.plano-detalhes small {
-
-    font-size: 13px;
-
-    color: var(--cor-marrom);
-
-}
-
-.plano-detalhes strong {
-
-    font-family: var(--fonte-titulo);
-
+    border-radius: 999px;
     font-size: 15px;
-
-    color: var(--cor-marrom);
-
+    text-align: center;
+    text-decoration: none;
+    white-space: normal;
 }
 
-.plano-preco {
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 3px;
-
-    width: 100%;
-
-    margin-top: auto;
-
-    margin-bottom: 10px;
-
+.servico-agendar svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    fill: currentColor;
 }
 
-.plano-preco small {
-
-    font-size: 13px;
-
-    color: var(--cor-marrom);
-
+.servico-agendar svg .furo {
+    fill: var(--cor-laranja);
 }
 
-.plano-preco strong {
-
-    font-family: var(--fonte-titulo);
-
-    font-size: 24px;
-
-    color: var(--cor-laranja);
-
+/* botão do card principal: não ocupa a largura toda */
+.pagina-servicos .servico-destaque .servico-agendar {
+    width: fit-content;
+    min-width: 300px;
+    min-height: 52px;
+    margin: 0 auto;
+    font-size: 18px;
 }
 
 /* ========================================
-
    CHAMADA FINAL
-
 ======================================== */
 
 .servicos-chamada {
-
     position: relative;
-
     display: flex;
-
     align-items: center;
-
-    gap: 15px;
-
+    gap: 28px;
     width: 100%;
-
-    min-height: 90px;
-
-    margin: 20px 0;
-
-    padding: 15px 20px;
-
-    border-radius: 15px;
-
-    background-color: var(--cor-bege);
-
+    min-height: 130px;
+    margin: 26px 0 10px;
+    padding: 24px 40px;
+    border-radius: 22px;
+    background-color: var(--cor-creme);
 }
 
 .chamada-patinha {
-
-    width: 30px;
-
-    height: 30px;
-
+    width: 70px;
+    height: 70px;
     object-fit: contain;
-
     flex-shrink: 0;
-
+    transform: rotate(-10deg);
 }
 
 .servicos-chamada > div {
-
     flex: 1;
-
     min-width: 0;
-
 }
 
 .servicos-chamada h2 {
-
     font-family: var(--fonte-titulo);
-
-    font-size: 18px;
-
-    color: var(--cor-marrom);
-
-    margin: 0 0 4px;
-
+    font-size: 32px;
+    line-height: 1.15;
+    color: var(--cor-preto);
+    margin: 0 0 6px;
 }
 
 .servicos-chamada p {
-
-    font-size: 12px;
-
-    line-height: 1.5;
-
-    color: var(--cor-marrom);
-
+    font-size: 18px;
+    line-height: 1.4;
+    color: var(--cor-preto);
     margin: 0;
-
 }
 
 .servicos-chamada .btn {
-
     flex-shrink: 0;
-
-    padding: 9px 14px;
-
-    font-size: 12px;
-
+    padding: 14px 34px;
+    border-radius: 999px;
+    font-size: 18px;
     text-decoration: none;
-
     white-space: nowrap;
-
 }
 
 .chamada-coracao {
-
     position: absolute;
+    right: 30px;
+    top: 8px;
+    font-size: 40px;
+    line-height: 1;
+    color: var(--cor-preto);
+    transform: rotate(12deg);
+}
 
-    right: 12px;
-
-    top: -12px;
-
-    font-size: 27px;
-
-    color: var(--cor-laranja);
-
-    transform: rotate(-15deg);
-
+.chamada-coracao-2 {
+    top: auto;
+    right: auto;
+    bottom: 8px;
+    left: 54%;
+    font-size: 30px;
+    transform: rotate(-12deg);
 }
 
 /* ========================================
-
    CARDS - CONSULTAS, PET-CARE E PLANOS
-
 ======================================== */
 
 .pagina-servicos .servico-card,
-
 .pagina-servicos .plano-card,
-
 .pagina-servicos .servico-destaque {
-
-    background-color: var(--cor-bege);
-
+    background-color: var(--cor-creme);
     border-radius: 18px;
-
     overflow: hidden;
-
 }
 
 /* ========================================
+   PET CARE - CARDS
+======================================== */
 
+.pagina-servicos .petcare-card {
+    padding: 28px 22px 22px;
+    border-radius: 24px;
+}
+
+.petcare-card .card-imagem {
+    width: 170px;
+    height: 170px;
+    margin-bottom: 16px;
+    border: 4px solid var(--cor-branco);
+    background-color: var(--cor-bege);
+}
+
+.pagina-servicos .petcare-card h3 {
+    gap: 8px;
+    margin: 0 0 10px;
+    font-size: 24px;
+    line-height: 1.15;
+}
+
+.pagina-servicos .petcare-card h3 img {
+    width: 30px;
+    height: 30px;
+}
+
+.pagina-servicos .petcare-card > p {
+    min-height: 0;
+    margin: 0 0 18px;
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+/* linha com ícone de relógio e de moeda */
+.card-informacoes--icones {
+    margin-bottom: 18px;
+}
+
+.card-informacoes--icones > div {
+    display: grid;
+    grid-template-columns: 34px auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    justify-content: center;
+    column-gap: 8px;
+    row-gap: 2px;
+    text-align: left;
+}
+
+.card-informacoes--icones .info-icone {
+    grid-row: span 2;
+    width: 34px;
+    height: 34px;
+}
+
+.card-informacoes--icones small {
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+.card-informacoes--icones strong {
+    font-size: 20px;
+    line-height: 1.1;
+}
+
+/* ========================================
    RESPONSIVIDADE - TABLETS
-
 ======================================== */
 
 @media (max-width: 900px) {
 
-.servicos-submenu {
-
+    .servicos-submenu {
         gap: 25px;
-
     }
 
-.servicos-grid {
-
+    .servicos-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-
     }
 
-.servico-destaque {
-
-        grid-template-columns: 32% minmax(0, 1fr);
-
-        gap: 15px;
-
+    .servicos-apresentacao {
+        min-height: 130px;
+        padding: 25px 100px 10px;
     }
 
-.destaque-imagem {
-
-        width: 145px;
-
-        height: 145px;
-
+    .apresentacao-patinha {
+        left: 30px;
+        width: 70px;
+        height: 70px;
     }
 
-.servicos-chamada {
+    .apresentacao-texto h1 {
+        font-size: 32px;
+    }
 
+    .apresentacao-texto p {
+        font-size: 19px;
+    }
+
+    .apresentacao-coracao {
+        right: 40px;
+        font-size: 46px;
+    }
+
+    .servico-destaque {
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 25px;
+        min-height: 0;
+        padding: 25px;
+    }
+
+    .destaque-imagem {
+        width: 210px;
+        height: 210px;
+    }
+
+    .destaque-conteudo h2 {
+        font-size: 28px;
+    }
+
+    .destaque-conteudo > p {
+        font-size: 17px;
+    }
+
+    .destaque-informacoes strong {
+        font-size: 22px;
+    }
+
+    .pagina-servicos .servico-destaque .servico-agendar {
+        min-width: 0;
+        width: 100%;
+        font-size: 16px;
+    }
+
+    .pagina-servicos .petcare-card {
+        padding: 24px 16px 18px;
+    }
+
+    .petcare-card .card-imagem {
+        width: 140px;
+        height: 140px;
+    }
+
+    .pagina-servicos .petcare-card h3 {
+        font-size: 21px;
+    }
+
+    .pagina-servicos .petcare-card > p {
+        font-size: 16px;
+    }
+
+    .servicos-chamada {
         flex-wrap: wrap;
+        padding: 22px 28px;
+    }
 
+    .servicos-chamada h2 {
+        font-size: 26px;
+    }
+
+    .servicos-chamada p {
+        font-size: 16px;
     }
 
 }
 
 /* ========================================
-
    RESPONSIVIDADE - CELULARES
-
 ======================================== */
 
 @media (max-width: 600px) {
 
-.servicos-submenu {
-
+    .servicos-submenu {
         gap: 5px;
-
         min-height: 46px;
-
     }
 
-.servicos-submenu a {
-
+    .servicos-submenu a {
         padding: 9px 12px;
-
         font-size: 17px;
-
     }
 
-.servicos-submenu a i {
-
+    .servicos-submenu a i {
         font-size: 19px;
-
     }
 
-.submenu-patinha {
-
+    .submenu-patinha {
         width: 17px;
-
         height: 17px;
-
     }
 
-.servicos-conteudo {
-
+    .servicos-conteudo {
         padding-inline: 12px;
-
     }
 
-.servicos-apresentacao {
+    .servicos-apresentacao {
+        min-height: 0;
+        padding: 60px 10px 5px;
+    }
 
-        padding: 18px 5px;
+    .apresentacao-patinha {
+        top: 8px;
+        left: 8px;
+        width: 52px;
+        height: 52px;
+    }
 
+    .apresentacao-texto h1 {
         gap: 8px;
-
+        font-size: 26px;
     }
 
-.apresentacao-patinha {
-
-        width: 22px;
-
-        height: 22px;
-
+    .apresentacao-texto h1 img {
+        width: 24px;
+        height: 24px;
     }
 
-.apresentacao-coracao {
-
-        font-size: 25px;
-
-    }
-
-.apresentacao-texto h1 {
-
-        font-size: 21px;
-
-    }
-
-.apresentacao-texto p {
-
-        font-size: 12px;
-
-    }
-
-.servico-destaque {
-
-        grid-template-columns: 1fr;
-
-        gap: 15px;
-
-        padding: 18px;
-
-        text-align: center;
-
-    }
-
-.destaque-imagem {
-
-        width: 125px;
-
-        height: 125px;
-
-    }
-
-.destaque-conteudo h2 {
-
-        justify-content: center;
-
-        font-size: 21px;
-
-    }
-
-.destaque-conteudo > p {
-
-        font-size: 14px;
-
-    }
-
-.destaque-informacoes {
-
-        justify-content: center;
-
-        gap: 15px;
-
-    }
-
-.servicos-grid {
-
-        gap: 10px;
-
-    }
-
-.servico-card {
-
-        padding: 12px 8px;
-
-    }
-
-.card-imagem {
-
-        width: 75px;
-
-        height: 75px;
-
-    }
-
-.servico-card h3 {
-
+    .apresentacao-texto p {
         font-size: 16px;
-
     }
 
-.servico-card > p {
-
-        font-size: 14px;
-
+    .apresentacao-coracao {
+        top: 12px;
+        right: 14px;
+        font-size: 38px;
     }
 
-.card-informacoes small {
-
-        font-size: 11px;
-
-    }
-
-.card-informacoes strong {
-
-        font-size: 14px;
-
-    }
-
-.plano-preco strong {
-
-        font-size: 21px;
-
-    }
-
-.servicos-chamada {
-
-        gap: 10px;
-
-        padding: 15px;
-
-    }
-
-.chamada-patinha {
-
-        width: 23px;
-
-        height: 23px;
-
-    }
-
-.servicos-chamada > div {
-
-        flex-basis: calc(100% - 45px);
-
-    }
-
-.servicos-chamada h2 {
-
-        font-size: 15px;
-
-    }
-
-.servicos-chamada .btn {
-
-        width: 100%;
-
+    .servico-destaque {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 22px 18px;
         text-align: center;
+    }
 
+    .destaque-imagem {
+        width: 180px;
+        height: 180px;
+    }
+
+    .destaque-conteudo h2 {
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .destaque-conteudo h2 img {
+        width: 28px;
+        height: 28px;
+    }
+
+    .destaque-conteudo > p {
+        font-size: 16px;
+    }
+
+    .destaque-informacoes > div {
+        grid-template-columns: 38px auto;
+        column-gap: 8px;
+        padding: 4px 6px;
+        text-align: left;
+    }
+
+    .destaque-informacoes .info-icone {
+        width: 38px;
+        height: 38px;
+    }
+
+    .destaque-informacoes small {
+        font-size: 12px;
+    }
+
+    .destaque-informacoes strong {
+        font-size: 18px;
+    }
+
+    .servico-destaque-patinha {
+        right: -8px;
+        bottom: -26px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .servicos-grid {
+        gap: 10px;
+    }
+
+    .servico-card {
+        padding: 12px 8px;
+    }
+
+    .card-imagem {
+        width: 75px;
+        height: 75px;
+    }
+
+    .servico-card h3 {
+        font-size: 16px;
+    }
+
+    .servico-card > p {
+        font-size: 14px;
+    }
+
+    .card-informacoes small {
+        font-size: 11px;
+    }
+
+    .card-informacoes strong {
+        font-size: 14px;
+    }
+
+    .pagina-servicos .petcare-card {
+        padding: 16px 10px 14px;
+    }
+
+    .petcare-card .card-imagem {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 10px;
+    }
+
+    .pagina-servicos .petcare-card h3 {
+        gap: 5px;
+        font-size: 16px;
+    }
+
+    .pagina-servicos .petcare-card h3 img {
+        width: 20px;
+        height: 20px;
+    }
+
+    .pagina-servicos .petcare-card > p {
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .card-informacoes--icones > div {
+        grid-template-columns: 24px auto;
+        column-gap: 5px;
+    }
+
+    .card-informacoes--icones .info-icone {
+        width: 24px;
+        height: 24px;
+    }
+
+    .card-informacoes--icones small {
+        font-size: 10px;
+    }
+
+    .card-informacoes--icones strong {
+        font-size: 14px;
+    }
+
+    .pagina-servicos .servico-agendar {
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .servico-agendar svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .servicos-chamada {
+        gap: 12px;
+        padding: 18px;
+    }
+
+    .chamada-patinha {
+        width: 50px;
+        height: 50px;
+    }
+
+    .servicos-chamada > div {
+        flex-basis: calc(100% - 65px);
+    }
+
+    .servicos-chamada h2 {
+        font-size: 21px;
+    }
+
+    .servicos-chamada p {
+        font-size: 14px;
+    }
+
+    .servicos-chamada .btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .chamada-coracao {
+        top: -14px;
+        right: 14px;
+        font-size: 32px;
+    }
+
+    .chamada-coracao-2 {
+        display: none;
     }
 
 }
 
 /* ========================================
-
    RESPONSIVIDADE - CELULARES PEQUENOS
-
 ======================================== */
 
 @media (max-width: 420px) {
 
-.servicos-grid {
-
+    .servicos-grid {
         grid-template-columns: 1fr;
-
     }
 
-.servico-card {
-
+    .servico-card {
         min-height: 290px;
-
         padding: 15px;
-
     }
 
-.card-imagem {
-
+    .card-imagem {
         width: 90px;
-
         height: 90px;
-
     }
 
-.servico-card h3 {
-
-        font-size: 16px;
-
-    }
-
-.servico-card > p {
-
-        font-size: 14px;
-
-    }
-
-.servicos-submenu {
-
+    .servicos-submenu {
         gap: 0;
-
     }
 
-.servicos-submenu a {
-
+    .servicos-submenu a {
         padding-inline: 9px;
-
         font-size: 15px;
-
     }
 
-.servicos-submenu a i {
-
+    .servicos-submenu a i {
         font-size: 17px;
-
     }
 
+    .pagina-servicos .petcare-card {
+        padding: 22px 16px 18px;
+    }
+
+    .petcare-card .card-imagem {
+        width: 140px;
+        height: 140px;
+    }
+
+    .pagina-servicos .petcare-card h3 {
+        font-size: 20px;
+    }
+
+    .pagina-servicos .petcare-card > p {
+        font-size: 16px;
+    }
+
+    .card-informacoes--icones > div {
+        grid-template-columns: 30px auto;
+    }
+
+    .card-informacoes--icones .info-icone {
+        width: 30px;
+        height: 30px;
+    }
+
+    .card-informacoes--icones small {
+        font-size: 12px;
+    }
+
+    .card-informacoes--icones strong {
+        font-size: 18px;
+    }
+
+    .apresentacao-texto h1 {
+        font-size: 22px;
+    }
+
+}
+
+/* ========================================
+   CONSULTAS - HERO
+======================================== */
+
+.consultas-hero {
+    position: relative;
+    display: block;
+    min-height: 200px;
+    margin: 20px 0 0;
+    padding: 30px 330px 0 190px;
+    background: none;
+    border-radius: 0;
+    overflow: visible;
+}
+
+.consultas-hero-patinha {
+    position: absolute;
+    top: 35px;
+    left: 70px;
+    width: 95px;
+    height: 95px;
+    object-fit: contain;
+    transform: none;
+}
+
+.consultas-hero-texto {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.consultas-hero-texto h1 {
+    font-family: var(--fonte-titulo);
+    font-size: 44px;
+    line-height: 1.15;
+    color: var(--cor-preto);
+    margin: 0 0 10px;
+}
+
+.consultas-hero-texto p {
+    font-size: 24px;
+    line-height: 1.3;
+    color: var(--cor-preto);
+    margin: 0;
+}
+
+/* foto recortada (PNG transparente) */
+.consultas-hero-imagem {
+    position: absolute;
+    top: 120px;
+    right: 0;
+    z-index: 3;
+    width: 300px;
+    height: auto;
+    max-width: none;
+    object-fit: contain;
+    border: none;
+    border-radius: 0;
+    background: none;
+}
+
+/* patinha grande atrás da foto */
+.consultas-hero-patona {
+    position: absolute;
+    top: 0;
+    right: -50px;
+    z-index: 2;
+    width: 380px;
+    height: 380px;
+    object-fit: contain;
+    transform: rotate(20deg);
+    pointer-events: none;
+}
+
+/* ========================================
+   CONSULTAS - BENEFÍCIOS
+======================================== */
+
+.consultas-beneficios {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    width: 100%;
+    margin: 0 0 35px;
+    padding: 28px 320px 22px 10px;
+    border-radius: 30px;
+    background-color: var(--cor-creme);
+}
+
+.beneficio-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 0;
+    padding: 0 8px;
+    border-radius: 0;
+    background: none;
+    text-align: center;
+}
+
+/* divisória laranja */
+.beneficio-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 60px;
+    background-color: var(--cor-laranja);
+}
+
+.beneficio-item > img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.beneficio-item p {
+    font-family: var(--fonte-texto);
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--cor-preto);
+    margin: 0;
+}
+
+.beneficio-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    font-size: 62px;
+    line-height: 1;
+    color: var(--cor-laranja);
+}
+
+.beneficio-check {
+    font-weight: 300;
+}
+
+/* relógio desenhado em CSS (círculo cheio + ponteiros brancos) */
+.beneficio-relogio {
+    position: relative;
+    font-size: 0;
+    border-radius: 50%;
+    background-color: var(--cor-laranja);
+}
+
+.beneficio-relogio::after {
+    content: "";
+    position: absolute;
+    right: 50%;
+    bottom: 50%;
+    width: 18px;
+    height: 24px;
+    border-right: 5px solid var(--cor-bege);
+    border-bottom: 5px solid var(--cor-bege);
+}
+
+/* ========================================
+   CONSULTAS - TÍTULO DA SEÇÃO
+======================================== */
+
+.consultas-titulo-secao {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    margin: 25px 0;
+    padding: 0;
+    text-align: left;
+}
+
+.consultas-titulo-secao > img {
+    width: 55px;
+    height: 55px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.consultas-titulo-secao h2 {
+    font-family: var(--fonte-titulo);
+    font-size: 40px;
+    line-height: 1.1;
+    color: var(--cor-preto);
+    margin: 0 0 6px;
+}
+
+.consultas-titulo-secao p {
+    font-size: 17px;
+    line-height: 1.4;
+    color: var(--cor-preto);
+    margin: 0;
+}
+
+/* ========================================
+   CONSULTAS - RESPONSIVO
+======================================== */
+
+@media (max-width: 900px) {
+    .consultas-hero {
+        padding: 30px 230px 0 120px;
+    }
+
+    .consultas-hero-patinha {
+        left: 20px;
+        width: 70px;
+        height: 70px;
+    }
+
+    .consultas-hero-texto h1 { font-size: 32px; }
+    .consultas-hero-texto p  { font-size: 18px; }
+
+    .consultas-hero-imagem {
+        width: 220px;
+        height: auto;
+        top: 90px;
+    }
+
+    .consultas-hero-patona {
+        width: 290px;
+        height: 290px;
+        right: 0;
+    }
+
+    .consultas-beneficios {
+        padding-right: 230px;
+    }
+
+    .beneficio-item p { font-size: 16px; }
+}
+
+@media (max-width: 600px) {
+    .consultas-hero {
+        min-height: 0;
+        padding: 20px 0 0;
+    }
+
+    .consultas-hero-patinha {
+        top: 15px;
+        left: 5px;
+        width: 45px;
+        height: 45px;
+    }
+
+    .consultas-hero-texto h1 { font-size: 26px; }
+    .consultas-hero-texto p  { font-size: 15px; }
+
+    .consultas-hero-patona {
+        top: 60px;
+        right: 0;
+        width: 220px;
+        height: 220px;
+    }
+
+    .consultas-hero-imagem {
+        position: relative;
+        top: auto;
+        right: auto;
+        display: block;
+        width: 220px;
+        height: auto;
+        margin: 15px auto -30px;
+    }
+
+    .consultas-beneficios {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 0;
+        padding: 45px 10px 22px;
+    }
+
+    .beneficio-item:not(:last-child)::after { display: none; }
+    .beneficio-item:nth-child(odd)::after {
+        display: block;
+        height: 50px;
+    }
+
+    .beneficio-item p { font-size: 14px; }
+
+    .consultas-titulo-secao { gap: 10px; }
+    .consultas-titulo-secao > img { width: 38px; height: 38px; }
+    .consultas-titulo-secao h2 { font-size: 26px; }
+    .consultas-titulo-secao p  { font-size: 13px; }
+}
+
+/* ========================================
+   PLANOS - ÍCONES DOS BENEFÍCIOS (SVG)
+   (o hero e a faixa de benefícios reaproveitam
+   as classes consultas-* e beneficio-*)
+======================================== */
+
+.beneficio-icone svg {
+    width: 56px;
+    height: 56px;
+    fill: currentColor;
+}
+
+.beneficio-icone .furo {
+    fill: var(--cor-creme);
+}
+
+/* ========================================
+   PLANOS - CARDS
+======================================== */
+
+.planos-grid {
+    gap: 22px;
+    padding-top: 18px;
+    align-items: stretch;
+}
+
+.pagina-servicos .plano-card {
+    position: relative;
+    min-height: 0;
+    padding: 28px 18px 18px;
+    overflow: visible; /* deixa o selo "Mais escolhido" sair do card */
+    border: 3px solid transparent;
+    border-radius: 24px;
+    background-color: var(--cor-creme);
+    text-align: center;
+}
+
+.pagina-servicos .plano-card.plano-destaque {
+    border-color: var(--cor-laranja);
+}
+
+.plano-selo {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 18px;
+    border: 2px solid var(--cor-laranja);
+    border-radius: 999px;
+    background-color: var(--cor-bege);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--cor-preto);
+    white-space: nowrap;
+}
+
+.pagina-servicos .plano-card h3 {
+    gap: 10px;
+    margin: 0 0 8px;
+    font-size: 24px;
+    color: var(--cor-laranja);
+}
+
+.pagina-servicos .plano-card h3 img {
+    width: 36px;
+    height: 36px;
+}
+
+.pagina-servicos .plano-card > p {
+    min-height: 0;
+    margin: 0 0 16px;
+    font-size: 15px;
+    color: var(--cor-preto);
+}
+
+/* caixa clara com os benefícios */
+.plano-beneficios {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    width: 100%;
+    min-height: 130px;
+    margin: 0 0 16px;
+    padding: 16px;
+    list-style: none;
+    border-radius: 14px;
+    background-color: var(--cor-claro);
+    text-align: left;
+}
+
+.plano-beneficios li {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 14px;
+    line-height: 1.35;
+    color: var(--cor-preto);
+}
+
+.plano-beneficios li img {
+    width: 16px;
+    height: 16px;
+    margin-top: 1px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.plano-preco {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    width: 100%;
+    margin: auto 0 14px;
+    text-align: left;
+}
+
+.plano-preco small {
+    font-size: 14px;
+    color: var(--cor-preto);
+}
+
+.plano-preco strong {
+    font-family: var(--fonte-titulo);
+    font-size: 30px;
+    line-height: 1.1;
+    color: var(--cor-preto);
+}
+
+.plano-preco strong span {
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 400;
+}
+
+.pagina-servicos .plano-card .servico-agendar {
+    min-height: 44px;
+    margin-top: 0;
+    font-size: 15px;
+    border-radius: 999px;
+}
+
+@media (max-width: 700px) {
+    .planos-grid {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 28px;
+    }
 }
