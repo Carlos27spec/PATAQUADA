@@ -12,10 +12,31 @@
   background: #f8eddb;
 }
 
+.header__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
 .header__logo img {
   display: block;
-  height: clamp(56px, 7vw, 92px);
-  width: auto;
+  width: clamp(60px, 6vw, 88px);
+  height: clamp(60px, 6vw, 88px);
+  object-fit: contain;
+}
+
+.header__logo span {
+  font-family: var(--fonte-titulo);
+  font-size: clamp(38px, 4.8vw, 58px);
+  line-height: 1;
+  color: var(--cor-azul);
+  -webkit-text-stroke: 0.4px var(--cor-preto);
+  text-shadow: 1px 1px 0 var(--cor-preto);
+}
+
+.header__logo .logo-destaque {
+  color: var(--cor-laranja);
 }
 
 .header__menu {

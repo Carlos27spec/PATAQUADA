@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import './home.css'
 import racao from '../assets/racao.png'
+import arteSobre from '../assets/dog-cat-2.png'
+import arteContato from '../assets/dog-cat-3.png'
 if ('scrollRestoration' in window.history) {
     window.history.scrollRestoration = 'manual'
 }
@@ -360,7 +362,7 @@ function SecaoSobre() {
             <Pata className="pata-sobre-2" />
 
             <div className="sobre-imagem">
-                <img src="/images/sobre-pets.png" alt="Cachorro e gato sorrindo" />
+                <img src={arteSobre} alt="Cachorro e gato sorrindo" />
             </div>
 
             <div className="sobre-conteudo">
@@ -404,12 +406,7 @@ function SecaoContato() {
         e.preventDefault()
         setStatus('enviando')
         try {
-            // TODO: trocar pela rota do seu back-end, ex.:
-            // await fetch('http://localhost:3333/contato', {
-            //   method: 'POST',
-            //   headers: { 'Content-Type': 'application/json' },
-            //   body: JSON.stringify(form),
-            // })
+            // TODO: trocar pela rota do seu back-end
             await new Promise((r) => setTimeout(r, 600))
             setStatus('ok')
             setForm({ nome: '', email: '', mensagem: '' })
@@ -431,7 +428,7 @@ function SecaoContato() {
             </div>
 
             <div className="contato-caixa">
-                <img className="contato-imagem" src="/images/contato-pets.png" alt="" />
+                <img className="contato-imagem" src={arteContato} alt="" />
 
                 <form className="contato-form" onSubmit={enviar}>
                     <label className="campo">

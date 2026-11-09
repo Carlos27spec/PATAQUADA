@@ -6,16 +6,9 @@
 ======================================== */
 
 .home {
-    /* Exclusiva da home (não existe no geral) */
     --cor-laranja-claro: #ecaa57;
-
-    /* Aliases para variáveis equivalentes do geral */
     --cor-creme-claro: var(--cor-bege);
     --cor-texto: var(--cor-preto);
-
-    /* Mais escuro que o azul do geral, para dar contraste
-       com o texto sobre o fundo amarelo do banner.
-       Para usar o azul do geral, apague esta linha. */
     --cor-azul: #2f3e5c;
 
     font-family: var(--fonte-texto);
@@ -194,7 +187,8 @@
 
 .banner-imagem img {
     position: relative;
-    max-height: 340px;
+    height: clamp(240px, 30vw, 330px);
+    width: auto;
     max-width: 100%;
     object-fit: contain;
 }
@@ -284,7 +278,8 @@
 
 .produto-card img {
     justify-self: center;
-    height: 310px;
+    height: clamp(220px, 28vw, 310px);
+    width: auto;
     max-width: 100%;
     object-fit: contain;
 }
@@ -331,7 +326,6 @@
     filter: brightness(0.92);
 }
 
-/* setas laranjas, sem bolinha branca, dentro do card (como no design) */
 .produtos-carrossel .carrossel-seta {
     width: 40px;
     height: 40px;
@@ -381,7 +375,6 @@
     bottom: 0;
     transform: translateX(-50%);
     width: 60px;
-    /* ajuste aqui o tamanho da linha */
     height: 3px;
     border-radius: 3px;
     background: var(--cor-laranja);
@@ -479,28 +472,35 @@
     grid-template-columns: 0.9fr 1.3fr;
     gap: 32px;
     align-items: center;
-    padding: 56px 4% 56px 0;
+    padding: 56px 4% 72px 0;
 }
 
+/* a arte já tem a mancha e a patinha: aparece inteira, sem corte */
 .sobre-imagem img {
     display: block;
     width: 100%;
-    max-height: 420px;
-    object-fit: cover;
-    border-radius: 0 55% 45% 0 / 0 60% 40% 0;
+    height: auto;
+    object-fit: contain;
+    border-radius: 0;
 }
 
-.sobre-titulo {
+.sobre-conteudo {
+    position: relative;
+    z-index: 1;
+}
+
+/* ".home" na frente para ganhar do ".home h2 { margin: 0 }" */
+.home .sobre-titulo {
     font-size: clamp(1.3rem, 2.6vw, 1.8rem);
     max-width: 22ch;
-    margin: 6px 0 14px;
+    margin: 8px 0 18px;
 }
 
 .sobre-texto {
     max-width: 52ch;
     font-size: 1.05rem;
     line-height: 1.45;
-    margin-bottom: 22px;
+    margin-bottom: 28px;
 }
 
 .sobre-valores {
@@ -526,7 +526,6 @@
     place-items: center;
 }
 
-/* ícones dos valores: pata, coração e estrela */
 .valor-icone svg {
     width: 26px;
     height: 26px;
@@ -550,6 +549,7 @@
     line-height: 1.25;
 }
 
+/* patinhas ficam nos espaços vazios, longe do texto */
 .pata-sobre-1 {
     right: 6%;
     top: 40px;
@@ -558,8 +558,10 @@
 }
 
 .pata-sobre-2 {
-    right: 18%;
-    bottom: 120px;
+    right: 4%;
+    top: 42%;
+    width: 44px;
+    height: 44px;
 }
 
 /* ===== 5. contato ===== */
@@ -567,13 +569,18 @@
     position: relative;
     background: var(--cor-pessego);
     display: grid;
-    grid-template-columns: 1fr 1.6fr;
+    grid-template-columns: 1fr 1.5fr;
     gap: 24px;
     align-items: center;
     padding: 40px 4% 40px 8%;
 }
 
-.contato-texto h2 {
+.contato-texto {
+    position: relative;
+    z-index: 1;
+}
+
+.home .contato-texto h2 {
     font-size: clamp(1.3rem, 2.6vw, 1.8rem);
     max-width: 18ch;
     margin: 8px 0 12px;
@@ -583,33 +590,37 @@
     font-size: 1.1rem;
 }
 
+/* caixa: imagem à esquerda (colada embaixo) + formulário à direita */
 .contato-caixa {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: 0.7fr 1.3fr;
-    gap: 16px;
-    align-items: center;
+    grid-template-columns: 0.6fr 1.4fr;
+    gap: 14px;
+    align-items: end;
     background: #fdf4e6;
     border-radius: 32px;
-    padding: 28px 28px 28px 12px;
+    padding: 24px 24px 0 14px;
+    overflow: hidden;
 }
 
 .contato-imagem {
     width: 100%;
-    max-height: 200px;
+    max-height: 230px;
     object-fit: contain;
+    object-position: bottom;
 }
 
 .contato-form {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding-bottom: 24px;
 }
 
 .campo {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
     background: #fff;
     border-radius: 12px;
@@ -620,7 +631,6 @@
     flex: 0 0 22px;
     width: 22px;
     height: 22px;
-    margin-top: 2px;
     color: #111;
 }
 
@@ -640,6 +650,15 @@
     outline: 3px solid var(--cor-laranja);
 }
 
+/* só o campo de mensagem alinha o ícone no topo */
+.campo-mensagem {
+    align-items: flex-start;
+}
+
+.campo-mensagem svg {
+    margin-top: 2px;
+}
+
 .campo-mensagem textarea {
     min-height: 70px;
 }
@@ -649,6 +668,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+    width: 100%;
     border: 0;
     border-radius: 999px;
     background: var(--cor-laranja);
@@ -657,6 +677,11 @@
     font-size: 1.15rem;
     padding: 8px 16px;
     cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.contato-enviar:hover {
+    filter: brightness(0.92);
 }
 
 .contato-enviar:disabled {
@@ -710,7 +735,7 @@
     }
 
     .banner-imagem img {
-        max-height: 220px;
+        height: 220px;
     }
 
     .produto-card {
@@ -725,18 +750,27 @@
 
     #sobre {
         grid-template-columns: 1fr;
-        padding: 0 6% 40px;
+        gap: 16px;
+        padding: 0 6% 40px 0;
     }
 
     .sobre-imagem img {
-        border-radius: 0 0 45% 45% / 0 0 30% 30%;
-        max-height: 300px;
-        margin: 0 -9%;
-        width: calc(100% + 18%);
+        width: 100%;
+        height: auto;
+        max-height: 360px;
+        object-fit: contain;
+    }
+
+    .sobre-conteudo {
+        padding-left: 6%;
     }
 
     .sobre-valores {
         grid-template-columns: 1fr;
+    }
+
+    .pata-sobre-2 {
+        display: none;
     }
 
     #contato {
@@ -755,13 +789,27 @@
         padding: 24px 44px 28px;
     }
 
+    .contato-texto {
+        text-align: center;
+    }
+
+    .home .contato-texto h2 {
+        max-width: none;
+    }
+
     .contato-caixa {
         grid-template-columns: 1fr;
-        padding: 20px;
+        padding: 20px 20px 0;
     }
 
     .contato-imagem {
         max-height: 140px;
+        margin: 0 auto;
+        order: 2;
+    }
+
+    .contato-form {
+        padding-bottom: 12px;
     }
 
     .banner-texto {

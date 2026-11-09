@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import logo from "../assets/logo.png";
+import insignea from "../assets/Insignea-mini.png";
 import { SearchIcon, CartIcon, UserIcon } from "./Icons";
 import "./Header.css";
 
@@ -44,7 +44,12 @@ export default function Header() {
   return (
     <header className="header">
       <Link to="/" className="header__logo" onClick={() => aoClicar("/")}>
-        <img src={logo} alt="PataQuada" />
+        <div className="footer-logo">
+          <img src={insignea} alt="" />
+          <span>
+            Pata<span className="logo-destaque">Quada</span>
+          </span>
+        </div>
       </Link>
 
       <button
