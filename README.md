@@ -71,8 +71,12 @@ cd PATAQUADA
 
 ```bash
 npm install
+<<<<<<< HEAD
 npm install nodemailer
 ```
+=======
+npm install express bcrypt better-sqlite3 dotenv
+>>>>>>> 9cf10b6 (banco)
 
 ### 4. Executar a aplicação
 
