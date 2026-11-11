@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useDadosPagina } from './servicos.js'
 import './servicos.css'
 
@@ -10,32 +11,88 @@ function Consultas() {
     return (
         <section className="servicos-conteudo">
 
-            {/* APRESENTAÇÃO PRINCIPAL */}
-            <div className="consultas-hero">
+            {/* TOPO: hero + benefícios + foto ancorada no fim da faixa */}
+            <div className="consultas-topo">
 
-                <img
-                    src={patinha}
-                    alt=""
-                    className="consultas-hero-patinha"
-                />
+                {/* APRESENTAÇÃO PRINCIPAL */}
+                <div className="consultas-hero">
 
-                <div className="consultas-hero-texto">
-                    <h1>Consultas Veterinárias</h1>
+                    <img
+                        src={patinha}
+                        alt=""
+                        className="consultas-hero-patinha"
+                    />
 
-                    <p>
-                        Na PataQuada, a saúde do seu pet
-                        <br />
-                        vem em primeiro lugar.
-                    </p>
+                    <div className="consultas-hero-texto">
+                        <h1>Consultas Veterinárias</h1>
+
+                        <p>
+                            Na PataQuada, a saúde do seu pet
+                            <br />
+                            vem em primeiro lugar.
+                        </p>
+                    </div>
+
                 </div>
 
+                {/* BENEFÍCIOS */}
+                <div className="consultas-beneficios">
+
+                    <div className="beneficio-item">
+                        <span className="beneficio-icone beneficio-check">
+                            ✓
+                        </span>
+
+                        <p>
+                            Atendimento
+                            <br />
+                            de qualidade
+                        </p>
+                    </div>
+
+                    <div className="beneficio-item">
+                        <img src={patinha} alt="" />
+
+                        <p>
+                            Diagnóstico
+                            <br />
+                            preciso
+                        </p>
+                    </div>
+
+                    <div className="beneficio-item">
+                        <span className="beneficio-icone beneficio-coracao">
+                            ♥
+                        </span>
+
+                        <p>
+                            Mais saúde e
+                            <br />
+                            bem-estar
+                        </p>
+                    </div>
+
+                    <div className="beneficio-item">
+                        <span className="beneficio-icone beneficio-relogio">
+                            ◷
+                        </span>
+
+                        <p>
+                            Agendamento
+                            <br />
+                            fácil e rápido
+                        </p>
+                    </div>
+
+                </div>
+
+                {/* foto e patinha: base alinhada à base da faixa */}
                 {/* patinha grande atrás da veterinária */}
                 <img
                     src={patinha}
                     alt=""
                     className="consultas-hero-patona"
                 />
-
                 <img
                     src={veterinaria}
                     alt="Atendimento veterinário"
@@ -43,59 +100,6 @@ function Consultas() {
                 />
 
             </div>
-
-
-            {/* BENEFÍCIOS */}
-            <div className="consultas-beneficios">
-
-                <div className="beneficio-item">
-                    <span className="beneficio-icone beneficio-check">
-                        ✓
-                    </span>
-
-                    <p>
-                        Atendimento
-                        <br />
-                        de qualidade
-                    </p>
-                </div>
-
-                <div className="beneficio-item">
-                    <img src={patinha} alt="" />
-
-                    <p>
-                        Diagnóstico
-                        <br />
-                        preciso
-                    </p>
-                </div>
-
-                <div className="beneficio-item">
-                    <span className="beneficio-icone beneficio-coracao">
-                        ♥
-                    </span>
-
-                    <p>
-                        Mais saúde e
-                        <br />
-                        bem-estar
-                    </p>
-                </div>
-
-                <div className="beneficio-item">
-                    <span className="beneficio-icone beneficio-relogio">
-                        ◷
-                    </span>
-
-                    <p>
-                        Agendamento
-                        <br />
-                        fácil e rápido
-                    </p>
-                </div>
-
-            </div>
-
 
             {/* TÍTULO DOS TIPOS DE CONSULTA */}
             <div className="consultas-titulo-secao">
@@ -179,14 +183,12 @@ function Consultas() {
 
                             </div>
 
-                            <a
-                                href={consulta.whatsappUrl || '#'}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <Link
+                                to={`/agendamento?consulta=${consulta.id}`}
                                 className="btn servico-agendar"
                             >
                                 Agendar consulta →
-                            </a>
+                            </Link>
 
                         </article>
                     ))}

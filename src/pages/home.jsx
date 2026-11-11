@@ -1,46 +1,51 @@
+
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import './home.css'
-import racao from '../assets/racao.png'
+import { useHome } from './home.js'
+
+import arteCarrossel from '../assets/dog-cat-1.png'
 import arteSobre from '../assets/dog-cat-2.png'
 import arteContato from '../assets/dog-cat-3.png'
+
 if ('scrollRestoration' in window.history) {
     window.history.scrollRestoration = 'manual'
 }
 
-
-/* ---------- Dados (troque pelas informações reais / API depois) ---------- */
+/* ---------- Dados dos banners ---------- */
 
 const slides = [
     {
         id: 1,
         titulo: 'Tudo o que seu pet precisa, em um só lugar!',
         botao: 'Conheça nossos serviços',
-        link: '/servicos',
-        imagem: '/images/banner-pets.png',
+        link: '/servicos/pet-care',
+        imagem: arteCarrossel,
     },
     {
         id: 2,
         titulo: 'Rações, petiscos e brinquedos para todos os dias.',
         botao: 'Ver produtos',
         link: '/shop',
-        imagem: '/images/banner-pets.png',
+        imagem: arteCarrossel,
     },
     {
         id: 3,
         titulo: 'Cuidado veterinário com carinho e atenção.',
         botao: 'Marcar consulta',
-        link: '/contato',
-        imagem: '/images/banner-pets.png',
+        link: '/servicos/consultas',
+        imagem: arteCarrossel,
     },
 ]
+
+/* ---------- Dados dos serviços ---------- */
 
 const servicos = [
     {
         id: 1,
         titulo: 'Banho e Tosa',
         texto: 'Seu pet bonito e cheiroso para qualquer ocasião',
-        link: '/servicos',
+        link: '/servicos/pet-care',
         cta: 'Saiba mais',
         cor: 'amarelo',
         icone: (
@@ -72,7 +77,7 @@ const servicos = [
         id: 3,
         titulo: 'Veterinário',
         texto: 'Mais saúde e bem-estar para o seu pet.',
-        link: '/contato',
+        link: '/servicos/consultas',
         cta: 'Marcar consulta',
         cor: 'verde',
         icone: (
@@ -86,32 +91,48 @@ const servicos = [
     },
 ]
 
-const descricaoRacao =
-    'Ração nutritiva e balanceada para cães e gatos, com sabor irresistível e nutrientes essenciais para a saúde e energia do seu melhor amigo. Disponível em várias marcas e tamanhos.'
-
-const produtos = [
-    { id: 1, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
-    { id: 2, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
-    { id: 3, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
-    { id: 4, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
-    { id: 5, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
-    { id: 6, nome: 'Ração Pataquada 5kg', descricao: descricaoRacao, preco: 90, imagem: racao },
-]
+/* ---------- Dados da seção sobre ---------- */
 
 const valores = [
-    { id: 1, titulo: 'Cuidado', texto: 'Tudo pensado para o bem-estar do seu pet.', cor: 'amarelo', icone: <Pata /> },
-    { id: 2, titulo: 'Carinho', texto: 'Porque cada pet merece atenção especial.', cor: 'rosa', icone: <Coracao /> },
-    { id: 3, titulo: 'Praticidade', texto: 'Serviços e informações em um só lugar.', cor: 'verde', icone: <Estrela /> },
+    {
+        id: 1,
+        titulo: 'Cuidado',
+        texto: 'Tudo pensado para o bem-estar do seu pet.',
+        cor: 'amarelo',
+        icone: <Pata />,
+    },
+    {
+        id: 2,
+        titulo: 'Carinho',
+        texto: 'Porque cada pet merece atenção especial.',
+        cor: 'rosa',
+        icone: <Coracao />,
+    },
+    {
+        id: 3,
+        titulo: 'Praticidade',
+        texto: 'Serviços e informações em um só lugar.',
+        cor: 'verde',
+        icone: <Estrela />,
+    },
 ]
 
 const formatarPreco = (valor) =>
-    valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    Number(valor || 0).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+    })
 
 /* ---------- Pequenos componentes ---------- */
 
 function Pata({ className = '' }) {
     return (
-        <svg className={`home-pata ${className}`} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <svg
+            className={`home-pata ${className}`}
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+        >
             <ellipse cx="6.2" cy="10" rx="2.1" ry="2.8" />
             <ellipse cx="10.2" cy="5.8" rx="2.1" ry="2.8" />
             <ellipse cx="15.2" cy="5.8" rx="2.1" ry="2.8" />
@@ -139,7 +160,17 @@ function Estrela() {
 
 function SetaEsquerda() {
     return (
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
             <path d="m15 5-7 7 7 7" />
         </svg>
     )
@@ -147,13 +178,23 @@ function SetaEsquerda() {
 
 function SetaDireita() {
     return (
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
             <path d="m9 5 7 7-7 7" />
         </svg>
     )
 }
 
-/* ---------- 1. Carrossel principal (banner) ---------- */
+/* ---------- 1. Carrossel principal ---------- */
 
 function CarrosselBanner() {
     const [atual, setAtual] = useState(0)
@@ -161,16 +202,27 @@ function CarrosselBanner() {
 
     useEffect(() => {
         if (pausado) return
-        const reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+        const reduzir = window.matchMedia(
+            '(prefers-reduced-motion: reduce)'
+        ).matches
+
         if (reduzir) return
+
         const timer = setInterval(() => {
             setAtual((i) => (i + 1) % slides.length)
         }, 5000)
+
         return () => clearInterval(timer)
     }, [pausado])
 
-    const anterior = () => setAtual((i) => (i - 1 + slides.length) % slides.length)
-    const proximo = () => setAtual((i) => (i + 1) % slides.length)
+    const anterior = () => {
+        setAtual((i) => (i - 1 + slides.length) % slides.length)
+    }
+
+    const proximo = () => {
+        setAtual((i) => (i + 1) % slides.length)
+    }
 
     return (
         <section
@@ -185,7 +237,9 @@ function CarrosselBanner() {
             <div className="banner-janela">
                 <div
                     className="banner-trilho"
-                    style={{ transform: `translateX(-${atual * 100}%)` }}
+                    style={{
+                        transform: `translateX(-${atual * 100}%)`,
+                    }}
                 >
                     {slides.map((slide, i) => (
                         <article
@@ -200,10 +254,15 @@ function CarrosselBanner() {
 
                             <div className="banner-texto">
                                 <p className="banner-pre">BEM-VINDO À</p>
+
                                 <p className="banner-marca">
                                     Pata<span>Quada</span>
                                 </p>
-                                <h1 className="banner-titulo">{slide.titulo}</h1>
+
+                                <h1 className="banner-titulo">
+                                    {slide.titulo}
+                                </h1>
+
                                 <Link
                                     to={slide.link}
                                     className="banner-botao"
@@ -215,17 +274,34 @@ function CarrosselBanner() {
                             </div>
 
                             <div className="banner-imagem">
-                                <span className="banner-mancha" aria-hidden="true" />
-                                <img src={slide.imagem} alt="Cachorro e gato juntos" />
+                                <span
+                                    className="banner-mancha"
+                                    aria-hidden="true"
+                                />
+                                <img
+                                    src={slide.imagem}
+                                    alt="Cachorro e gato juntos"
+                                />
                             </div>
                         </article>
                     ))}
                 </div>
 
-                <button type="button" className="carrossel-seta seta-esq" onClick={anterior} aria-label="Slide anterior">
+                <button
+                    type="button"
+                    className="carrossel-seta seta-esq"
+                    onClick={anterior}
+                    aria-label="Slide anterior"
+                >
                     <SetaEsquerda />
                 </button>
-                <button type="button" className="carrossel-seta seta-dir" onClick={proximo} aria-label="Próximo slide">
+
+                <button
+                    type="button"
+                    className="carrossel-seta seta-dir"
+                    onClick={proximo}
+                    aria-label="Próximo slide"
+                >
                     <SetaDireita />
                 </button>
 
@@ -257,15 +333,28 @@ function SecaoServicos() {
 
             <div className="home-container">
                 <p className="secao-pre">SERVIÇOS</p>
-                <h2 className="secao-titulo">Tudo para o bem-estar do seu pet</h2>
+
+                <h2 className="secao-titulo">
+                    Tudo para o bem-estar do seu pet
+                </h2>
 
                 <div className="servicos-grade">
                     {servicos.map((item) => (
-                        <article key={item.id} className="servico-item">
-                            <div className={`servico-icone cor-${item.cor}`}>{item.icone}</div>
+                        <article
+                            key={item.id}
+                            className="servico-item"
+                        >
+                            <div className={`servico-icone cor-${item.cor}`}>
+                                {item.icone}
+                            </div>
+
                             <h3>{item.titulo}</h3>
                             <p>{item.texto}</p>
-                            <Link to={item.link} className="servico-link">
+
+                            <Link
+                                to={item.link}
+                                className="servico-link"
+                            >
                                 {item.cta} →
                             </Link>
                         </article>
@@ -276,78 +365,163 @@ function SecaoServicos() {
     )
 }
 
-/* ---------- 3. Mais vendidos (carrossel de produtos) ---------- */
+/* ---------- 3. Produtos do banco de dados ---------- */
 
 function CarrosselProdutos() {
+    const resultado = useHome() || {}
+
+    const produtos = Array.isArray(resultado.produtos)
+        ? resultado.produtos
+        : []
+
+    const carregando = resultado.carregando ?? true
+    const erro = resultado.erro ?? null
+
     const total = produtos.length
+
     const [atual, setAtual] = useState(0)
     const [pausado, setPausado] = useState(false)
 
+    const indiceAtual = total > 0 ? atual % total : 0
+
     useEffect(() => {
-        if (pausado) return
-        const reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (pausado || total <= 1) return
+
+        const reduzir = window.matchMedia(
+            '(prefers-reduced-motion: reduce)'
+        ).matches
+
         if (reduzir) return
+
         const timer = setInterval(() => {
             setAtual((i) => (i + 1) % total)
         }, 6000)
+
         return () => clearInterval(timer)
     }, [pausado, total])
 
-    const anterior = () => setAtual((i) => (i - 1 + total) % total)
-    const proximo = () => setAtual((i) => (i + 1) % total)
+    const anterior = () => {
+        if (total > 1) {
+            setAtual((i) => (i - 1 + total) % total)
+        }
+    }
+
+    const proximo = () => {
+        if (total > 1) {
+            setAtual((i) => (i + 1) % total)
+        }
+    }
 
     return (
         <section className="home-produtos">
             <div className="home-container">
-                <p className="secao-pre">MAIS VENDIDOS</p>
-                <h2 className="secao-titulo">Tudo que seu pet ama!</h2>
+                <p className="secao-pre">NOSSOS PRODUTOS</p>
 
-                <div
-                    className="produtos-carrossel"
-                    aria-roledescription="carrossel"
-                    aria-label="Produtos mais vendidos"
-                    onMouseEnter={() => setPausado(true)}
-                    onMouseLeave={() => setPausado(false)}
-                    onFocus={() => setPausado(true)}
-                    onBlur={() => setPausado(false)}
-                >
-                    <div className="produtos-janela">
-                        <div
-                            className="produtos-trilho"
-                            style={{ transform: `translateX(-${atual * 100}%)` }}
-                        >
-                            {produtos.map((produto, i) => (
-                                <article
-                                    key={produto.id}
-                                    className="produto-card"
-                                    aria-hidden={i !== atual}
-                                    aria-label={`Produto ${i + 1} de ${total}`}
-                                >
-                                    <img src={produto.imagem} alt={produto.nome} />
-                                    <div className="produto-info">
-                                        <h3>{produto.nome}</h3>
-                                        <p className="produto-descricao">{produto.descricao}</p>
-                                        <p className="produto-preco">{formatarPreco(produto.preco)}</p>
-                                        <button
-                                            type="button"
-                                            className="produto-botao"
-                                            tabIndex={i === atual ? 0 : -1}
-                                        >
-                                            Comprar Agora
-                                        </button>
-                                    </div>
-                                </article>
-                            ))}
+                <h2 className="secao-titulo">
+                    Tudo que seu pet ama!
+                </h2>
+
+                {carregando && (
+                    <p className="produtos-status">
+                        Carregando produtos...
+                    </p>
+                )}
+
+                {!carregando && erro && (
+                    <p className="produtos-status">
+                        Não foi possível carregar os produtos no momento.
+                    </p>
+                )}
+
+                {!carregando && !erro && total === 0 && (
+                    <p className="produtos-status">
+                        Nenhum produto disponível no momento.
+                    </p>
+                )}
+
+                {!carregando && !erro && total > 0 && (
+                    <div
+                        className="produtos-carrossel"
+                        aria-roledescription="carrossel"
+                        aria-label="Produtos da Pataquada"
+                        onMouseEnter={() => setPausado(true)}
+                        onMouseLeave={() => setPausado(false)}
+                        onFocus={() => setPausado(true)}
+                        onBlur={() => setPausado(false)}
+                    >
+                        <div className="produtos-janela">
+                            <div
+                                className="produtos-trilho"
+                                style={{
+                                    transform: `translateX(-${indiceAtual * 100}%)`,
+                                }}
+                            >
+                                {produtos.map((produto, i) => (
+                                    <article
+                                        key={produto.id}
+                                        className="produto-card"
+                                        aria-hidden={i !== indiceAtual}
+                                        aria-label={`Produto ${i + 1} de ${total}`}
+                                    >
+                                        {produto.imagem ? (
+                                            <img
+                                                src={produto.imagem}
+                                                alt={produto.nome || 'Produto'}
+                                            />
+                                        ) : (
+                                            <div className="produto-imagem-vazia">
+                                                <Pata />
+                                            </div>
+                                        )}
+
+                                        <div className="produto-info">
+                                            <h3>{produto.nome}</h3>
+
+                                            <p className="produto-descricao">
+                                                {produto.descricao ||
+                                                    'Confira este produto em nossa loja.'}
+                                            </p>
+
+                                            <p className="produto-preco">
+                                                {formatarPreco(produto.preco)}
+                                            </p>
+
+                                            <Link
+                                                to="/shop"
+                                                className="produto-botao"
+                                                tabIndex={i === indiceAtual ? 0 : -1}
+                                            >
+                                                Comprar Agora
+                                            </Link>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
                         </div>
-                    </div>
 
-                    <button type="button" className="carrossel-seta seta-esq" onClick={anterior} aria-label="Produto anterior">
-                        <SetaEsquerda />
-                    </button>
-                    <button type="button" className="carrossel-seta seta-dir" onClick={proximo} aria-label="Próximo produto">
-                        <SetaDireita />
-                    </button>
-                </div>
+                        {total > 1 && (
+                            <>
+                                <button
+                                    type="button"
+                                    className="carrossel-seta seta-esq"
+                                    onClick={anterior}
+                                    aria-label="Produto anterior"
+                                >
+                                    <SetaEsquerda />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="carrossel-seta seta-dir"
+                                    onClick={proximo}
+                                    aria-label="Próximo produto"
+                                >
+                                    <SetaDireita />
+                                </button>
+                            </>
+                        )}
+                    </div>
+                )}
             </div>
         </section>
     )
@@ -362,14 +536,19 @@ function SecaoSobre() {
             <Pata className="pata-sobre-2" />
 
             <div className="sobre-imagem">
-                <img src={arteSobre} alt="Cachorro e gato sorrindo" />
+                <img
+                    src={arteSobre}
+                    alt="Cachorro e gato sorrindo"
+                />
             </div>
 
             <div className="sobre-conteudo">
                 <p className="secao-pre">SOBRE A PATAQUADA</p>
+
                 <h2 className="sobre-titulo">
                     Cuidar do seu pet pode ser mais simples, divertido e cheio de carinho
                 </h2>
+
                 <p className="sobre-texto">
                     A Pataquada nasceu para reunir tudo o que seu pet precisa em um só lugar.
                     Aqui você encontra serviços, produtos, informações e conteúdos pensados
@@ -379,9 +558,13 @@ function SecaoSobre() {
                 <ul className="sobre-valores">
                     {valores.map((v) => (
                         <li key={v.id}>
-                            <span className={`valor-icone cor-${v.cor}`} aria-hidden="true">
+                            <span
+                                className={`valor-icone cor-${v.cor}`}
+                                aria-hidden="true"
+                            >
                                 {v.icone}
                             </span>
+
                             <div>
                                 <h3>{v.titulo}</h3>
                                 <p>{v.texto}</p>
@@ -394,22 +577,38 @@ function SecaoSobre() {
     )
 }
 
-/* ---------- 5. Contato (formulário) ---------- */
+/* ---------- 5. Contato ---------- */
 
 function SecaoContato() {
-    const [form, setForm] = useState({ nome: '', email: '', mensagem: '' })
-    const [status, setStatus] = useState('') // '', 'enviando', 'ok', 'erro'
+    const [form, setForm] = useState({
+        nome: '',
+        email: '',
+        mensagem: '',
+    })
 
-    const atualizar = (e) => setForm({ ...form, [e.target.name]: e.target.value })
+    const [status, setStatus] = useState('')
+
+    const atualizar = (e) => {
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value,
+        })
+    }
 
     const enviar = async (e) => {
         e.preventDefault()
         setStatus('enviando')
+
         try {
-            // TODO: trocar pela rota do seu back-end
+            // TODO: integrar com a rota de contato do back-end.
             await new Promise((r) => setTimeout(r, 600))
+
             setStatus('ok')
-            setForm({ nome: '', email: '', mensagem: '' })
+            setForm({
+                nome: '',
+                email: '',
+                mensagem: '',
+            })
         } catch {
             setStatus('erro')
         }
@@ -423,47 +622,105 @@ function SecaoContato() {
 
             <div className="contato-texto">
                 <p className="secao-pre">VAMOS CONVERSAR?</p>
-                <h2>Tem alguma dúvida, sugestão ou precisa de ajuda?</h2>
+
+                <h2>
+                    Tem alguma dúvida, sugestão ou precisa de ajuda?
+                </h2>
+
                 <p>Entre em contato com a Pataquada!</p>
             </div>
 
             <div className="contato-caixa">
-                <img className="contato-imagem" src={arteContato} alt="" />
+                <img
+                    className="contato-imagem"
+                    src={arteContato}
+                    alt=""
+                />
 
                 <form className="contato-form" onSubmit={enviar}>
                     <label className="campo">
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-hidden="true"
+                        >
                             <circle cx="12" cy="7" r="4" />
                             <path d="M4 21v-2a8 8 0 0 1 16 0v2z" />
                         </svg>
-                        <input type="text" name="nome" placeholder="Nome" value={form.nome} onChange={atualizar} required />
+
+                        <input
+                            type="text"
+                            name="nome"
+                            placeholder="Nome"
+                            value={form.nome}
+                            onChange={atualizar}
+                            required
+                        />
                     </label>
 
                     <label className="campo">
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-hidden="true"
+                        >
                             <path d="M3 5h18a1 1 0 0 1 1 1v.6l-10 6.4L2 6.6V6a1 1 0 0 1 1-1z" />
                             <path d="M2 9l10 6.4L22 9v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V9z" />
                         </svg>
-                        <input type="email" name="email" placeholder="E-mail" value={form.email} onChange={atualizar} required />
+
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="E-mail"
+                            value={form.email}
+                            onChange={atualizar}
+                            required
+                        />
                     </label>
 
                     <label className="campo campo-mensagem">
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-hidden="true"
+                        >
                             <path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
                         </svg>
-                        <textarea name="mensagem" placeholder="Mensagem" rows="3" value={form.mensagem} onChange={atualizar} required />
+
+                        <textarea
+                            name="mensagem"
+                            placeholder="Mensagem"
+                            rows="3"
+                            value={form.mensagem}
+                            onChange={atualizar}
+                            required
+                        />
                     </label>
 
-                    <button type="submit" className="contato-enviar" disabled={status === 'enviando'}>
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                    <button
+                        type="submit"
+                        className="contato-enviar"
+                        disabled={status === 'enviando'}
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="20"
+                            height="20"
+                            fill="currentColor"
+                            aria-hidden="true"
+                        >
                             <path d="M2 21 23 12 2 3v7l15 2-15 2z" />
                         </svg>
+
                         {status === 'enviando' ? 'Enviando...' : 'Enviar'}
                     </button>
 
                     <p className="contato-status" role="status">
-                        {status === 'ok' && 'Mensagem enviada! Responderemos em breve.'}
-                        {status === 'erro' && 'Não foi possível enviar. Tente novamente.'}
+                        {status === 'ok' &&
+                            'Mensagem enviada! Responderemos em breve.'}
+
+                        {status === 'erro' &&
+                            'Não foi possível enviar. Tente novamente.'}
                     </p>
                 </form>
             </div>
@@ -471,7 +728,7 @@ function SecaoContato() {
     )
 }
 
-/* ---------- Página ---------- */
+/* ---------- Página inicial ---------- */
 
 function Home() {
     const location = useLocation()
@@ -481,11 +738,18 @@ function Home() {
             window.scrollTo(0, 0)
             return
         }
-        const elemento = document.getElementById(location.hash.slice(1))
+
+        const elemento = document.getElementById(
+            location.hash.slice(1)
+        )
+
         if (elemento) {
-            elemento.scrollIntoView({ behavior: "smooth" })
+            elemento.scrollIntoView({
+                behavior: 'smooth',
+            })
         }
     }, [location.hash])
+
     return (
         <main className="home">
             <CarrosselBanner />

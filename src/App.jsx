@@ -19,7 +19,8 @@ import Consultas from './pages/servicos/consultas.jsx'
 import PetCare from './pages/servicos/pet-care.jsx'
 
 // Loja
-import Shop from './pages/shop.jsx'
+import Shop from './pages/shop/shop.jsx'
+import Produto from './pages/shop/Produto.jsx'
 
 // Ao trocar de página, volta para o topo (a não ser que o link tenha #âncora)
 function ScrollToTop() {
@@ -66,6 +67,7 @@ function App() {
 
                 {/* Loja */}
                 <Route path="/shop" element={<Shop />} />
+                <Route path="/produto/:id" element={<Produto />} />
 
                 {/* Página não encontrada */}
                 <Route path="*" element={<Navigate to="/" replace />} />

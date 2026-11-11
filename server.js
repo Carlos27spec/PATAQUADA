@@ -1042,6 +1042,8 @@ app.get('/api/planos', (req, res) => {
 // Tabela: produtos
 // =====================================================
 
+// CONSULTAR TODOS OS PRODUTOS
+
 app.get('/api/produtos', (req, res) => {
     try {
         const produtos = consultarTabela('produtos');
@@ -1059,6 +1061,69 @@ app.get('/api/produtos', (req, res) => {
         );
     }
 });
+
+// CONSULTAR PRODUTOS ALEATÓRIOS PARA A PÁGINA INICIAL
+
+app.get('/api/produtos/aleatorios', (req, res) => {
+    try {
+        const quantidadeDisponivel = db.prepare(`
+            SELECT COUNT(*) AS total
+            FROM produtos
+            WHERE status = 1
+            AND estoque > 0
+        `).get();
+
+        const total = quantidadeDisponivel.total;
+
+        if (total === 0) {
+            return res.json({
+                sucesso: true,
+                dados: []
+            });
+        }
+
+        // Sorteia uma quantidade entre 5 e 10.
+        // Se houver menos produtos, utiliza todos os disponíveis.
+        const quantidadeAleatoria = Math.floor(
+            Math.random() * 6
+        ) + 5;
+
+        const limite = Math.min(
+            quantidadeAleatoria,
+            total
+        );
+
+        const produtos = db.prepare(`
+            SELECT
+                id,
+                nome,
+                descricao,
+                preco,
+                estoque,
+                imagem,
+                status
+            FROM produtos
+            WHERE status = 1
+            AND estoque > 0
+            ORDER BY RANDOM()
+            LIMIT ?
+        `).all(limite);
+
+        return res.json({
+            sucesso: true,
+            total: produtos.length,
+            dados: produtos
+        });
+
+    } catch (erro) {
+        return responderErro(
+            res,
+            erro,
+            'Erro ao consultar produtos aleatórios.'
+        );
+    }
+});
+
 
 // =====================================================
 // CATEGORIAS DE PRODUTOS

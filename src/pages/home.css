@@ -1,3 +1,4 @@
+
 /* ========================================
    HOME
    Usa as variáveis do CSS geral (:root).
@@ -47,6 +48,7 @@
 }
 
 /* ===== setas dos carrosséis ===== */
+
 .carrossel-seta {
     position: absolute;
     top: 50%;
@@ -89,6 +91,7 @@
 }
 
 /* ===== 1. banner ===== */
+
 .home-banner {
     background: var(--cor-creme-claro);
     padding: 16px 2.5%;
@@ -238,7 +241,8 @@
     background: #1f1f1f;
 }
 
-/* ===== 2. produtos (mais vendidos) ===== */
+/* ===== 2. produtos ===== */
+
 .home-produtos {
     position: relative;
     background: var(--cor-creme);
@@ -320,6 +324,8 @@
     padding: 8px 16px;
     cursor: pointer;
     transition: filter 0.2s;
+    text-align: center;
+    text-decoration: none;
 }
 
 .produto-botao:hover {
@@ -352,7 +358,41 @@
     right: 14px;
 }
 
+/* Estados de carregamento, erro e ausência de produtos */
+
+.produtos-status {
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: var(--cor-bege);
+    border-radius: 32px;
+    font-size: 1.05rem;
+    text-align: center;
+}
+
+/* Produto sem imagem cadastrada */
+
+.produto-imagem-vazia {
+    justify-self: center;
+    width: min(100%, 310px);
+    height: 260px;
+    display: grid;
+    place-items: center;
+    border-radius: 20px;
+    background: var(--cor-creme);
+}
+
+.produto-imagem-vazia .home-pata {
+    position: static;
+    width: 80px;
+    height: 80px;
+    opacity: 0.5;
+}
+
 /* ===== 3. serviços ===== */
+
 .home-servicos {
     position: relative;
     background: var(--cor-creme);
@@ -465,6 +505,7 @@
 }
 
 /* ===== 4. sobre ===== */
+
 #sobre {
     position: relative;
     background: var(--cor-creme-claro);
@@ -476,6 +517,7 @@
 }
 
 /* a arte já tem a mancha e a patinha: aparece inteira, sem corte */
+
 .sobre-imagem img {
     display: block;
     width: 100%;
@@ -489,7 +531,8 @@
     z-index: 1;
 }
 
-/* ".home" na frente para ganhar do ".home h2 { margin: 0 }" */
+/* ".home" na frente para ganhar do ".home h2 { margin: 0 } */
+
 .home .sobre-titulo {
     font-size: clamp(1.3rem, 2.6vw, 1.8rem);
     max-width: 22ch;
@@ -550,6 +593,7 @@
 }
 
 /* patinhas ficam nos espaços vazios, longe do texto */
+
 .pata-sobre-1 {
     right: 6%;
     top: 40px;
@@ -565,6 +609,7 @@
 }
 
 /* ===== 5. contato ===== */
+
 #contato {
     position: relative;
     background: var(--cor-pessego);
@@ -591,6 +636,7 @@
 }
 
 /* caixa: imagem à esquerda (colada embaixo) + formulário à direita */
+
 .contato-caixa {
     position: relative;
     z-index: 1;
@@ -651,6 +697,7 @@
 }
 
 /* só o campo de mensagem alinha o ícone no topo */
+
 .campo-mensagem {
     align-items: flex-start;
 }
@@ -720,6 +767,7 @@
 }
 
 /* ===== responsivo ===== */
+
 @media (max-width: 900px) {
     .banner-slide {
         grid-template-columns: 1fr;
@@ -745,6 +793,10 @@
     }
 
     .produto-card img {
+        height: 220px;
+    }
+
+    .produto-imagem-vazia {
         height: 220px;
     }
 

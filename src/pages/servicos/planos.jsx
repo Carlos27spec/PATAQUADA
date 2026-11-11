@@ -24,34 +24,110 @@ function Planos() {
     return (
         <section className="servicos-conteudo">
 
-            {/* APRESENTAÇÃO PRINCIPAL */}
-            <div className="consultas-hero">
+            {/* TOPO: hero + benefícios + foto ancorada no fim da faixa */}
+            <div className="consultas-topo">
 
-                <img
-                    src={patinha}
-                    alt=""
-                    className="consultas-hero-patinha"
-                />
+                {/* APRESENTAÇÃO PRINCIPAL */}
+                <div className="consultas-hero">
 
-                <div className="consultas-hero-texto">
-                    <h1>
-                        Confira todos os nossos planos
-                        <br />
-                        disponíveis
-                    </h1>
+                    <img
+                        src={patinha}
+                        alt=""
+                        className="consultas-hero-patinha"
+                    />
 
-                    <p>
-                        Escolha o cuidado ideal para o seu melhor amigo.
-                    </p>
+                    <div className="consultas-hero-texto">
+                        <h1>
+                            Confira todos os nossos planos
+                            <br />
+                            disponíveis
+                        </h1>
+
+                        <p>
+                            Escolha o cuidado ideal para o seu melhor amigo.
+                        </p>
+                    </div>
+
                 </div>
 
+                {/* BENEFÍCIOS */}
+                <div className="consultas-beneficios">
+
+                    <div className="beneficio-item">
+                        <span className="beneficio-icone">
+                            <svg viewBox="0 0 64 64" aria-hidden="true">
+                                <path d="M52 22l4-6-8 3c-3-2-6-3-10-3H26c-9 0-16 7-16 16 0 5 2 9 6 12v8h8v-4h12v4h8v-8c3-2 5-4 6-7h4V30h-4c-1-3-3-6-6-8z" />
+                                <rect className="furo" x="25" y="19" width="12" height="3" rx="1.5" />
+                                <circle className="furo" cx="45" cy="29" r="2" />
+                            </svg>
+                        </span>
+
+                        <p>
+                            Descontos
+                            <br />
+                            Exclusivos
+                        </p>
+                    </div>
+
+                    <div className="beneficio-item">
+                        <span className="beneficio-icone">
+                            <svg viewBox="0 0 64 64" aria-hidden="true">
+                                <rect x="12" y="6" width="40" height="52" rx="6" />
+                                <rect className="furo" x="18" y="12" width="28" height="10" rx="2" />
+                                <circle className="furo" cx="23" cy="31" r="2.5" />
+                                <circle className="furo" cx="32" cy="31" r="2.5" />
+                                <circle className="furo" cx="41" cy="31" r="2.5" />
+                                <circle className="furo" cx="23" cy="40" r="2.5" />
+                                <circle className="furo" cx="32" cy="40" r="2.5" />
+                                <circle className="furo" cx="41" cy="40" r="2.5" />
+                                <circle className="furo" cx="23" cy="49" r="2.5" />
+                                <circle className="furo" cx="32" cy="49" r="2.5" />
+                                <circle className="furo" cx="41" cy="49" r="2.5" />
+                            </svg>
+                        </span>
+
+                        <p>
+                            Mais praticidade
+                            <br />
+                            no seu dia a dia
+                        </p>
+                    </div>
+
+                    <div className="beneficio-item">
+                        <span className="beneficio-icone beneficio-coracao">
+                            ♥
+                        </span>
+
+                        <p>
+                            Pet sempre
+                            <br />
+                            saudável
+                        </p>
+                    </div>
+
+                    <div className="beneficio-item">
+                        <span className="beneficio-icone">
+                            ★
+                        </span>
+
+                        <p>
+                            Planos flexíveis
+                            <br />
+                            para cada
+                            <br />
+                            necessidade
+                        </p>
+                    </div>
+
+                </div>
+
+                {/* foto e patinha: base alinhada à base da faixa */}
                 {/* patinha grande atrás da veterinária */}
                 <img
                     src={patinha}
                     alt=""
                     className="consultas-hero-patona"
                 />
-
                 <img
                     src={veterinaria}
                     alt="Veterinária com cachorro"
@@ -59,79 +135,6 @@ function Planos() {
                 />
 
             </div>
-
-
-            {/* BENEFÍCIOS */}
-            <div className="consultas-beneficios">
-
-                <div className="beneficio-item">
-                    <span className="beneficio-icone">
-                        <svg viewBox="0 0 64 64" aria-hidden="true">
-                            <path d="M52 22l4-6-8 3c-3-2-6-3-10-3H26c-9 0-16 7-16 16 0 5 2 9 6 12v8h8v-4h12v4h8v-8c3-2 5-4 6-7h4V30h-4c-1-3-3-6-6-8z" />
-                            <rect className="furo" x="25" y="19" width="12" height="3" rx="1.5" />
-                            <circle className="furo" cx="45" cy="29" r="2" />
-                        </svg>
-                    </span>
-
-                    <p>
-                        Descontos
-                        <br />
-                        Exclusivos
-                    </p>
-                </div>
-
-                <div className="beneficio-item">
-                    <span className="beneficio-icone">
-                        <svg viewBox="0 0 64 64" aria-hidden="true">
-                            <rect x="12" y="6" width="40" height="52" rx="6" />
-                            <rect className="furo" x="18" y="12" width="28" height="10" rx="2" />
-                            <circle className="furo" cx="23" cy="31" r="2.5" />
-                            <circle className="furo" cx="32" cy="31" r="2.5" />
-                            <circle className="furo" cx="41" cy="31" r="2.5" />
-                            <circle className="furo" cx="23" cy="40" r="2.5" />
-                            <circle className="furo" cx="32" cy="40" r="2.5" />
-                            <circle className="furo" cx="41" cy="40" r="2.5" />
-                            <circle className="furo" cx="23" cy="49" r="2.5" />
-                            <circle className="furo" cx="32" cy="49" r="2.5" />
-                            <circle className="furo" cx="41" cy="49" r="2.5" />
-                        </svg>
-                    </span>
-
-                    <p>
-                        Mais praticidade
-                        <br />
-                        no seu dia a dia
-                    </p>
-                </div>
-
-                <div className="beneficio-item">
-                    <span className="beneficio-icone beneficio-coracao">
-                        ♥
-                    </span>
-
-                    <p>
-                        Pet sempre
-                        <br />
-                        saudável
-                    </p>
-                </div>
-
-                <div className="beneficio-item">
-                    <span className="beneficio-icone">
-                        ★
-                    </span>
-
-                    <p>
-                        Planos flexíveis
-                        <br />
-                        para cada
-                        <br />
-                        necessidade
-                    </p>
-                </div>
-
-            </div>
-
 
             {/* TÍTULO DOS PLANOS */}
             <div className="consultas-titulo-secao">
@@ -212,7 +215,7 @@ function Planos() {
                                 </ul>
 
                                 <div className="plano-preco">
-                                    <small>A partir de</small>
+                                    <small>Pelo valor de</small>
 
                                     <strong>
                                         {plano.precoFormatado}{' '}
