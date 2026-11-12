@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import './home.css'
-import { useHome } from './home.js'
+import { useHome, enviarContato } from './home.js'
+import { formatarPreco } from './shop/shop.js'
 
 import arteCarrossel from '../assets/dog-cat-1.png'
 import arteSobre from '../assets/dog-cat-2.png'
@@ -116,12 +117,6 @@ const valores = [
         icone: <Estrela />,
     },
 ]
-
-const formatarPreco = (valor) =>
-    Number(valor || 0).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-    })
 
 /* ---------- Pequenos componentes ---------- */
 
@@ -487,7 +482,7 @@ function CarrosselProdutos() {
                                             </p>
 
                                             <Link
-                                                to="/shop"
+                                                to={`/produto/${produto.id}`}
                                                 className="produto-botao"
                                                 tabIndex={i === indiceAtual ? 0 : -1}
                                             >
@@ -597,19 +592,23 @@ function SecaoContato() {
 
     const enviar = async (e) => {
         e.preventDefault()
+
+        if (status === 'enviando') return
+
         setStatus('enviando')
 
         try {
-            // TODO: integrar com a rota de contato do back-end.
-            await new Promise((r) => setTimeout(r, 600))
+            await enviarContato(form)
 
             setStatus('ok')
+
             setForm({
                 nome: '',
                 email: '',
                 mensagem: '',
             })
-        } catch {
+        } catch (error) {
+            console.error('Erro ao enviar mensagem de contato:', error)
             setStatus('erro')
         }
     }

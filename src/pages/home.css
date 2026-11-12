@@ -766,7 +766,77 @@
     color: var(--cor-laranja);
 }
 
-/* ===== responsivo ===== */
+
+/* ========================================
+   AJUSTES EXCLUSIVOS DA SEÇÃO DE CONTATO
+======================================== */
+
+#contato {
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+    justify-content: center;
+    align-items: center;
+    gap: clamp(20px, 3vw, 40px);
+    padding: 48px max(5%, calc((100% - 1100px) / 2));
+}
+
+.contato-texto {
+    width: 100%;
+    max-width: 340px;
+    justify-self: center;
+}
+
+.home .contato-texto h2 {
+    max-width: 20ch;
+}
+
+.contato-caixa {
+    width: 100%;
+    max-width: 680px;
+    justify-self: center;
+    grid-template-columns: minmax(120px, 0.55fr) minmax(0, 1.45fr);
+    gap: 16px;
+    align-items: center;
+}
+
+.contato-imagem {
+    max-width: 100%;
+}
+
+.contato-form {
+    width: 100%;
+    min-width: 0;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 900px) {
+    #contato {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 40px 6%;
+    }
+
+    .contato-texto {
+        max-width: 560px;
+        text-align: center;
+    }
+
+    .home .contato-texto h2 {
+        max-width: none;
+    }
+
+    .contato-caixa {
+        width: 100%;
+        max-width: 680px;
+    }
+}
+
+@media (max-width: 600px) {
+    .contato-caixa {
+        grid-template-columns: 1fr;
+    }
+}
+
 
 @media (max-width: 900px) {
     .banner-slide {

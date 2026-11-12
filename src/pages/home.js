@@ -48,21 +48,15 @@ function tratarProduto(item) {
         preco,
         precoFormatado: formatarPreco(preco),
         estoque,
-        disponivel: estoque > 0,
-        quantidadeVendida: Number(
-            item.quantidade_vendida ??
-            item.quantidadeVendida ??
-            item.total_vendido ??
-            0
-        )
+        disponivel: estoque > 0
     }
 }
 
-/* ---------- Buscar produtos mais vendidos ---------- */
+/* ---------- Buscar produtos aleatórios ---------- */
 
-async function buscarMaisVendidos(signal) {
+async function buscarProdutosAleatorios(signal) {
     const resposta = await fetch(
-        `${API_URL}/api/produtos/mais-vendidos?limite=${LIMITE_PRODUTOS}`,
+        `${API_URL}/api/produtos/aleatorios?limite=${LIMITE_PRODUTOS}`,
         {
             method: 'GET',
             headers: {
@@ -74,7 +68,7 @@ async function buscarMaisVendidos(signal) {
 
     if (!resposta.ok) {
         throw new Error(
-            `Não foi possível carregar os produtos mais vendidos (${resposta.status}).`
+            `Não foi possível carregar os produtos aleatórios (${resposta.status}).`
         )
     }
 
@@ -92,17 +86,42 @@ async function buscarMaisVendidos(signal) {
                 Number(produto.status) === 1
         )
         .filter(produto => produto.disponivel)
-        .sort(
-            (a, b) =>
-                b.quantidadeVendida - a.quantidadeVendida
-        )
         .slice(0, LIMITE_PRODUTOS)
+}
+
+/* ---------- Enviar formulário de contato ---------- */
+
+export async function enviarContato({ nome, email, mensagem }) {
+    const resposta = await fetch(`${API_URL}/api/contato`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body: JSON.stringify({
+            nome: nome.trim(),
+            email: email.trim(),
+            mensagem: mensagem.trim()
+        })
+    })
+
+    const resultado = await resposta.json().catch(() => ({}))
+
+    if (!resposta.ok) {
+        throw new Error(
+            resultado.erro ||
+            resultado.error ||
+            'Não foi possível enviar sua mensagem.'
+        )
+    }
+
+    return resultado
 }
 
 /* ---------- Hook da página inicial ---------- */
 
 export function useHome() {
-    const [produtosMaisVendidos, setProdutosMaisVendidos] = useState(
+    const [produtosAleatorios, setProdutosAleatorios] = useState(
         () => cache?.produtos ?? []
     )
 
@@ -128,7 +147,7 @@ export function useHome() {
             setErro(null)
 
             try {
-                const produtos = await buscarMaisVendidos(
+                const produtos = await buscarProdutosAleatorios(
                     controller.signal
                 )
 
@@ -137,11 +156,11 @@ export function useHome() {
                     em: Date.now()
                 }
 
-                setProdutosMaisVendidos(produtos)
+                setProdutosAleatorios(produtos)
             } catch (error) {
                 if (error.name !== 'AbortError') {
                     console.error(
-                        'Erro ao carregar os produtos mais vendidos:',
+                        'Erro ao carregar os produtos aleatórios:',
                         error
                     )
 
@@ -165,12 +184,8 @@ export function useHome() {
     }, [])
 
     return {
-        // Propriedade utilizada pelo home.jsx
-        produtos: produtosMaisVendidos,
-
-        // Mantida para compatibilidade com outros componentes
-        produtosMaisVendidos,
-
+        produtos: produtosAleatorios,
+        produtosMaisVendidos: produtosAleatorios,
         carregando,
         erro
     }

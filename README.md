@@ -71,6 +71,7 @@ cd PATAQUADA
 
 ```bash
 npm install
+npm install nodemailer
 ```
 
 ### 4. Executar a aplicação

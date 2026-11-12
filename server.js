@@ -6,7 +6,12 @@ import bcrypt from 'bcrypt';
 import Database from 'better-sqlite3';
 import path from 'path';
 import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 import { fileURLToPath } from 'url';
+
+// =====================================================
+// CONFIGURAÇÕES INICIAIS
+// =====================================================
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,8 +24,12 @@ const JWT_SECRET =
 
 const TEMPO_TOKEN = 7 * 24 * 60 * 60;
 
+const MP_API = (
+    process.env.MP_API || 'https://api.mercadopago.com'
+).replace(/\/$/, '');
+
 // =====================================================
-// CONFIGURAÇÕES E CORS
+// CORS
 // =====================================================
 
 app.use((req, res, next) => {
@@ -54,7 +63,7 @@ app.use(express.urlencoded({ extended: true }));
 // =====================================================
 
 const databasePath = path.join(__dirname, 'database');
-const databaseName = process.env.DB_NAME;
+const databaseName = process.env.DB_NAME || 'pataquada.db';
 const arquivoBanco = path.join(databasePath, databaseName);
 
 const db = new Database(arquivoBanco);
@@ -145,6 +154,14 @@ function consultarTabela(tabela, statusAtivo = true) {
     return db.prepare(sql).all();
 }
 
+function somenteDigitos(valor) {
+    return String(valor ?? '').replace(/\D/g, '');
+}
+
+function limitar(valor, tamanho) {
+    return String(valor ?? '').trim().slice(0, tamanho);
+}
+
 // =====================================================
 // AUTENTICAÇÃO POR TOKEN
 // =====================================================
@@ -200,7 +217,10 @@ function verificarToken(token) {
         Buffer.from(dados, 'base64url').toString('utf8')
     );
 
-    if (!payload.exp || payload.exp < Math.floor(Date.now() / 1000)) {
+    if (
+        !payload.exp ||
+        payload.exp < Math.floor(Date.now() / 1000)
+    ) {
         return null;
     }
 
@@ -397,6 +417,729 @@ function adicionarItemCarrinho(
 }
 
 // =====================================================
+// MERCADO PAGO - CONFIGURAÇÕES
+// =====================================================
+
+function configuracaoPagamento() {
+    return {
+        token: process.env.MP_ACCESS_TOKEN || '',
+
+        frontendUrl: (
+            process.env.FRONTEND_URL ||
+            'http://localhost:5173'
+        ).replace(/\/$/, ''),
+
+        backendUrl: (
+            process.env.BACKEND_URL ||
+            ''
+        ).replace(/\/$/, ''),
+
+        fretePadrao: Number(
+            process.env.FRETE_PADRAO ?? 1500
+        ),
+
+        freteGratisAPartirDe: Number(
+            process.env.FRETE_GRATIS_A_PARTIR_DE ?? 10000
+        )
+    };
+}
+
+class ErroPagamento extends Error {
+    constructor(mensagem, status = 400) {
+        super(mensagem);
+        this.status = status;
+    }
+}
+
+// =====================================================
+// MERCADO PAGO - TABELAS DE PEDIDOS
+// =====================================================
+
+const SQL_TABELAS_PEDIDOS = `
+CREATE TABLE IF NOT EXISTS pedidos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_usuario_cliente INTEGER NOT NULL,
+    subtotal INTEGER NOT NULL CHECK (subtotal >= 0),
+    frete INTEGER NOT NULL DEFAULT 0 CHECK (frete >= 0),
+    total INTEGER NOT NULL CHECK (total >= 0),
+    forma_pagamento TEXT NOT NULL DEFAULT 'TODAS',
+
+    status TEXT NOT NULL DEFAULT 'AGUARDANDO_PAGAMENTO'
+        CHECK (status IN (
+            'AGUARDANDO_PAGAMENTO',
+            'PAGO',
+            'EM_SEPARACAO',
+            'ENVIADO',
+            'ENTREGUE',
+            'CANCELADO',
+            'FALHOU'
+        )),
+
+    mp_preference_id TEXT,
+    mp_payment_id TEXT,
+    mp_status TEXT,
+
+    estoque_baixado INTEGER NOT NULL DEFAULT 0
+        CHECK (estoque_baixado IN (0, 1)),
+
+    entrega_destinatario TEXT NOT NULL,
+    entrega_telefone TEXT NOT NULL,
+    entrega_cep TEXT NOT NULL,
+    entrega_logradouro TEXT NOT NULL,
+    entrega_numero TEXT NOT NULL,
+    entrega_complemento TEXT,
+    entrega_bairro TEXT NOT NULL,
+    entrega_cidade TEXT NOT NULL,
+    entrega_uf TEXT NOT NULL,
+
+    data_criacao TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao TEXT,
+
+    FOREIGN KEY (id_usuario_cliente)
+        REFERENCES usuarios(id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+) STRICT;
+
+CREATE TABLE IF NOT EXISTS itens_pedido (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_pedido INTEGER NOT NULL,
+    id_produto INTEGER NOT NULL,
+    nome TEXT NOT NULL,
+    preco_unitario INTEGER NOT NULL CHECK (preco_unitario >= 0),
+    quantidade INTEGER NOT NULL CHECK (quantidade > 0),
+    imagem TEXT,
+
+    FOREIGN KEY (id_pedido)
+        REFERENCES pedidos(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (id_produto)
+        REFERENCES produtos(id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+) STRICT;
+
+CREATE INDEX IF NOT EXISTS idx_pedidos_usuario
+    ON pedidos (id_usuario_cliente);
+
+CREATE INDEX IF NOT EXISTS idx_itens_pedido_pedido
+    ON itens_pedido (id_pedido);
+`;
+
+db.exec(SQL_TABELAS_PEDIDOS);
+
+// =====================================================
+// MERCADO PAGO - CÁLCULO DOS VALORES
+// =====================================================
+
+function reais(centavos) {
+    return Number((centavos / 100).toFixed(2));
+}
+
+function calcularTotais(itens) {
+    const {
+        fretePadrao,
+        freteGratisAPartirDe
+    } = configuracaoPagamento();
+
+    const subtotal = itens.reduce(
+        (soma, item) => soma + item.preco * item.quantidade,
+        0
+    );
+
+    const frete =
+        itens.length === 0 ||
+        subtotal >= freteGratisAPartirDe
+            ? 0
+            : fretePadrao;
+
+    return {
+        subtotal,
+        frete,
+        total: subtotal + frete
+    };
+}
+
+// =====================================================
+// MERCADO PAGO - VALIDAÇÃO DA ENTREGA
+// =====================================================
+
+function validarEntrega(entrega = {}) {
+    const dados = {
+        destinatario: limitar(entrega.destinatario, 120),
+        telefone: somenteDigitos(entrega.telefone).slice(0, 11),
+        cep: somenteDigitos(entrega.cep).slice(0, 8),
+        logradouro: limitar(entrega.logradouro, 150),
+        numero: limitar(entrega.numero, 15),
+        complemento: limitar(entrega.complemento, 80),
+        bairro: limitar(entrega.bairro, 80),
+        cidade: limitar(entrega.cidade, 80),
+        uf: limitar(entrega.uf, 2).toUpperCase()
+    };
+
+    const erros = [];
+
+    if (dados.destinatario.length < 3) {
+        erros.push(
+            'Informe o nome de quem vai receber o pedido.'
+        );
+    }
+
+    if (dados.telefone.length < 10) {
+        erros.push('Informe um telefone com DDD.');
+    }
+
+    if (dados.cep.length !== 8) {
+        erros.push('Informe um CEP válido.');
+    }
+
+    if (!dados.logradouro) {
+        erros.push('Informe a rua do endereço de entrega.');
+    }
+
+    if (!dados.numero) {
+        erros.push('Informe o número do endereço de entrega.');
+    }
+
+    if (!dados.bairro) {
+        erros.push('Informe o bairro.');
+    }
+
+    if (!dados.cidade) {
+        erros.push('Informe a cidade.');
+    }
+
+    if (!/^[A-Z]{2}$/.test(dados.uf)) {
+        erros.push('Informe a sigla do estado (UF).');
+    }
+
+    return { dados, erros };
+}
+
+// =====================================================
+// MERCADO PAGO - FORMAS DE PAGAMENTO
+// =====================================================
+
+const TIPOS_PAGAMENTO = [
+    'account_money',
+    'ticket',
+    'atm',
+    'bank_transfer',
+    'credit_card',
+    'debit_card',
+    'prepaid_card'
+];
+
+const TIPO_POR_FORMA = {
+    PIX: 'bank_transfer',
+    CREDITO: 'credit_card',
+    DEBITO: 'debit_card',
+    BOLETO: 'ticket'
+};
+
+function metodosDePagamento(forma) {
+    const permitido = TIPO_POR_FORMA[forma];
+
+    if (!permitido) {
+        return undefined;
+    }
+
+    const metodos = {
+        excluded_payment_types: TIPOS_PAGAMENTO
+            .filter(tipo => tipo !== permitido)
+            .map(id => ({ id }))
+    };
+
+    if (forma === 'CREDITO') {
+        metodos.installments = 12;
+        metodos.default_installments = 1;
+    }
+
+    return metodos;
+}
+
+// =====================================================
+// MERCADO PAGO - COMUNICAÇÃO COM A API
+// =====================================================
+
+async function chamarMercadoPago(
+    caminho,
+    { metodo = 'GET', corpo } = {}
+) {
+    const { token } = configuracaoPagamento();
+
+    if (!token) {
+        throw new ErroPagamento(
+            'Pagamento indisponível no momento. Tente novamente mais tarde.',
+            503
+        );
+    }
+
+    let resposta;
+
+    try {
+        resposta = await fetch(`${MP_API}${caminho}`, {
+            method: metodo,
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: corpo ? JSON.stringify(corpo) : undefined
+        });
+
+    } catch (erro) {
+        console.error(
+            'Falha de rede ao falar com o Mercado Pago:',
+            erro
+        );
+
+        throw new ErroPagamento(
+            'Não foi possível conectar ao Mercado Pago.',
+            502
+        );
+    }
+
+    const dados = await resposta.json().catch(() => ({}));
+
+    if (!resposta.ok) {
+        console.error(
+            'Mercado Pago respondeu com erro:',
+            resposta.status,
+            JSON.stringify(dados)
+        );
+
+        throw new ErroPagamento(
+            'O Mercado Pago não aceitou a requisição. Tente novamente.',
+            502
+        );
+    }
+
+    return dados;
+}
+
+// =====================================================
+// MERCADO PAGO - CRIAÇÃO DA PREFERÊNCIA
+// =====================================================
+
+async function criarPreferenciaMercadoPago({
+    pedidoId,
+    usuario,
+    entrega,
+    itens,
+    frete,
+    forma
+}) {
+    const {
+        frontendUrl,
+        backendUrl
+    } = configuracaoPagamento();
+
+    const itensMP = itens.map(item => ({
+        id: String(item.id_produto),
+        title: String(item.nome).slice(0, 250),
+        quantity: item.quantidade,
+        currency_id: 'BRL',
+        unit_price: reais(item.preco)
+    }));
+
+    if (frete > 0) {
+        itensMP.push({
+            id: 'frete',
+            title: 'Frete',
+            quantity: 1,
+            currency_id: 'BRL',
+            unit_price: reais(frete)
+        });
+    }
+
+    const preferencia = {
+        items: itensMP,
+
+        payer: {
+            name: usuario.nome,
+            email: usuario.email,
+            phone: {
+                area_code: entrega.telefone.slice(0, 2),
+                number: entrega.telefone.slice(2)
+            }
+        },
+
+        back_urls: {
+            success: `${frontendUrl}/pedido/sucesso`,
+            pending: `${frontendUrl}/pedido/pendente`,
+            failure: `${frontendUrl}/pedido/falha`
+        },
+
+        external_reference: String(pedidoId),
+
+        statement_descriptor: 'PATAQUADA',
+
+        metadata: {
+            pedido_id: pedidoId
+        }
+    };
+
+    if (frontendUrl.startsWith('https://')) {
+        preferencia.auto_return = 'approved';
+    }
+
+    if (backendUrl.startsWith('https://')) {
+        preferencia.notification_url =
+            `${backendUrl}/api/pagamentos/webhook`;
+    }
+
+    const metodos = metodosDePagamento(forma);
+
+    if (metodos) {
+        preferencia.payment_methods = metodos;
+    }
+
+    return chamarMercadoPago('/checkout/preferences', {
+        metodo: 'POST',
+        corpo: preferencia
+    });
+}
+
+// =====================================================
+// MERCADO PAGO - CRIAÇÃO DO PEDIDO
+// =====================================================
+
+function criarPedido(
+    db,
+    { usuarioId, forma, entrega, itens, totais }
+) {
+    const criar = db.transaction(() => {
+        const resultado = db.prepare(`
+            INSERT INTO pedidos (
+                id_usuario_cliente,
+                subtotal,
+                frete,
+                total,
+                forma_pagamento,
+                entrega_destinatario,
+                entrega_telefone,
+                entrega_cep,
+                entrega_logradouro,
+                entrega_numero,
+                entrega_complemento,
+                entrega_bairro,
+                entrega_cidade,
+                entrega_uf
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+            usuarioId,
+            totais.subtotal,
+            totais.frete,
+            totais.total,
+            forma,
+            entrega.destinatario,
+            entrega.telefone,
+            entrega.cep,
+            entrega.logradouro,
+            entrega.numero,
+            entrega.complemento || null,
+            entrega.bairro,
+            entrega.cidade,
+            entrega.uf
+        );
+
+        const pedidoId = Number(resultado.lastInsertRowid);
+
+        const inserirItem = db.prepare(`
+            INSERT INTO itens_pedido (
+                id_pedido,
+                id_produto,
+                nome,
+                preco_unitario,
+                quantidade,
+                imagem
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+        `);
+
+        for (const item of itens) {
+            inserirItem.run(
+                pedidoId,
+                item.id_produto,
+                item.nome,
+                item.preco,
+                item.quantidade,
+                item.imagem ?? null
+            );
+        }
+
+        return pedidoId;
+    });
+
+    return criar();
+}
+
+// =====================================================
+// MERCADO PAGO - CONSULTA DO PEDIDO
+// =====================================================
+
+function buscarPedidoCompleto(db, pedidoId) {
+    const pedido = db.prepare(`
+        SELECT
+            id,
+            id_usuario_cliente,
+            subtotal,
+            frete,
+            total,
+            forma_pagamento,
+            status,
+            mp_payment_id,
+            mp_status,
+            entrega_destinatario,
+            entrega_telefone,
+            entrega_cep,
+            entrega_logradouro,
+            entrega_numero,
+            entrega_complemento,
+            entrega_bairro,
+            entrega_cidade,
+            entrega_uf,
+            data_criacao,
+            data_atualizacao
+        FROM pedidos
+        WHERE id = ?
+    `).get(pedidoId);
+
+    if (!pedido) {
+        return null;
+    }
+
+    pedido.itens = db.prepare(`
+        SELECT
+            id_produto,
+            nome,
+            preco_unitario,
+            quantidade,
+            imagem
+        FROM itens_pedido
+        WHERE id_pedido = ?
+        ORDER BY id
+    `).all(pedidoId);
+
+    return pedido;
+}
+
+// =====================================================
+// MERCADO PAGO - ATUALIZAÇÃO DO PAGAMENTO
+// =====================================================
+
+const ANTES_DO_PAGAMENTO = [
+    'AGUARDANDO_PAGAMENTO',
+    'FALHOU',
+    'CANCELADO'
+];
+
+const PAGAMENTO_EM_ANALISE = [
+    'pending',
+    'in_process',
+    'authorized'
+];
+
+function aplicarPagamento(db, pagamento) {
+    const pedidoId = Number(pagamento.external_reference);
+
+    if (!Number.isInteger(pedidoId) || pedidoId <= 0) {
+        return null;
+    }
+
+    const aplicar = db.transaction(() => {
+        const pedido = db.prepare(`
+            SELECT *
+            FROM pedidos
+            WHERE id = ?
+        `).get(pedidoId);
+
+        if (!pedido) {
+            return null;
+        }
+
+        const valorConfere =
+            Math.round(
+                Number(pagamento.transaction_amount) * 100
+            ) === pedido.total;
+
+        let novoStatus = pedido.status;
+
+        switch (pagamento.status) {
+            case 'approved':
+
+                if (!valorConfere) {
+                    console.warn(
+                        `Pagamento ${pagamento.id} aprovado com valor ` +
+                        `diferente do pedido ${pedidoId}. Pedido não alterado.`
+                    );
+
+                } else if (
+                    ANTES_DO_PAGAMENTO.includes(pedido.status)
+                ) {
+                    novoStatus = 'PAGO';
+                }
+
+                break;
+
+            case 'rejected':
+
+                if (pedido.status === 'AGUARDANDO_PAGAMENTO') {
+                    novoStatus = 'FALHOU';
+                }
+
+                break;
+
+            case 'cancelled':
+
+                if (pedido.status === 'AGUARDANDO_PAGAMENTO') {
+                    novoStatus = 'CANCELADO';
+                }
+
+                break;
+
+            case 'refunded':
+            case 'charged_back':
+
+                if (pedido.status === 'PAGO') {
+                    novoStatus = 'CANCELADO';
+                }
+
+                break;
+
+            default:
+                break;
+        }
+
+        const jaPagoEAvisoDeOutroPagamento =
+            pedido.status === 'PAGO' &&
+            novoStatus === 'PAGO' &&
+            pagamento.status !== 'approved';
+
+        if (!jaPagoEAvisoDeOutroPagamento) {
+            db.prepare(`
+                UPDATE pedidos
+                SET status = ?,
+                    mp_payment_id = ?,
+                    mp_status = ?,
+                    data_atualizacao = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `).run(
+                novoStatus,
+                String(pagamento.id),
+                String(pagamento.status),
+                pedidoId
+            );
+        }
+
+        // Baixa o estoque apenas uma vez.
+        if (
+            novoStatus === 'PAGO' &&
+            !pedido.estoque_baixado
+        ) {
+            const itens = db.prepare(`
+                SELECT
+                    id_produto,
+                    quantidade
+                FROM itens_pedido
+                WHERE id_pedido = ?
+            `).all(pedidoId);
+
+            const baixar = db.prepare(`
+                UPDATE produtos
+                SET estoque = MAX(estoque - ?, 0),
+                    data_atualizacao = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `);
+
+            for (const item of itens) {
+                baixar.run(
+                    item.quantidade,
+                    item.id_produto
+                );
+            }
+
+            db.prepare(`
+                UPDATE pedidos
+                SET estoque_baixado = 1
+                WHERE id = ?
+            `).run(pedidoId);
+        }
+
+        // Esvazia o carrinho quando o pagamento é aprovado
+        // ou está em análise.
+        if (
+            novoStatus === 'PAGO' ||
+            PAGAMENTO_EM_ANALISE.includes(pagamento.status)
+        ) {
+            db.prepare(`
+                DELETE FROM itens_carrinho
+                WHERE id_carrinho IN (
+                    SELECT id
+                    FROM carrinho
+                    WHERE id_usuario_cliente = ?
+                    AND status = 'ABERTO'
+                )
+            `).run(pedido.id_usuario_cliente);
+        }
+
+        return pedidoId;
+    });
+
+    return aplicar();
+}
+
+// =====================================================
+// MERCADO PAGO - SINCRONIZAÇÃO
+// =====================================================
+
+async function sincronizarPagamento(db, paymentId) {
+    const pagamento = await chamarMercadoPago(
+        `/v1/payments/${encodeURIComponent(paymentId)}`
+    );
+
+    return aplicarPagamento(db, pagamento);
+}
+
+async function sincronizarPorPedido(db, pedidoId) {
+    const resultado = await chamarMercadoPago(
+        `/v1/payments/search?external_reference=${pedidoId}` +
+        '&sort=date_created&criteria=desc&limit=1'
+    );
+
+    const pagamento = resultado?.results?.[0];
+
+    if (!pagamento) {
+        return null;
+    }
+
+    return aplicarPagamento(db, pagamento);
+}
+
+function responderErroPagamento(
+    res,
+    erro,
+    mensagemPadrao
+) {
+    if (erro instanceof ErroPagamento) {
+        return res.status(erro.status).json({
+            sucesso: false,
+            mensagem: erro.message
+        });
+    }
+
+    console.error(mensagemPadrao, erro);
+
+    return res.status(500).json({
+        sucesso: false,
+        mensagem: mensagemPadrao
+    });
+}
+
+// =====================================================
 // ROTA DE TESTE DO SERVIDOR
 // =====================================================
 
@@ -436,7 +1179,6 @@ app.get('/api/status', (req, res) => {
 
 // =====================================================
 // USUÁRIOS
-// Tabela: usuarios
 // =====================================================
 
 // CADASTRO
@@ -642,9 +1384,6 @@ app.get('/api/usuarios', autenticar, (req, res) => {
 
 // =====================================================
 // CARRINHO
-// Tabelas: carrinho e itens_carrinho
-// Todas as rotas exigem autenticação.
-// O carrinho de visitantes fica no localStorage.
 // =====================================================
 
 // CONSULTAR CARRINHO
@@ -671,7 +1410,10 @@ app.get('/api/carrinho', autenticar, (req, res) => {
 
 app.post('/api/carrinho/itens', autenticar, (req, res) => {
     try {
-        const { id_produto, quantidade = 1 } = req.body;
+        const {
+            id_produto,
+            quantidade = 1
+        } = req.body;
 
         if (
             !Number.isInteger(Number(id_produto)) ||
@@ -720,146 +1462,158 @@ app.post('/api/carrinho/itens', autenticar, (req, res) => {
 
 // ATUALIZAR QUANTIDADE
 
-app.put('/api/carrinho/itens/:idProduto', autenticar, (req, res) => {
-    try {
-        const idProduto = Number(req.params.idProduto);
-        const quantidade = Number(req.body.quantidade);
+app.put(
+    '/api/carrinho/itens/:idProduto',
+    autenticar,
+    (req, res) => {
+        try {
+            const idProduto = Number(req.params.idProduto);
+            const quantidade = Number(req.body.quantidade);
 
-        if (
-            !Number.isInteger(idProduto) ||
-            idProduto <= 0 ||
-            !Number.isInteger(quantidade) ||
-            quantidade <= 0
-        ) {
-            return res.status(400).json({
-                sucesso: false,
-                mensagem: 'Informe uma quantidade válida.'
+            if (
+                !Number.isInteger(idProduto) ||
+                idProduto <= 0 ||
+                !Number.isInteger(quantidade) ||
+                quantidade <= 0
+            ) {
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: 'Informe uma quantidade válida.'
+                });
+            }
+
+            const carrinho = db.prepare(`
+                SELECT id
+                FROM carrinho
+                WHERE id_usuario_cliente = ?
+                AND status = 'ABERTO'
+            `).get(req.usuario.id);
+
+            if (!carrinho) {
+                return res.status(404).json({
+                    sucesso: false,
+                    mensagem: 'Carrinho não encontrado.'
+                });
+            }
+
+            const produto = db.prepare(`
+                SELECT estoque
+                FROM produtos
+                WHERE id = ?
+                AND status = 1
+            `).get(idProduto);
+
+            if (!produto) {
+                return res.status(404).json({
+                    sucesso: false,
+                    mensagem: 'Produto não encontrado ou indisponível.'
+                });
+            }
+
+            if (quantidade > produto.estoque) {
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: `Estoque insuficiente. Disponível: ${produto.estoque}.`
+                });
+            }
+
+            const resultado = db.prepare(`
+                UPDATE itens_carrinho
+                SET quantidade = ?
+                WHERE id_carrinho = ?
+                AND id_produto = ?
+            `).run(
+                quantidade,
+                carrinho.id,
+                idProduto
+            );
+
+            if (resultado.changes === 0) {
+                return res.status(404).json({
+                    sucesso: false,
+                    mensagem: 'Item não encontrado no carrinho.'
+                });
+            }
+
+            db.prepare(`
+                UPDATE carrinho
+                SET data_atualizacao = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `).run(carrinho.id);
+
+            return res.json({
+                sucesso: true,
+                mensagem: 'Quantidade atualizada.',
+                dados: consultarCarrinho(req.usuario.id)
             });
+
+        } catch (erro) {
+            return responderErro(
+                res,
+                erro,
+                'Erro ao atualizar quantidade.'
+            );
         }
-
-        const carrinho = db.prepare(`
-            SELECT id
-            FROM carrinho
-            WHERE id_usuario_cliente = ?
-            AND status = 'ABERTO'
-        `).get(req.usuario.id);
-
-        if (!carrinho) {
-            return res.status(404).json({
-                sucesso: false,
-                mensagem: 'Carrinho não encontrado.'
-            });
-        }
-
-        const produto = db.prepare(`
-            SELECT estoque
-            FROM produtos
-            WHERE id = ?
-            AND status = 1
-        `).get(idProduto);
-
-        if (!produto) {
-            return res.status(404).json({
-                sucesso: false,
-                mensagem: 'Produto não encontrado ou indisponível.'
-            });
-        }
-
-        if (quantidade > produto.estoque) {
-            return res.status(400).json({
-                sucesso: false,
-                mensagem: `Estoque insuficiente. Disponível: ${produto.estoque}.`
-            });
-        }
-
-        const resultado = db.prepare(`
-            UPDATE itens_carrinho
-            SET quantidade = ?
-            WHERE id_carrinho = ?
-            AND id_produto = ?
-        `).run(quantidade, carrinho.id, idProduto);
-
-        if (resultado.changes === 0) {
-            return res.status(404).json({
-                sucesso: false,
-                mensagem: 'Item não encontrado no carrinho.'
-            });
-        }
-
-        db.prepare(`
-            UPDATE carrinho
-            SET data_atualizacao = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `).run(carrinho.id);
-
-        return res.json({
-            sucesso: true,
-            mensagem: 'Quantidade atualizada.',
-            dados: consultarCarrinho(req.usuario.id)
-        });
-
-    } catch (erro) {
-        return responderErro(
-            res,
-            erro,
-            'Erro ao atualizar quantidade.'
-        );
     }
-});
+);
 
 // REMOVER ITEM
 
-app.delete('/api/carrinho/itens/:idProduto', autenticar, (req, res) => {
-    try {
-        const idProduto = Number(req.params.idProduto);
+app.delete(
+    '/api/carrinho/itens/:idProduto',
+    autenticar,
+    (req, res) => {
+        try {
+            const idProduto = Number(req.params.idProduto);
 
-        const carrinho = db.prepare(`
-            SELECT id
-            FROM carrinho
-            WHERE id_usuario_cliente = ?
-            AND status = 'ABERTO'
-        `).get(req.usuario.id);
+            const carrinho = db.prepare(`
+                SELECT id
+                FROM carrinho
+                WHERE id_usuario_cliente = ?
+                AND status = 'ABERTO'
+            `).get(req.usuario.id);
 
-        if (!carrinho) {
-            return res.status(404).json({
-                sucesso: false,
-                mensagem: 'Carrinho não encontrado.'
+            if (!carrinho) {
+                return res.status(404).json({
+                    sucesso: false,
+                    mensagem: 'Carrinho não encontrado.'
+                });
+            }
+
+            const resultado = db.prepare(`
+                DELETE FROM itens_carrinho
+                WHERE id_carrinho = ?
+                AND id_produto = ?
+            `).run(carrinho.id, idProduto);
+
+            if (resultado.changes === 0) {
+                return res.status(404).json({
+                    sucesso: false,
+                    mensagem: 'Item não encontrado no carrinho.'
+                });
+            }
+
+            db.prepare(`
+                UPDATE carrinho
+                SET data_atualizacao = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `).run(carrinho.id);
+
+            return res.json({
+                sucesso: true,
+                mensagem: 'Produto removido do carrinho.',
+                dados: consultarCarrinho(req.usuario.id)
             });
+
+        } catch (erro) {
+            return responderErro(
+                res,
+                erro,
+                'Erro ao remover produto do carrinho.'
+            );
         }
-
-        const resultado = db.prepare(`
-            DELETE FROM itens_carrinho
-            WHERE id_carrinho = ?
-            AND id_produto = ?
-        `).run(carrinho.id, idProduto);
-
-        if (resultado.changes === 0) {
-            return res.status(404).json({
-                sucesso: false,
-                mensagem: 'Item não encontrado no carrinho.'
-            });
-        }
-
-        db.prepare(`
-            UPDATE carrinho
-            SET data_atualizacao = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `).run(carrinho.id);
-
-        return res.json({
-            sucesso: true,
-            mensagem: 'Produto removido do carrinho.',
-            dados: consultarCarrinho(req.usuario.id)
-        });
-
-    } catch (erro) {
-        return responderErro(
-            res,
-            erro,
-            'Erro ao remover produto do carrinho.'
-        );
     }
-});
+);
 
 // ESVAZIAR CARRINHO
 
@@ -926,7 +1680,9 @@ app.post('/api/carrinho/sincronizar', autenticar, (req, res) => {
                     !Number.isInteger(quantidade) ||
                     quantidade <= 0
                 ) {
-                    throw new Error('Um ou mais itens possuem dados inválidos.');
+                    throw new Error(
+                        'Um ou mais itens possuem dados inválidos.'
+                    );
                 }
 
                 adicionarItemCarrinho(
@@ -961,6 +1717,321 @@ app.post('/api/carrinho/sincronizar', autenticar, (req, res) => {
             res,
             erro,
             'Erro ao sincronizar carrinho.'
+        );
+    }
+});
+
+// =====================================================
+// MERCADO PAGO - ROTAS DE PAGAMENTO
+// =====================================================
+
+// CRIAR PEDIDO E PREFERÊNCIA DE PAGAMENTO
+
+app.post(
+    '/api/pagamentos/preferencia',
+    autenticar,
+    async (req, res) => {
+        let pedidoId = null;
+
+        try {
+            const forma = String(
+                req.body?.forma ?? 'TODAS'
+            ).toUpperCase();
+
+            if (
+                forma !== 'TODAS' &&
+                !TIPO_POR_FORMA[forma]
+            ) {
+                throw new ErroPagamento(
+                    'Forma de pagamento inválida.'
+                );
+            }
+
+            const {
+                dados: entrega,
+                erros
+            } = validarEntrega(req.body?.entrega);
+
+            if (erros.length > 0) {
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: erros[0],
+                    erros
+                });
+            }
+
+            const carrinho = consultarCarrinho(req.usuario.id);
+
+            if (carrinho.itens.length === 0) {
+                throw new ErroPagamento(
+                    'Seu carrinho está vazio.'
+                );
+            }
+
+            for (const item of carrinho.itens) {
+                if (Number(item.status_produto) !== 1) {
+                    throw new ErroPagamento(
+                        `O produto "${item.nome}" não está mais disponível.`
+                    );
+                }
+
+                if (item.quantidade > item.estoque) {
+                    throw new ErroPagamento(
+                        `Estoque insuficiente para "${item.nome}". ` +
+                        `Disponível: ${item.estoque}.`
+                    );
+                }
+            }
+
+            const totais = calcularTotais(carrinho.itens);
+
+            pedidoId = criarPedido(db, {
+                usuarioId: req.usuario.id,
+                forma,
+                entrega,
+                itens: carrinho.itens,
+                totais
+            });
+
+            const preferencia = await criarPreferenciaMercadoPago({
+                pedidoId,
+                usuario: req.usuario,
+                entrega,
+                itens: carrinho.itens,
+                frete: totais.frete,
+                forma
+            });
+
+            if (!preferencia.init_point) {
+                throw new ErroPagamento(
+                    'O Mercado Pago não devolveu o link de pagamento.',
+                    502
+                );
+            }
+
+            db.prepare(`
+                UPDATE pedidos
+                SET mp_preference_id = ?,
+                    data_atualizacao = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `).run(
+                String(preferencia.id),
+                pedidoId
+            );
+
+            return res.status(201).json({
+                sucesso: true,
+                pedido_id: pedidoId,
+                init_point: preferencia.init_point
+            });
+
+        } catch (erro) {
+            if (pedidoId) {
+                db.prepare(`
+                    UPDATE pedidos
+                    SET status = 'CANCELADO',
+                        data_atualizacao = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                    AND status = 'AGUARDANDO_PAGAMENTO'
+                `).run(pedidoId);
+            }
+
+            return responderErroPagamento(
+                res,
+                erro,
+                'Erro ao iniciar o pagamento.'
+            );
+        }
+    }
+);
+
+// CONFIRMAR PAGAMENTO QUANDO O CLIENTE RETORNA
+
+app.post(
+    '/api/pagamentos/confirmar',
+    autenticar,
+    async (req, res) => {
+        try {
+            const paymentId = String(
+                req.body?.payment_id ?? ''
+            ).trim();
+
+            let pedidoId = Number(req.body?.pedido_id);
+
+            if (paymentId && /^\d+$/.test(paymentId)) {
+                const pagamento = await chamarMercadoPago(
+                    `/v1/payments/${paymentId}`
+                );
+
+                pedidoId = Number(
+                    pagamento.external_reference
+                );
+
+                const dono = db.prepare(`
+                    SELECT id_usuario_cliente
+                    FROM pedidos
+                    WHERE id = ?
+                `).get(pedidoId);
+
+                if (
+                    !dono ||
+                    dono.id_usuario_cliente !== req.usuario.id
+                ) {
+                    throw new ErroPagamento(
+                        'Pedido não encontrado.',
+                        404
+                    );
+                }
+
+                aplicarPagamento(db, pagamento);
+
+            } else if (
+                Number.isInteger(pedidoId) &&
+                pedidoId > 0
+            ) {
+                const dono = db.prepare(`
+                    SELECT id_usuario_cliente
+                    FROM pedidos
+                    WHERE id = ?
+                `).get(pedidoId);
+
+                if (
+                    !dono ||
+                    dono.id_usuario_cliente !== req.usuario.id
+                ) {
+                    throw new ErroPagamento(
+                        'Pedido não encontrado.',
+                        404
+                    );
+                }
+
+                await sincronizarPorPedido(db, pedidoId);
+
+            } else {
+                throw new ErroPagamento(
+                    'Informe o pedido ou o pagamento.'
+                );
+            }
+
+            return res.json({
+                sucesso: true,
+                dados: buscarPedidoCompleto(db, pedidoId)
+            });
+
+        } catch (erro) {
+            return responderErroPagamento(
+                res,
+                erro,
+                'Erro ao confirmar o pagamento.'
+            );
+        }
+    }
+);
+
+// WEBHOOK DO MERCADO PAGO
+
+app.post(
+    '/api/pagamentos/webhook',
+    async (req, res) => {
+        // Confirma o recebimento do aviso.
+        res.sendStatus(200);
+
+        try {
+            const tipo =
+                req.body?.type ||
+                req.query.type ||
+                req.query.topic;
+
+            if (tipo !== 'payment') {
+                return;
+            }
+
+            const id =
+                req.body?.data?.id ||
+                req.query['data.id'] ||
+                req.query.id;
+
+            if (
+                !id ||
+                !/^\d+$/.test(String(id))
+            ) {
+                return;
+            }
+
+            await sincronizarPagamento(
+                db,
+                String(id)
+            );
+
+        } catch (erro) {
+            console.error(
+                'Erro ao processar webhook:',
+                erro.message
+            );
+        }
+    }
+);
+
+// =====================================================
+// PEDIDOS DO CLIENTE
+// =====================================================
+
+// LISTAR PEDIDOS
+
+app.get('/api/pedidos', autenticar, (req, res) => {
+    try {
+        const ids = db.prepare(`
+            SELECT id
+            FROM pedidos
+            WHERE id_usuario_cliente = ?
+            ORDER BY id DESC
+        `).all(req.usuario.id);
+
+        return res.json({
+            sucesso: true,
+            dados: ids.map(
+                ({ id }) => buscarPedidoCompleto(db, id)
+            )
+        });
+
+    } catch (erro) {
+        return responderErroPagamento(
+            res,
+            erro,
+            'Erro ao consultar pedidos.'
+        );
+    }
+});
+
+// CONSULTAR PEDIDO ESPECÍFICO
+
+app.get('/api/pedidos/:id', autenticar, (req, res) => {
+    try {
+        const pedido = buscarPedidoCompleto(
+            db,
+            Number(req.params.id)
+        );
+
+        if (
+            !pedido ||
+            pedido.id_usuario_cliente !== req.usuario.id
+        ) {
+            return res.status(404).json({
+                sucesso: false,
+                mensagem: 'Pedido não encontrado.'
+            });
+        }
+
+        return res.json({
+            sucesso: true,
+            dados: pedido
+        });
+
+    } catch (erro) {
+        return responderErroPagamento(
+            res,
+            erro,
+            'Erro ao consultar pedido.'
         );
     }
 });
@@ -1039,7 +2110,6 @@ app.get('/api/planos', (req, res) => {
 
 // =====================================================
 // PRODUTOS
-// Tabela: produtos
 // =====================================================
 
 // CONSULTAR TODOS OS PRODUTOS
@@ -1062,7 +2132,7 @@ app.get('/api/produtos', (req, res) => {
     }
 });
 
-// CONSULTAR PRODUTOS ALEATÓRIOS PARA A PÁGINA INICIAL
+// PRODUTOS ALEATÓRIOS
 
 app.get('/api/produtos/aleatorios', (req, res) => {
     try {
@@ -1082,11 +2152,8 @@ app.get('/api/produtos/aleatorios', (req, res) => {
             });
         }
 
-        // Sorteia uma quantidade entre 5 e 10.
-        // Se houver menos produtos, utiliza todos os disponíveis.
-        const quantidadeAleatoria = Math.floor(
-            Math.random() * 6
-        ) + 5;
+        const quantidadeAleatoria =
+            Math.floor(Math.random() * 6) + 5;
 
         const limite = Math.min(
             quantidadeAleatoria,
@@ -1124,10 +2191,8 @@ app.get('/api/produtos/aleatorios', (req, res) => {
     }
 });
 
-
 // =====================================================
 // CATEGORIAS DE PRODUTOS
-// Tabela: categorias_produto
 // =====================================================
 
 app.get('/api/categorias-produto', (req, res) => {
@@ -1153,12 +2218,13 @@ app.get('/api/categorias-produto', (req, res) => {
 
 // =====================================================
 // PROFISSIONAIS
-// Tabela: profissionais
 // =====================================================
 
 app.get('/api/profissionais', (req, res) => {
     try {
-        const profissionais = consultarTabela('profissionais');
+        const profissionais = consultarTabela(
+            'profissionais'
+        );
 
         return res.json({
             sucesso: true,
@@ -1176,12 +2242,14 @@ app.get('/api/profissionais', (req, res) => {
 
 // =====================================================
 // TIPOS DE USUÁRIO
-// Tabela: tipo_usuario
 // =====================================================
 
 app.get('/api/tipos-usuario', (req, res) => {
     try {
-        const tipos = consultarTabela('tipo_usuario', false);
+        const tipos = consultarTabela(
+            'tipo_usuario',
+            false
+        );
 
         return res.json({
             sucesso: true,
@@ -1199,12 +2267,14 @@ app.get('/api/tipos-usuario', (req, res) => {
 
 // =====================================================
 // SITUAÇÕES
-// Tabela: situacao
 // =====================================================
 
 app.get('/api/situacoes', (req, res) => {
     try {
-        const situacoes = consultarTabela('situacao', false);
+        const situacoes = consultarTabela(
+            'situacao',
+            false
+        );
 
         return res.json({
             sucesso: true,
@@ -1217,6 +2287,183 @@ app.get('/api/situacoes', (req, res) => {
             erro,
             'Erro ao consultar situações.'
         );
+    }
+});
+
+// =====================================================
+// DEBUG - DADOS DAS TABELAS DE SERVIÇOS
+// =====================================================
+
+app.get('/api/debug/dados-servicos', (req, res) => {
+    const tabelasDebug = [
+        'servicos',
+        'tipos_consulta',
+        'plano'
+    ];
+
+    const resultado = {};
+
+    try {
+        for (const tabela of tabelasDebug) {
+            try {
+                const colunas = db.prepare(`
+                    PRAGMA table_info("${tabela}")
+                `).all();
+
+                const dados = db.prepare(`
+                    SELECT *
+                    FROM "${tabela}"
+                `).all();
+
+                resultado[tabela] = {
+                    total: dados.length,
+                    colunas: colunas.map(
+                        coluna => coluna.name
+                    ),
+                    dados
+                };
+
+            } catch (erro) {
+                resultado[tabela] = {
+                    erro: erro.message
+                };
+            }
+        }
+
+        return res.json(resultado);
+
+    } catch (erro) {
+        console.error(
+            'Erro ao consultar tabelas:',
+            erro
+        );
+
+        return res.status(500).json({
+            erro: erro.message
+        });
+    }
+});
+
+// =====================================================
+// CONTATO - ENVIO DE E-MAIL
+// =====================================================
+
+function escaparHtml(valor) {
+    return String(valor)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+app.post('/api/contato', async (req, res) => {
+    try {
+        const nome = limitar(req.body?.nome, 120);
+        const email = limitar(req.body?.email, 254);
+        const mensagem = limitar(req.body?.mensagem, 5000);
+
+        if (!nome || !email || !mensagem) {
+            return res.status(400).json({
+                sucesso: false,
+                erro: 'Preencha todos os campos do formulário.'
+            });
+        }
+
+        const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        if (!emailValido) {
+            return res.status(400).json({
+                sucesso: false,
+                erro: 'Informe um endereço de e-mail válido.'
+            });
+        }
+
+        if (
+            !process.env.SMTP_HOST ||
+            !process.env.SMTP_USER ||
+            !process.env.SMTP_PASS ||
+            !process.env.EMAIL_DESTINATARIO
+        ) {
+            console.error(
+                'Configurações SMTP incompletas no arquivo .env.'
+            );
+
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'O serviço de contato não está configurado.'
+            });
+        }
+
+        const transportadorEmail = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: Number(process.env.SMTP_PORT || 587),
+            secure: process.env.SMTP_SECURE === 'true',
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS
+            }
+        });
+
+        await transportadorEmail.sendMail({
+            from: {
+                name: nome,
+                address: email
+            },
+
+            to: process.env.EMAIL_DESTINATARIO,
+
+            replyTo: {
+                name: nome,
+                address: email
+            },
+
+            subject: `Solicitação de Contato do Cliente - ${nome}`,
+
+            text: [
+                `Nome: ${nome}`,
+                `E-mail: ${email}`,
+                '',
+                'Mensagem:',
+                mensagem
+            ].join('\n'),
+
+            html: `
+                <h2>Nova solicitação de contato</h2>
+
+                <p>
+                    <strong>Nome:</strong>
+                    ${escaparHtml(nome)}
+                </p>
+
+                <p>
+                    <strong>E-mail:</strong>
+                    ${escaparHtml(email)}
+                </p>
+
+                <p><strong>Mensagem:</strong></p>
+
+                <p>
+                    ${escaparHtml(mensagem).replace(/\n/g, '<br>')}
+                </p>
+            `
+        });
+
+        return res.status(200).json({
+            sucesso: true,
+            mensagem: 'Mensagem enviada com sucesso.'
+        });
+
+    } catch (erro) {
+        console.error(
+            'Erro ao enviar e-mail de contato:',
+            erro
+        );
+
+        return res.status(500).json({
+            sucesso: false,
+            erro: 'Não foi possível enviar sua mensagem. Tente novamente.'
+        });
     }
 });
 
@@ -1253,54 +2500,12 @@ const servidor = app.listen(PORT, () => {
     console.log(`Servidor PataQuada iniciado na porta ${PORT}`);
     console.log(`Acesse: http://localhost:${PORT}`);
     console.log(`Banco utilizado: ${arquivoBanco}`);
-});
 
-// =====================================================
-// DEBUG - CONSULTAR DADOS DAS TABELAS DA PÁGINA SERVIÇOS
-// =====================================================
-
-app.get('/api/debug/dados-servicos', (req, res) => {
-    const tabelas = [
-        'servicos',
-        'tipos_consulta',
-        'plano'
-    ];
-
-    const resultado = {};
-
-    try {
-        for (const tabela of tabelas) {
-            try {
-                const colunas = db.prepare(`
-                    PRAGMA table_info("${tabela}")
-                `).all();
-
-                const dados = db.prepare(`
-                    SELECT *
-                    FROM "${tabela}"
-                `).all();
-
-                resultado[tabela] = {
-                    total: dados.length,
-                    colunas: colunas.map(coluna => coluna.name),
-                    dados: dados
-                };
-
-            } catch (erro) {
-                resultado[tabela] = {
-                    erro: erro.message
-                };
-            }
-        }
-
-        return res.json(resultado);
-
-    } catch (erro) {
-        console.error('Erro ao consultar tabelas:', erro);
-
-        return res.status(500).json({
-            erro: erro.message
-        });
+    if (!process.env.MP_ACCESS_TOKEN) {
+        console.warn(
+            'AVISO: MP_ACCESS_TOKEN não configurado. ' +
+            'O pagamento pelo Mercado Pago ficará indisponível.'
+        );
     }
 });
 
@@ -1314,7 +2519,9 @@ function encerrarServidor() {
     servidor.close(() => {
         db.close();
 
-        console.log('Conexão com o banco de dados encerrada.');
+        console.log(
+            'Conexão com o banco de dados encerrada.'
+        );
 
         process.exit(0);
     });

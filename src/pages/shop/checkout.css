@@ -1,0 +1,914 @@
+/* ========================================
+   CARRINHO, PAGAMENTO E CONFIRMAÇÃO - PATAQUADA
+   Usa as variáveis do css principal (:root).
+   Só 2 cores vêm direto do design: o fundo da página
+   (igual ao da loja) e o verde do Pix.
+======================================== */
+
+.ck-pagina {
+    --ck-fundo: #FFF7EA;
+    --ck-pix: #32BCAD;
+
+    width: 100%;
+    padding: 28px 0 72px;
+    background-color: var(--ck-fundo);
+    color: var(--cor-preto);
+}
+
+.ck-pagina *,
+.ck-pagina *::before,
+.ck-pagina *::after {
+    box-sizing: border-box;
+}
+
+.ck-container {
+    width: min(100% - 32px, 1200px);
+    margin-inline: auto;
+}
+
+/* ========================================
+   TÍTULO
+======================================== */
+
+.ck-titulo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.ck-titulo h1 {
+    font-size: clamp(34px, 4vw, 48px);
+    line-height: 1.05;
+}
+
+.ck-voltar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--cor-creme);
+    color: var(--cor-preto);
+    font-size: 20px;
+    transition:
+        background-color var(--transicao-padrao),
+        color var(--transicao-padrao);
+}
+
+.ck-voltar:hover {
+    background-color: var(--cor-laranja);
+    color: var(--cor-branco);
+}
+
+.ck-voltar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   ESTRUTURA E QUADROS
+======================================== */
+
+.ck-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+}
+
+.ck-painel {
+    padding: 30px;
+    border-radius: 36px;
+    background-color: var(--cor-creme);
+}
+
+.ck-painel h2 {
+    margin-bottom: 18px;
+    font-size: 28px;
+    line-height: 1.1;
+}
+
+.ck-mensagem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 40px 24px;
+    border-radius: 36px;
+    background-color: var(--cor-creme);
+    font-size: 18px;
+    text-align: center;
+}
+
+.ck-mensagem--erro {
+    border: 2px solid var(--cor-laranja);
+}
+
+.ck-vazio img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+}
+
+.ck-vazio h2 {
+    margin: 0;
+}
+
+.ck-aviso {
+    margin: 0 0 18px;
+    padding: 12px 18px;
+    border-radius: 16px;
+    font-size: 16px;
+}
+
+.ck-aviso--erro {
+    background-color: var(--cor-rosa);
+}
+
+.ck-aviso a {
+    text-decoration: underline;
+}
+
+/* ========================================
+   BOTÕES
+======================================== */
+
+.ck-botao {
+    padding: 12px 30px;
+    font-size: 20px;
+}
+
+.ck-botao--grande {
+    width: 100%;
+    height: 58px;
+    margin-top: 8px;
+    font-size: 22px;
+}
+
+.ck-botao--contorno {
+    border: 2px solid var(--cor-laranja);
+    background-color: transparent;
+    color: var(--cor-laranja);
+}
+
+.ck-botao--contorno:hover {
+    background-color: var(--cor-laranja);
+    color: var(--cor-branco);
+}
+
+.ck-pagina .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.ck-link {
+    display: block;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--cor-laranja);
+    font-size: 16px;
+    text-align: center;
+    text-decoration: underline;
+}
+
+.ck-link:hover {
+    color: var(--cor-marrom);
+}
+
+/* ========================================
+   CARRINHO - LISTA
+======================================== */
+
+.ck-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.ck-item {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 18px;
+    padding: 14px 18px;
+    border-radius: 24px;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.ck-item[aria-busy="true"] {
+    opacity: 0.6;
+}
+
+.ck-item-imagem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    height: 96px;
+    overflow: hidden;
+    border-radius: 18px;
+    background-color: var(--cor-branco);
+}
+
+.ck-item-imagem img {
+    max-width: 88%;
+    max-height: 88%;
+    object-fit: contain;
+}
+
+.ck-item-dados {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.ck-item-dados > a {
+    font-size: 18px;
+    line-height: 1.25;
+}
+
+.ck-item-dados > a:hover {
+    color: var(--cor-laranja);
+}
+
+.ck-item-dados strong {
+    font-family: var(--fonte-titulo);
+    font-size: 26px;
+    font-weight: normal;
+    line-height: 1.1;
+}
+
+.ck-item-alerta {
+    color: var(--cor-marrom);
+    font-size: 14px;
+}
+
+.ck-qtd {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ck-qtd button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1.5px solid var(--cor-preto);
+    border-radius: 50%;
+    background-color: var(--cor-branco);
+    color: var(--cor-preto);
+    font-size: 20px;
+    line-height: 1;
+}
+
+.ck-qtd button:hover:not(:disabled) {
+    border-color: var(--cor-laranja);
+    color: var(--cor-laranja);
+}
+
+.ck-qtd button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.ck-qtd span {
+    min-width: 34px;
+    font-family: var(--fonte-titulo);
+    font-size: 22px;
+    text-align: center;
+}
+
+.ck-remover {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: var(--cor-laranja);
+    font-size: 20px;
+    transition: background-color var(--transicao-padrao);
+}
+
+.ck-remover:hover:not(:disabled) {
+    background-color: var(--cor-rosa);
+}
+
+.ck-remover:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   RESUMO DO PEDIDO
+======================================== */
+
+.ck-resumo {
+    position: sticky;
+    top: 24px;
+}
+
+.ck-resumo-itens {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(128, 58, 27, 0.2);
+}
+
+.ck-resumo-itens li {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+}
+
+.ck-resumo-itens img {
+    width: 52px;
+    height: 52px;
+    padding: 4px;
+    border-radius: 12px;
+    background-color: var(--cor-branco);
+    object-fit: contain;
+}
+
+.ck-resumo-item-nome {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.2;
+}
+
+.ck-resumo-item-nome small {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.ck-resumo-linhas {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 18px;
+}
+
+.ck-resumo-linhas > div,
+.ck-resumo-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ck-resumo-total {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(128, 58, 27, 0.2);
+    font-family: var(--fonte-titulo);
+    font-size: 26px;
+}
+
+.ck-resumo-total strong {
+    font-size: 34px;
+    font-weight: normal;
+}
+
+.ck-resumo-dica {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 1.3;
+}
+
+.ck-resumo-dica i {
+    margin-top: 2px;
+    color: var(--cor-laranja);
+}
+
+.ck-resumo .ck-botao--grande {
+    margin-top: 20px;
+}
+
+.ck-resumo .ck-link {
+    margin-top: 14px;
+}
+
+/* ========================================
+   ETAPAS
+======================================== */
+
+.ck-passos {
+    display: flex;
+    max-width: 640px;
+    margin: 0 auto 32px;
+}
+
+.ck-passo {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+}
+
+/* linha entre uma etapa e a anterior */
+.ck-passo + .ck-passo::before {
+    content: "";
+    position: absolute;
+    top: 19px;
+    right: 50%;
+    width: 100%;
+    height: 2px;
+    background-color: rgba(128, 58, 27, 0.2);
+}
+
+.ck-passo.ativo::before,
+.ck-passo.concluido::before {
+    background-color: var(--cor-laranja);
+}
+
+.ck-passo-numero {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(128, 58, 27, 0.25);
+    color: var(--cor-branco);
+    font-family: var(--fonte-titulo);
+    font-size: 20px;
+}
+
+.ck-passo.ativo .ck-passo-numero,
+.ck-passo.concluido .ck-passo-numero {
+    background-color: var(--cor-laranja);
+}
+
+.ck-passo.ativo .ck-passo-nome {
+    font-family: var(--fonte-titulo);
+    font-size: 17px;
+}
+
+/* ========================================
+   FORMULÁRIO DE ENTREGA
+======================================== */
+
+.ck-form {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.ck-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 15px;
+}
+
+.ck-campo--2 { grid-column: span 2; }
+.ck-campo--3 { grid-column: span 3; }
+.ck-campo--4 { grid-column: span 4; }
+.ck-campo--6 { grid-column: span 6; }
+
+.ck-campo input {
+    width: 100%;
+    height: 50px;
+    padding: 0 16px;
+    border: 1.5px solid transparent;
+    border-radius: 14px;
+    background-color: var(--cor-branco);
+    color: var(--cor-preto);
+    font-size: 17px;
+}
+
+.ck-campo input:focus {
+    outline: none;
+    border-color: var(--cor-laranja);
+}
+
+.ck-campo small {
+    color: var(--cor-marrom);
+}
+
+/* ========================================
+   FORMAS DE PAGAMENTO
+======================================== */
+
+.ck-entrega-resumo {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 26px;
+    padding: 16px 20px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.ck-entrega-resumo > i {
+    color: var(--cor-laranja);
+    font-size: 22px;
+}
+
+.ck-formas {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ck-forma {
+    position: relative;
+    display: grid;
+    grid-template-columns: 28px 56px minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition:
+        border-color var(--transicao-padrao),
+        background-color var(--transicao-padrao);
+}
+
+.ck-forma:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.ck-forma.selecionada {
+    border-color: var(--cor-laranja);
+    background-color: var(--cor-branco);
+}
+
+.ck-forma-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ck-radio {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--cor-laranja);
+    border-radius: 50%;
+    background-color: var(--cor-branco);
+}
+
+.ck-forma.selecionada .ck-radio {
+    background-color: var(--cor-laranja);
+    box-shadow: inset 0 0 0 5px var(--cor-branco);
+}
+
+.ck-forma-input:focus-visible + .ck-radio {
+    outline: 3px solid var(--cor-laranja);
+    outline-offset: 3px;
+}
+
+.ck-forma-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 44px;
+    font-size: 36px;
+}
+
+.ck-icone-pix {
+    width: 44px;
+    height: 44px;
+    fill: var(--ck-pix);
+}
+
+.ck-icone-cartao {
+    color: var(--cor-azul);
+}
+
+.ck-icone-boleto {
+    color: var(--cor-preto);
+}
+
+.ck-forma-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ck-forma-texto strong {
+    font-family: var(--fonte-titulo);
+    font-size: 21px;
+    font-weight: normal;
+}
+
+.ck-forma-texto small {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.ck-seguro {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 22px 0 8px;
+    font-size: 15px;
+    line-height: 1.35;
+}
+
+.ck-seguro i {
+    margin-top: 2px;
+    color: var(--cor-laranja);
+    font-size: 18px;
+}
+
+/* ========================================
+   CONFIRMAÇÃO DO PEDIDO
+======================================== */
+
+.ck-retorno {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 760px;
+    margin-inline: auto;
+    padding: 48px 36px 40px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.ck-retorno > * {
+    position: relative;
+    z-index: 1;
+}
+
+.ck-retorno-icone {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    height: 96px;
+    margin-bottom: 18px;
+    border-radius: 50%;
+    background-color: var(--cor-verde);
+    color: var(--cor-branco);
+    font-size: 44px;
+}
+
+.ck-retorno--pendente .ck-retorno-icone {
+    background-color: var(--cor-amarelo-claro);
+    color: var(--cor-preto);
+}
+
+.ck-retorno--falha .ck-retorno-icone {
+    background-color: var(--cor-rosa);
+    color: var(--cor-preto);
+}
+
+.ck-retorno h1 {
+    margin-bottom: 8px;
+    font-size: clamp(34px, 5vw, 50px);
+    line-height: 1.05;
+}
+
+.ck-retorno-subtitulo {
+    font-size: 20px;
+}
+
+.ck-retorno-numero {
+    margin-top: 18px;
+    font-size: 20px;
+}
+
+.ck-retorno-detalhe {
+    max-width: 520px;
+    margin-top: 10px;
+    font-size: 16px;
+    line-height: 1.45;
+}
+
+.ck-retorno-itens {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 520px;
+    margin-top: 24px;
+    padding: 18px 22px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+    text-align: left;
+}
+
+.ck-retorno-itens li {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.ck-retorno-total {
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(128, 58, 27, 0.2);
+    font-family: var(--fonte-titulo);
+    font-size: 22px;
+}
+
+.ck-retorno-endereco {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 15px;
+}
+
+.ck-retorno-endereco i {
+    color: var(--cor-laranja);
+}
+
+.ck-retorno-botoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 26px;
+}
+
+.ck-retorno-imagem {
+    width: min(100%, 360px);
+    margin-top: 28px;
+    margin-bottom: -40px;
+    object-fit: contain;
+}
+
+/* confetes (só na confirmação) */
+.ck-confetes {
+    position: absolute;
+    inset: 0;
+    z-index: 0 !important;
+    pointer-events: none;
+}
+
+.ck-confetes span {
+    position: absolute;
+    width: 10px;
+    height: 18px;
+    border-radius: 3px;
+    background-color: var(--cor-laranja);
+    opacity: 0.85;
+}
+
+.ck-confetes span:nth-child(3n + 1) { background-color: var(--cor-amarelo); }
+.ck-confetes span:nth-child(3n + 2) { background-color: var(--cor-rosa); }
+.ck-confetes span:nth-child(4n) { background-color: var(--cor-verde); }
+
+.ck-confetes span:nth-child(1)  { top: 6%;  left: 12%; transform: rotate(20deg); }
+.ck-confetes span:nth-child(2)  { top: 14%; left: 30%; transform: rotate(-35deg); }
+.ck-confetes span:nth-child(3)  { top: 5%;  left: 62%; transform: rotate(50deg); }
+.ck-confetes span:nth-child(4)  { top: 16%; left: 80%; transform: rotate(-15deg); }
+.ck-confetes span:nth-child(5)  { top: 30%; left: 8%;  transform: rotate(65deg); }
+.ck-confetes span:nth-child(6)  { top: 34%; left: 90%; transform: rotate(-60deg); }
+.ck-confetes span:nth-child(7)  { top: 9%;  left: 46%; transform: rotate(10deg); }
+.ck-confetes span:nth-child(8)  { top: 24%; left: 70%; transform: rotate(-40deg); }
+.ck-confetes span:nth-child(9)  { top: 22%; left: 20%; transform: rotate(35deg); }
+.ck-confetes span:nth-child(10) { top: 42%; left: 4%;  transform: rotate(-20deg); }
+.ck-confetes span:nth-child(11) { top: 46%; left: 94%; transform: rotate(25deg); }
+.ck-confetes span:nth-child(12) { top: 3%;  left: 90%; transform: rotate(-50deg); }
+
+/* ========================================
+   RESPONSIVIDADE
+======================================== */
+
+@media (max-width: 960px) {
+
+    .ck-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .ck-resumo {
+        position: static;
+    }
+
+}
+
+@media (max-width: 640px) {
+
+    .ck-pagina {
+        padding-top: 16px;
+    }
+
+    .ck-painel {
+        padding: 20px 16px;
+        border-radius: 28px;
+    }
+
+    .ck-item {
+        grid-template-columns: 76px minmax(0, 1fr) auto;
+        grid-template-areas:
+            "imagem dados dados"
+            "imagem qtd remover";
+        gap: 10px 14px;
+        padding: 12px;
+    }
+
+    .ck-item-imagem {
+        grid-area: imagem;
+        width: 76px;
+        height: 76px;
+    }
+
+    .ck-item-dados {
+        grid-area: dados;
+    }
+
+    .ck-qtd {
+        grid-area: qtd;
+    }
+
+    .ck-remover {
+        grid-area: remover;
+    }
+
+    .ck-item-dados strong {
+        font-size: 22px;
+    }
+
+    .ck-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ck-campo--2,
+    .ck-campo--3 {
+        grid-column: span 1;
+    }
+
+    .ck-campo--4,
+    .ck-campo--6 {
+        grid-column: span 2;
+    }
+
+    .ck-entrega-resumo {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .ck-entrega-resumo .ck-link {
+        grid-column: 1 / -1;
+        text-align: left;
+    }
+
+    .ck-forma {
+        grid-template-columns: 24px 44px minmax(0, 1fr);
+        gap: 12px;
+        padding: 14px 16px;
+    }
+
+    .ck-radio {
+        width: 24px;
+        height: 24px;
+    }
+
+    .ck-forma-icone {
+        width: 44px;
+        font-size: 30px;
+    }
+
+    .ck-icone-pix {
+        width: 36px;
+        height: 36px;
+    }
+
+    .ck-retorno {
+        padding: 36px 18px 28px;
+    }
+
+    .ck-retorno-botoes {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+
+}
