@@ -12,8 +12,6 @@
 
 ======================================== */
 
-
-
 .shop-pagina {
 
     --shop-fundo: #FFF7EA;
@@ -23,8 +21,6 @@
     --shop-frete-elipse: #F6E5CB;
 
     --shop-banner-fim: #FDC963;
-
-
 
     width: 100%;
 
@@ -36,8 +32,6 @@
 
 }
 
-
-
 .shop-pagina *,
 
 .shop-pagina *::before,
@@ -48,8 +42,6 @@
 
 }
 
-
-
 .shop-container {
 
     width: min(100% - 32px, 1200px);
@@ -58,15 +50,11 @@
 
 }
 
-
-
 /* ========================================
 
       BANNER
 
 ======================================== */
-
-
 
 .shop-banner {
 
@@ -92,8 +80,6 @@
 
 }
 
-
-
 .shop-banner-patinhas {
 
     position: absolute;
@@ -112,8 +98,6 @@
 
 }
 
-
-
 .shop-banner-patinhas img {
 
     width: 46px;
@@ -126,23 +110,17 @@
 
 }
 
-
-
 .shop-banner-patinhas img:nth-child(odd) {
 
     transform: translateX(10px) rotate(-12deg);
 
 }
 
-
-
 .shop-banner-patinhas img:nth-child(even) {
 
     transform: translateX(-4px) rotate(14deg);
 
 }
-
-
 
 .shop-banner-texto {
 
@@ -153,8 +131,6 @@
     width: min(100%, 480px);
 
 }
-
-
 
 .shop-banner-texto h1 {
 
@@ -172,8 +148,6 @@
 
 }
 
-
-
 .shop-banner-faiscas {
 
     position: absolute;
@@ -188,8 +162,6 @@
 
 }
 
-
-
 .shop-banner-texto blockquote {
 
     margin: 0 0 18px;
@@ -200,8 +172,6 @@
 
 }
 
-
-
 .shop-banner-texto p {
 
     max-width: 380px;
@@ -211,8 +181,6 @@
     line-height: 1.35;
 
 }
-
-
 
 .shop-banner-imagem {
 
@@ -236,8 +204,6 @@
 
 }
 
-
-
 .shop-banner-patinha {
 
     position: absolute;
@@ -254,8 +220,6 @@
 
 }
 
-
-
 .shop-banner-patinha--meio {
 
     bottom: 36px;
@@ -266,8 +230,6 @@
 
 }
 
-
-
 .shop-banner-patinha--canto {
 
     top: 38px;
@@ -277,8 +239,6 @@
     transform: rotate(18deg);
 
 }
-
-
 
 .shop-banner-coracao {
 
@@ -298,155 +258,243 @@
 
 }
 
-
-
 /* ========================================
 
       CATEGORIAS
 
 ======================================== */
 
-
-
 .shop-categorias-wrapper {
+
     position: relative;
+
     display: flex;
+
     align-items: center;
+
     gap: 12px;
+
     margin: 52px 0 44px;
+
     padding-inline: 42px;
+
 }
 
 .shop-categorias {
+
     display: flex;
+
     align-items: flex-start;
+
     gap: 24px;
+
     width: 100%;
+
     min-width: 0;
+
     margin: 0;
+
     padding: 8px 4px 14px;
+
     overflow-x: auto;
+
     overflow-y: hidden;
+
     scroll-behavior: smooth;
+
     scrollbar-width: none;
+
     cursor: grab;
+
     user-select: none;
-    -webkit-overflow-scrolling: touch;
+
+-webkit-overflow-scrolling: touch;
+
 }
 
 .shop-categorias::-webkit-scrollbar {
+
     display: none;
+
 }
 
 .shop-categorias:active {
+
     cursor: grabbing;
+
 }
 
 .shop-categoria {
+
     display: flex;
+
     flex: 0 0 140px;
+
     flex-direction: column;
+
     align-items: center;
+
     gap: 14px;
+
     padding: 0;
+
     border: none;
+
     background: none;
+
     color: inherit;
+
     font-family: var(--fonte-titulo);
+
     font-size: 22px;
+
     cursor: pointer;
+
 }
 
 .shop-categoria-circulo {
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     width: 126px;
+
     height: 126px;
+
     border-radius: 50%;
+
     background-color: var(--cor-amarelo-claro);
+
     transition:
+
         transform var(--transicao-padrao),
+
         box-shadow var(--transicao-padrao);
+
 }
 
 .shop-categoria:nth-child(5n + 2) .shop-categoria-circulo {
+
     background-color: var(--cor-lilas);
+
 }
 
 .shop-categoria:nth-child(5n + 3) .shop-categoria-circulo {
+
     background-color: var(--cor-verde);
+
 }
 
 .shop-categoria:nth-child(5n + 4) .shop-categoria-circulo {
+
     background-color: var(--cor-rosa);
+
 }
 
 .shop-categoria:nth-child(5n + 5) .shop-categoria-circulo {
+
     background-color: var(--cor-azul);
+
 }
 
 .shop-categoria-circulo img {
+
     width: 58%;
+
     height: 58%;
+
     object-fit: contain;
+
     pointer-events: none;
-    -webkit-user-drag: none;
+
+-webkit-user-drag: none;
+
 }
 
 .shop-categoria-nome {
+
     text-align: center;
+
 }
 
 .shop-categoria:hover .shop-categoria-circulo {
+
     transform: translateY(-4px);
+
 }
 
 .shop-categoria.ativa .shop-categoria-circulo {
+
     box-shadow: 0 0 0 4px var(--shop-fundo), 0 0 0 7px var(--cor-laranja);
+
 }
 
 .shop-categoria.ativa .shop-categoria-nome {
+
     color: var(--cor-laranja);
+
 }
 
 .shop-categorias-seta {
+
     display: inline-flex;
+
     flex: 0 0 38px;
+
     align-items: center;
+
     justify-content: center;
+
     width: 38px;
+
     height: 38px;
+
     border: 1px solid var(--cor-preto);
+
     border-radius: 50%;
+
     background-color: var(--cor-branco);
+
     color: var(--cor-preto);
+
     cursor: pointer;
+
     transition:
+
         background-color var(--transicao-padrao),
+
         color var(--transicao-padrao),
+
         border-color var(--transicao-padrao);
+
 }
 
 .shop-categorias-seta:hover {
+
     border-color: var(--cor-laranja);
+
     background-color: var(--cor-laranja);
+
     color: var(--cor-branco);
+
 }
 
 .shop-categorias-seta:focus-visible {
-    outline: 3px solid var(--cor-laranja);
-    outline-offset: 3px;
-}
 
+    outline: 3px solid var(--cor-laranja);
+
+    outline-offset: 3px;
+
+}
 
 /* ========================================
 
       BUSCA E FILTROS
 
 ======================================== */
-
-
 
 .shop-busca {
 
@@ -461,8 +509,6 @@
     padding-inline: clamp(0px, 3.5vw, 40px);
 
 }
-
-
 
 .shop-busca-campo {
 
@@ -484,8 +530,6 @@
 
 }
 
-
-
 .shop-busca-campo:focus-within,
 
 .shop-filtros-botao:focus-visible {
@@ -495,8 +539,6 @@
     outline-offset: 2px;
 
 }
-
-
 
 .shop-busca-campo input {
 
@@ -518,8 +560,6 @@
 
 }
 
-
-
 .shop-busca-campo input::placeholder {
 
     color: var(--cor-preto);
@@ -527,8 +567,6 @@
     opacity: 1;
 
 }
-
-
 
 .shop-busca-campo button {
 
@@ -548,15 +586,11 @@
 
 }
 
-
-
 .shop-busca-campo button:hover {
 
     color: var(--cor-laranja);
 
 }
-
-
 
 .shop-filtros-botao {
 
@@ -582,8 +616,6 @@
 
 }
 
-
-
 .shop-filtros-botao:hover,
 
 .shop-filtros-botao[aria-expanded="true"] {
@@ -595,8 +627,6 @@
     color: var(--cor-branco);
 
 }
-
-
 
 .shop-filtros-painel {
 
@@ -618,8 +648,6 @@
 
 }
 
-
-
 .shop-filtros-painel label {
 
     display: flex;
@@ -631,8 +659,6 @@
     font-size: 15px;
 
 }
-
-
 
 .shop-filtros-painel select,
 
@@ -652,8 +678,6 @@
 
 }
 
-
-
 .shop-filtros-painel .shop-filtros-check {
 
     flex-direction: row;
@@ -666,8 +690,6 @@
 
 }
 
-
-
 .shop-filtros-painel input[type="checkbox"] {
 
     width: 20px;
@@ -678,15 +700,11 @@
 
 }
 
-
-
 .shop-filtros-limpar {
 
     height: 44px;
 
 }
-
-
 
 .shop-filtros-limpar:disabled {
 
@@ -698,15 +716,11 @@
 
 }
 
-
-
 /* ========================================
 
       MENSAGENS
 
 ======================================== */
-
-
 
 .shop-mensagem {
 
@@ -724,23 +738,17 @@
 
 }
 
-
-
 .shop-mensagem--erro {
 
     border: 2px solid var(--cor-laranja);
 
 }
 
-
-
 .shop-mensagem .shop-voltar {
 
     margin-top: 18px;
 
 }
-
-
 
 .shop-link-botao {
 
@@ -756,15 +764,11 @@
 
 }
 
-
-
 /* ========================================
 
       GRADE E CARDS DE PRODUTO
 
 ======================================== */
-
-
 
 .shop-grid {
 
@@ -777,8 +781,6 @@
     padding-inline: clamp(0px, 3.5vw, 40px);
 
 }
-
-
 
 .shop-card {
 
@@ -808,8 +810,6 @@
 
 }
 
-
-
 .shop-card:hover,
 
 .shop-card:focus-visible {
@@ -820,8 +820,6 @@
 
 }
 
-
-
 .shop-card:focus-visible {
 
     outline: 3px solid var(--cor-laranja);
@@ -830,8 +828,6 @@
 
 }
 
-
-
 .shop-card:hover .btn,
 
 .shop-card:focus-visible .btn {
@@ -839,8 +835,6 @@
     background-color: var(--cor-marrom);
 
 }
-
-
 
 .shop-card-esgotado {
 
@@ -864,8 +858,6 @@
 
 }
 
-
-
 .shop-card-imagem {
 
     display: flex;
@@ -882,8 +874,6 @@
 
 }
 
-
-
 .shop-card-imagem img {
 
     max-width: 100%;
@@ -893,8 +883,6 @@
     object-fit: contain;
 
 }
-
-
 
 .shop-card h3 {
 
@@ -907,8 +895,6 @@
     text-align: center;
 
 }
-
-
 
 .shop-card p {
 
@@ -926,15 +912,13 @@
 
     text-align: left;
 
-    -webkit-line-clamp: 6;
+-webkit-line-clamp: 6;
 
     line-clamp: 6;
 
-    -webkit-box-orient: vertical;
+-webkit-box-orient: vertical;
 
 }
-
-
 
 .shop-card-preco {
 
@@ -952,8 +936,6 @@
 
 }
 
-
-
 .shop-card-botao {
 
     min-width: 280px;
@@ -963,8 +945,6 @@
     font-size: 22px;
 
 }
-
-
 
 /* versão menor (semelhantes) */
 
@@ -976,8 +956,6 @@
 
 }
 
-
-
 .shop-card--compacto .shop-card-imagem {
 
     height: 170px;
@@ -986,35 +964,27 @@
 
 }
 
-
-
 .shop-card--compacto h3 {
 
     font-size: 24px;
 
 }
 
-
-
 .shop-card--compacto p {
 
     font-size: 16px;
 
-    -webkit-line-clamp: 3;
+-webkit-line-clamp: 3;
 
     line-clamp: 3;
 
 }
-
-
 
 .shop-card--compacto .shop-card-preco {
 
     font-size: 28px;
 
 }
-
-
 
 .shop-card--compacto .shop-card-botao {
 
@@ -1028,8 +998,6 @@
 
 }
 
-
-
 .shop-card--compacto .shop-card-esgotado {
 
     top: 18px;
@@ -1038,15 +1006,11 @@
 
 }
 
-
-
 /* ========================================
 
       FAIXA DE FRETE GRÁTIS
 
 ======================================== */
-
-
 
 .shop-frete {
 
@@ -1067,8 +1031,6 @@
     background-color: var(--shop-frete-fundo);
 
 }
-
-
 
 /* elipse clara atrás do texto */
 
@@ -1092,8 +1054,6 @@
 
 }
 
-
-
 .shop-frete-texto {
 
     position: relative;
@@ -1106,8 +1066,6 @@
 
 }
 
-
-
 .shop-frete-texto h2 {
 
     margin: 0 0 6px;
@@ -1118,15 +1076,11 @@
 
 }
 
-
-
 .shop-frete-texto p {
 
     font-size: 22px;
 
 }
-
-
 
 .shop-frete-caminhao {
 
@@ -1146,15 +1100,11 @@
 
 }
 
-
-
 .shop-frete-roda {
 
     fill: var(--shop-frete-fundo);
 
 }
-
-
 
 .shop-frete-imagem {
 
@@ -1178,8 +1128,6 @@
 
 }
 
-
-
 .shop-frete-patinha {
 
     position: absolute;
@@ -1194,8 +1142,6 @@
 
 }
 
-
-
 .shop-frete-patinha--esq {
 
     top: -52px;
@@ -1205,8 +1151,6 @@
     transform: rotate(-18deg);
 
 }
-
-
 
 .shop-frete-patinha--dir {
 
@@ -1218,15 +1162,11 @@
 
 }
 
-
-
 /* ========================================
 
       PÁGINA DO PRODUTO
 
 ======================================== */
-
-
 
 .shop-migalhas {
 
@@ -1246,15 +1186,11 @@
 
 }
 
-
-
 .shop-migalhas a {
 
     color: var(--cor-laranja);
 
 }
-
-
 
 .shop-migalhas a:hover {
 
@@ -1262,15 +1198,11 @@
 
 }
 
-
-
 .shop-migalhas [aria-current="page"] {
 
     font-family: var(--fonte-titulo);
 
 }
-
-
 
 .produto-detalhe {
 
@@ -1287,8 +1219,6 @@
     background-color: var(--cor-creme);
 
 }
-
-
 
 .produto-galeria {
 
@@ -1312,8 +1242,6 @@
 
 }
 
-
-
 .produto-galeria-patinha {
 
     position: absolute;
@@ -1334,8 +1262,6 @@
 
 }
 
-
-
 .produto-galeria-imagem {
 
     position: relative;
@@ -1348,8 +1274,6 @@
 
 }
 
-
-
 .produto-info {
 
     display: flex;
@@ -1361,8 +1285,6 @@
     min-width: 0;
 
 }
-
-
 
 .produto-categoria {
 
@@ -1380,8 +1302,6 @@
 
 }
 
-
-
 .produto-info h1 {
 
     font-size: clamp(34px, 4vw, 52px);
@@ -1389,8 +1309,6 @@
     line-height: 1.05;
 
 }
-
-
 
 .produto-preco {
 
@@ -1404,8 +1322,6 @@
 
 }
 
-
-
 .produto-estoque {
 
     align-self: flex-start;
@@ -1418,23 +1334,17 @@
 
 }
 
-
-
 .produto-estoque--disponivel {
 
     background-color: var(--cor-verde);
 
 }
 
-
-
 .produto-estoque--esgotado {
 
     background-color: var(--cor-rosa);
 
 }
-
-
 
 .produto-descricao h2 {
 
@@ -1443,8 +1353,6 @@
     font-size: 26px;
 
 }
-
-
 
 .produto-descricao p {
 
@@ -1455,8 +1363,6 @@
     line-height: 1.55;
 
 }
-
-
 
 .produto-compra {
 
@@ -1471,8 +1377,6 @@
     margin-top: 6px;
 
 }
-
-
 
 .produto-quantidade {
 
@@ -1489,8 +1393,6 @@
     background-color: var(--cor-branco);
 
 }
-
-
 
 .produto-quantidade button {
 
@@ -1510,15 +1412,11 @@
 
 }
 
-
-
 .produto-quantidade button:hover:not(:disabled) {
 
     background-color: var(--cor-creme);
 
 }
-
-
 
 .produto-quantidade button:disabled {
 
@@ -1527,8 +1425,6 @@
     cursor: not-allowed;
 
 }
-
-
 
 .produto-quantidade input {
 
@@ -1554,8 +1450,6 @@
 
 }
 
-
-
 .produto-quantidade input::-webkit-outer-spin-button,
 
 .produto-quantidade input::-webkit-inner-spin-button {
@@ -1565,8 +1459,6 @@
     appearance: none;
 
 }
-
-
 
 .produto-botao-comprar,
 
@@ -1580,8 +1472,6 @@
 
 }
 
-
-
 .produto-botao-carrinho {
 
     border: 2px solid var(--cor-laranja);
@@ -1592,8 +1482,6 @@
 
 }
 
-
-
 .produto-botao-carrinho:hover {
 
     background-color: var(--cor-laranja);
@@ -1601,8 +1489,6 @@
     color: var(--cor-branco);
 
 }
-
-
 
 .produto-botao-comprar:disabled,
 
@@ -1616,8 +1502,6 @@
 
 }
 
-
-
 .produto-aviso {
 
     padding: 12px 18px;
@@ -1628,15 +1512,11 @@
 
 }
 
-
-
 .produto-aviso a {
 
     text-decoration: underline;
 
 }
-
-
 
 .produto-aviso--sucesso {
 
@@ -1644,15 +1524,11 @@
 
 }
 
-
-
 .produto-aviso--erro {
 
     background-color: var(--cor-rosa);
 
 }
-
-
 
 .produto-vantagens {
 
@@ -1667,8 +1543,6 @@
     padding-top: 12px;
 
 }
-
-
 
 .produto-vantagens li {
 
@@ -1690,8 +1564,6 @@
 
 }
 
-
-
 .produto-vantagens i {
 
     flex-shrink: 0;
@@ -1702,15 +1574,11 @@
 
 }
 
-
-
 .produto-semelhantes {
 
     margin-top: 72px;
 
 }
-
-
 
 .produto-semelhantes h2 {
 
@@ -1728,8 +1596,6 @@
 
 }
 
-
-
 .produto-semelhantes h2 img {
 
     width: 44px;
@@ -1739,8 +1605,6 @@
     object-fit: contain;
 
 }
-
-
 
 .shop-grid--semelhantes {
 
@@ -1752,21 +1616,15 @@
 
 }
 
-
-
 /* ========================================
 
       RESPONSIVIDADE - TABLETS
 
 ======================================== */
 
-
-
 @media (max-width: 1000px) {
 
-
-
-    .shop-banner {
+.shop-banner {
 
         min-height: 300px;
 
@@ -1774,57 +1632,43 @@
 
     }
 
-
-
-    .shop-banner-patinhas {
+.shop-banner-patinhas {
 
         left: 32px;
 
     }
 
-
-
-    .shop-banner-texto h1 {
+.shop-banner-texto h1 {
 
         font-size: 64px;
 
     }
 
-
-
-    .shop-banner-texto blockquote {
+.shop-banner-texto blockquote {
 
         font-size: 30px;
 
     }
 
-
-
-    .shop-banner-imagem {
+.shop-banner-imagem {
 
         max-width: 48%;
 
     }
 
-
-
-    .shop-busca {
+.shop-busca {
 
         gap: 24px;
 
     }
 
-
-
-    .shop-grid {
+.shop-grid {
 
         gap: 36px 36px;
 
     }
 
-
-
-    .shop-card {
+.shop-card {
 
         padding: 28px 26px 30px;
 
@@ -1832,33 +1676,25 @@
 
     }
 
-
-
-    .shop-card h3 {
+.shop-card h3 {
 
         font-size: 28px;
 
     }
 
-
-
-    .shop-card p {
+.shop-card p {
 
         font-size: 17px;
 
     }
 
-
-
-    .shop-card-preco {
+.shop-card-preco {
 
         font-size: 32px;
 
     }
 
-
-
-    .shop-card-botao {
+.shop-card-botao {
 
         min-width: 0;
 
@@ -1868,33 +1704,25 @@
 
     }
 
-
-
-    .shop-frete {
+.shop-frete {
 
         padding-left: 60px;
 
     }
 
-
-
-    .shop-frete-texto h2 {
+.shop-frete-texto h2 {
 
         font-size: 28px;
 
     }
 
-
-
-    .shop-frete-texto p {
+.shop-frete-texto p {
 
         font-size: 18px;
 
     }
 
-
-
-    .produto-detalhe {
+.produto-detalhe {
 
         gap: 32px;
 
@@ -1904,27 +1732,19 @@
 
     }
 
-
-
-    .produto-vantagens {
+.produto-vantagens {
 
         grid-template-columns: 1fr;
 
     }
 
-
-
-    .shop-grid--semelhantes {
+.shop-grid--semelhantes {
 
         grid-template-columns: repeat(2, minmax(0, 1fr));
 
     }
 
-
-
 }
-
-
 
 /* ========================================
 
@@ -1932,21 +1752,15 @@
 
 ======================================== */
 
-
-
 @media (max-width: 700px) {
 
-
-
-    .shop-pagina {
+.shop-pagina {
 
         padding-top: 16px;
 
     }
 
-
-
-    .shop-banner {
+.shop-banner {
 
         flex-direction: column;
 
@@ -1962,35 +1776,27 @@
 
     }
 
+.shop-banner-patinhas,
 
-
-    .shop-banner-patinhas,
-
-    .shop-banner-patinha--meio {
+.shop-banner-patinha--meio {
 
         display: none;
 
     }
 
-
-
-    .shop-banner-texto {
+.shop-banner-texto {
 
         width: 100%;
 
     }
 
-
-
-    .shop-banner-texto h1 {
+.shop-banner-texto h1 {
 
         font-size: 52px;
 
     }
 
-
-
-    .shop-banner-faiscas {
+.shop-banner-faiscas {
 
         left: calc(50% + 48px);
 
@@ -1998,17 +1804,13 @@
 
     }
 
-
-
-    .shop-banner-texto blockquote {
+.shop-banner-texto blockquote {
 
         font-size: 24px;
 
     }
 
-
-
-    .shop-banner-texto p {
+.shop-banner-texto p {
 
         margin-inline: auto;
 
@@ -2016,9 +1818,7 @@
 
     }
 
-
-
-    .shop-banner-imagem {
+.shop-banner-imagem {
 
         position: relative;
 
@@ -2032,9 +1832,7 @@
 
     }
 
-
-
-    .shop-banner-coracao {
+.shop-banner-coracao {
 
         top: 20px;
 
@@ -2044,9 +1842,7 @@
 
     }
 
-
-
-    .shop-banner-patinha--canto {
+.shop-banner-patinha--canto {
 
         top: auto;
 
@@ -2060,34 +1856,47 @@
 
     }
 
+.shop-categorias-wrapper {
 
-
-    .shop-categorias-wrapper {
         gap: 8px;
+
         margin: 32px -16px 28px;
+
         padding-inline: 16px;
+
     }
 
-    .shop-categorias {
+.shop-categorias {
+
         gap: 18px;
+
         padding: 6px 2px 10px;
+
     }
 
-    .shop-categoria {
+.shop-categoria {
+
         flex-basis: 104px;
+
         font-size: 17px;
+
     }
 
-    .shop-categoria-circulo {
+.shop-categoria-circulo {
+
         width: 92px;
+
         height: 92px;
+
     }
 
-    .shop-categorias-seta {
+.shop-categorias-seta {
+
         display: none;
+
     }
 
-    .shop-busca {
+.shop-busca {
 
         grid-template-columns: 1fr;
 
@@ -2097,29 +1906,23 @@
 
     }
 
+.shop-busca-campo,
 
-
-    .shop-busca-campo,
-
-    .shop-filtros-botao {
+.shop-filtros-botao {
 
         height: 54px;
 
     }
 
+.shop-busca-campo input,
 
-
-    .shop-busca-campo input,
-
-    .shop-filtros-botao {
+.shop-filtros-botao {
 
         font-size: 17px;
 
     }
 
-
-
-    .shop-filtros-painel {
+.shop-filtros-painel {
 
         margin-top: -12px;
 
@@ -2127,9 +1930,7 @@
 
     }
 
-
-
-    .shop-grid {
+.shop-grid {
 
         grid-template-columns: 1fr;
 
@@ -2139,9 +1940,7 @@
 
     }
 
-
-
-    .shop-card {
+.shop-card {
 
         padding: 24px 22px 26px;
 
@@ -2149,33 +1948,25 @@
 
     }
 
-
-
-    .shop-card-imagem {
+.shop-card-imagem {
 
         height: 210px;
 
     }
 
-
-
-    .shop-card h3 {
+.shop-card h3 {
 
         font-size: 26px;
 
     }
 
-
-
-    .shop-card-preco {
+.shop-card-preco {
 
         font-size: 30px;
 
     }
 
-
-
-    .shop-frete {
+.shop-frete {
 
         flex-direction: column;
 
@@ -2189,9 +1980,7 @@
 
     }
 
-
-
-    .shop-frete::before {
+.shop-frete::before {
 
         top: 28px;
 
@@ -2203,9 +1992,7 @@
 
     }
 
-
-
-    .shop-frete-texto {
+.shop-frete-texto {
 
         max-width: 100%;
 
@@ -2213,25 +2000,19 @@
 
     }
 
-
-
-    .shop-frete-texto h2 {
+.shop-frete-texto h2 {
 
         font-size: 22px;
 
     }
 
-
-
-    .shop-frete-texto p {
+.shop-frete-texto p {
 
         font-size: 15px;
 
     }
 
-
-
-    .shop-frete-caminhao {
+.shop-frete-caminhao {
 
         left: 12px;
 
@@ -2241,9 +2022,7 @@
 
     }
 
-
-
-    .shop-frete-imagem {
+.shop-frete-imagem {
 
         position: relative;
 
@@ -2259,9 +2038,7 @@
 
     }
 
-
-
-    .shop-frete-patinha {
+.shop-frete-patinha {
 
         width: 38px;
 
@@ -2269,19 +2046,15 @@
 
     }
 
+.shop-frete-patinha--esq,
 
-
-    .shop-frete-patinha--esq,
-
-    .shop-frete-patinha--dir {
+.shop-frete-patinha--dir {
 
         top: -38px;
 
     }
 
-
-
-    .produto-detalhe {
+.produto-detalhe {
 
         grid-template-columns: 1fr;
 
@@ -2291,9 +2064,7 @@
 
     }
 
-
-
-    .produto-galeria {
+.produto-galeria {
 
         min-height: 280px;
 
@@ -2303,25 +2074,19 @@
 
     }
 
-
-
-    .produto-galeria-imagem {
+.produto-galeria-imagem {
 
         max-height: 260px;
 
     }
 
-
-
-    .produto-descricao p {
+.produto-descricao p {
 
         font-size: 17px;
 
     }
 
-
-
-    .produto-compra {
+.produto-compra {
 
         flex-direction: column;
 
@@ -2329,56 +2094,165 @@
 
     }
 
-
-
-    .produto-quantidade {
+.produto-quantidade {
 
         align-self: flex-start;
 
     }
 
+.produto-botao-comprar,
 
-
-    .produto-botao-comprar,
-
-    .produto-botao-carrinho {
+.produto-botao-carrinho {
 
         width: 100%;
 
     }
 
-
-
-    .produto-semelhantes {
+.produto-semelhantes {
 
         margin-top: 48px;
 
     }
 
-
-
-    .produto-semelhantes h2 {
+.produto-semelhantes h2 {
 
         font-size: 28px;
 
     }
 
-
-
 }
-
-
 
 @media (max-width: 420px) {
 
-
-
-    .shop-grid--semelhantes {
+.shop-grid--semelhantes {
 
         grid-template-columns: 1fr;
 
     }
 
+}
 
+/* ========================================
+   CATÁLOGO - CARDS MENORES COM 4 COLUNAS
+   ======================================== */
 
+.shop-grid--catalogo {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px 22px;
+    padding-inline: clamp(0px, 2vw, 24px);
+    align-items: stretch;
+}
+
+.shop-grid--catalogo > .shop-card {
+    height: 100%;
+    padding: 18px 16px 20px;
+    border-radius: 30px;
+}
+
+.shop-grid--catalogo .shop-card-esgotado {
+    top: 14px;
+    right: 14px;
+    padding: 4px 10px;
+    font-size: 11px;
+}
+
+.shop-grid--catalogo .shop-card-imagem {
+    height: 145px;
+    margin-bottom: 12px;
+}
+
+.shop-grid--catalogo .shop-card-imagem img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.shop-grid--catalogo .shop-card h3 {
+    width: 100%;
+    margin: 0 0 8px;
+    font-size: 20px;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.shop-grid--catalogo .shop-card p {
+    margin-bottom: 12px;
+    font-size: 13px;
+    line-height: 1.4;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}
+
+.shop-grid--catalogo .shop-card-preco {
+    margin-bottom: 12px;
+    font-size: 25px;
+}
+
+.shop-grid--catalogo .shop-card-botao {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    font-size: 15px;
+}
+
+@media (max-width: 1000px) {
+    .shop-grid--catalogo {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px 18px;
+    }
+
+    .shop-grid--catalogo .shop-card-imagem {
+        height: 135px;
+    }
+}
+
+@media (max-width: 760px) {
+    .shop-grid--catalogo {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 14px;
+        padding-inline: 0;
+    }
+
+    .shop-grid--catalogo > .shop-card {
+        padding: 16px 12px;
+        border-radius: 24px;
+    }
+
+    .shop-grid--catalogo .shop-card-imagem {
+        height: 125px;
+    }
+
+    .shop-grid--catalogo .shop-card h3 {
+        font-size: 17px;
+    }
+
+    .shop-grid--catalogo .shop-card p {
+        font-size: 12px;
+    }
+
+    .shop-grid--catalogo .shop-card-preco {
+        font-size: 22px;
+    }
+
+    .shop-grid--catalogo .shop-card-botao {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 420px) {
+    .shop-grid--catalogo {
+        gap: 16px 10px;
+    }
+
+    .shop-grid--catalogo .shop-card-imagem {
+        height: 105px;
+    }
+
+    .shop-grid--catalogo .shop-card h3 {
+        font-size: 15px;
+    }
+
+    .shop-grid--catalogo .shop-card-preco {
+        font-size: 19px;
+    }
 }

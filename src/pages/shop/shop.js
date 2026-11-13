@@ -1,17 +1,26 @@
+
 import { useEffect, useState } from 'react';
 
 import patinha from '../../assets/paw.png';
 
 const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
-// Valor mínimo (em centavos) para frete grátis.
+// Frete (em centavos). Mantenha iguais aos valores do servidor.
 export const FRETE_GRATIS_A_PARTIR_DE = 10000;
+export const FRETE_PADRAO = 1500;
+
+export function calcularFrete(subtotal) {
+    if (subtotal <= 0 || subtotal >= FRETE_GRATIS_A_PARTIR_DE) {
+        return 0;
+    }
+
+    return FRETE_PADRAO;
+}
 
 // ========================================
 // IMAGENS
 // ========================================
 
-// Todas as imagens de src/assets (inclusive subpastas).
 const imagensLocais = import.meta.glob(
     '../../assets/**/*.{png,jpg,jpeg,webp,svg,avif}',
     {
@@ -31,8 +40,6 @@ function nomeArquivo(caminho) {
         .replace(/[\u0300-\u036f]/g, '');
 }
 
-// Procura uma imagem em src/assets pelo nome do arquivo (contém a palavra).
-// Retorna null se não existir, para a página simplesmente não exibir.
 export function localizarImagem(palavras) {
     const achada = Object.entries(imagensLocais).find(([caminho]) =>
         palavras.some(palavra => nomeArquivo(caminho).includes(palavra))
@@ -41,10 +48,6 @@ export function localizarImagem(palavras) {
     return achada ? achada[1] : null;
 }
 
-// Converte o texto salvo na coluna "imagem" do banco em uma URL.
-// Aceita: http(s), data:, caminho começando com "/", caminho relativo
-// da pasta public (ex.: "images/racao.png") ou só o nome de um arquivo
-// que esteja em src/assets.
 export function resolverImagem(valor) {
     if (!valor) {
         return patinha;
@@ -77,7 +80,6 @@ export function resolverImagem(valor) {
 // FORMATAÇÃO
 // ========================================
 
-// Valores do banco armazenados em centavos.
 export function formatarPreco(valor) {
     const numero = Number(valor);
 
@@ -91,7 +93,6 @@ export function formatarPreco(valor) {
     });
 }
 
-// Remove acentos e deixa em minúsculas (para a busca).
 export function normalizarTexto(texto) {
     return String(texto ?? '')
         .toLowerCase()
@@ -154,8 +155,6 @@ function tratarProduto(item, categoriasPorId) {
 // SEMELHANTES
 // ========================================
 
-// Mesma categoria primeiro (disponíveis antes), depois completa com
-// produtos de outras categorias, dos mais próximos em preço.
 export function produtosSemelhantes(produto, produtos, limite = 4) {
     const outros = produtos.filter(item => item.id !== produto.id);
 
@@ -190,9 +189,6 @@ export function produtosSemelhantes(produto, produtos, limite = 4) {
 // BUSCA DOS DADOS (produtos + categorias)
 // ========================================
 
-// Guarda a última resposta: ao abrir um produto e voltar para a loja,
-// a página aparece na hora, sem "piscar". Se os dados têm mais de
-// 60 segundos, eles aparecem e são atualizados em segundo plano.
 const VALIDADE_CACHE = 60 * 1000;
 let cache = null;
 
@@ -219,16 +215,16 @@ async function buscarJson(endpoint, signal) {
 }
 
 export function useShop() {
-    // Estado inicial vindo do cache (sem chamar Date.now durante a renderização).
     const [produtos, setProdutos] = useState(() => cache?.produtos ?? []);
+
     const [categorias, setCategorias] = useState(
         () => cache?.categorias ?? []
     );
+
     const [carregando, setCarregando] = useState(() => !cache);
     const [erro, setErro] = useState(null);
 
     useEffect(() => {
-        // Dados recentes no cache: não precisa buscar de novo.
         if (cache && Date.now() - cache.em < VALIDADE_CACHE) {
             return undefined;
         }
@@ -237,7 +233,6 @@ export function useShop() {
         const temCache = Boolean(cache);
 
         async function buscarDados() {
-            // Com cache antigo, mantém os dados na tela enquanto atualiza.
             if (!temCache) {
                 setCarregando(true);
             }
@@ -250,7 +245,7 @@ export function useShop() {
                     buscarJson('/api/categorias-produto', controller.signal)
                 ]);
 
-                // A rota de categorias devolve também as inativas.
+                // Mantém somente as categorias ativas.
                 const categoriasAtivas = listaCategorias
                     .filter(
                         item =>
@@ -260,9 +255,13 @@ export function useShop() {
                     .map(tratarCategoria);
 
                 const categoriasPorId = new Map(
-                    categoriasAtivas.map(item => [Number(item.id), item])
+                    categoriasAtivas.map(item => [
+                        Number(item.id),
+                        item
+                    ])
                 );
 
+                // Mantém somente os produtos ativos.
                 const produtosTratados = listaProdutos
                     .filter(
                         item =>
@@ -271,14 +270,26 @@ export function useShop() {
                     )
                     .map(item => tratarProduto(item, categoriasPorId));
 
+                // Identifica as categorias que possuem produtos cadastrados.
+                const idsCategoriasComProdutos = new Set(
+                    produtosTratados.map(produto => produto.categoriaId)
+                );
+
+                // Exibe somente categorias que possuem pelo menos um produto.
+                const categoriasComProdutos = categoriasAtivas.filter(
+                    categoria =>
+                        idsCategoriasComProdutos.has(Number(categoria.id))
+                );
+
+                // Atualiza o cache com as categorias filtradas.
                 cache = {
                     produtos: produtosTratados,
-                    categorias: categoriasAtivas,
+                    categorias: categoriasComProdutos,
                     em: Date.now()
                 };
 
                 setProdutos(produtosTratados);
-                setCategorias(categoriasAtivas);
+                setCategorias(categoriasComProdutos);
 
             } catch (error) {
                 if (error.name !== 'AbortError') {

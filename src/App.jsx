@@ -21,7 +21,9 @@ import PetCare from './pages/servicos/pet-care.jsx'
 // Loja
 import Shop from './pages/shop/shop.jsx'
 import Produto from './pages/shop/Produto.jsx'
-// import Carrinho from './pages/shop/Carrinho.jsx'
+import Carrinho from './pages/shop/Carrinho.jsx'
+import Pagamento from './pages/shop/PedidoRetorno.jsx'
+import PedidoRetorno from './pages/shop/PedidoRetorno.jsx'
 
 // Ao trocar de página, volta para o topo (a não ser que o link tenha #âncora)
 function ScrollToTop() {
@@ -70,7 +72,11 @@ function App() {
                 {/* Loja */}
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/produto/:id" element={<Produto />} />
-                {/* <Route path="/carrinho" element={<Carrinho />} /> */}
+                <Route path="/carrinho" element={<Carrinho />} />
+                <Route path="/pagamento" element={<Pagamento />} />
+                <Route path="/pedido/sucesso" element={<PedidoRetorno resultado="sucesso" />} />
+                <Route path="/pedido/pendente" element={<PedidoRetorno resultado="pendente" />} />
+                <Route path="/pedido/falha" element={<PedidoRetorno resultado="falha" />} />
 
                 {/* Página não encontrada */}
                 <Route path="*" element={<Navigate to="/" replace />} />
