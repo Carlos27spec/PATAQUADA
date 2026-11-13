@@ -74,13 +74,20 @@
   gap: 22px;
 }
 
-.header__actions a {
+/* o ícone de pesquisa agora é um botão (abre a janela de pesquisa) */
+.header__actions a,
+.header__actions button {
   display: grid;
+  padding: 0;
+  border: 0;
+  background: none;
   color: #111;
+  cursor: pointer;
   transition: color 0.15s;
 }
 
-.header__actions a:hover {
+.header__actions a:hover,
+.header__actions button:hover {
   color: #d66e2f;
 }
 
@@ -90,6 +97,7 @@
 }
 
 .header a:focus-visible,
+.header__actions button:focus-visible,
 .header__toggle:focus-visible {
   outline: 3px solid #d66e2f;
   outline-offset: 3px;

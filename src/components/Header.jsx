@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import insignea from "../assets/Insignea-mini.png";
 import { SearchIcon, CartIcon, UserIcon } from "./Icons";
+import BuscaGlobal from "../pages/search/BuscaGlobal";
 import "./Header.css";
 
 const links = [
@@ -19,7 +20,21 @@ function separar(to) {
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  // A pesquisa lembra em qual página foi aberta: se a rota mudar
+  // (botão voltar, por exemplo), ela deixa de aparecer sozinha.
+  const [busca, setBusca] = useState({ aberta: false, em: "" });
   const { pathname, hash } = useLocation();
+
+  const buscaVisivel = busca.aberta && busca.em === pathname;
+
+  const abrirBusca = () => {
+    setOpen(false);
+    setBusca({ aberta: true, em: pathname });
+  };
+
+  const fecharBusca = useCallback(() => {
+    setBusca({ aberta: false, em: "" });
+  }, []);
 
   const estaAtivo = (to) => {
     const alvo = separar(to);
@@ -77,9 +92,15 @@ export default function Header() {
         </nav>
 
         <div className="header__actions">
-          <Link to="/busca" aria-label="Buscar">
+          <button
+            type="button"
+            aria-label="Buscar"
+            aria-haspopup="dialog"
+            aria-expanded={buscaVisivel}
+            onClick={abrirBusca}
+          >
             <SearchIcon />
-          </Link>
+          </button>
 
           <Link to="/carrinho" aria-label="Carrinho">
             <CartIcon />
@@ -90,6 +111,8 @@ export default function Header() {
           </Link>
         </div>
       </div>
+
+      {buscaVisivel && <BuscaGlobal aoFechar={fecharBusca} />}
     </header>
   );
 }
