@@ -11,6 +11,7 @@ import Home from './pages/home.jsx'
 import Login from './pages/login.jsx'
 import Cadastro from './pages/cadastro.jsx'
 import EsqueciSenha from './pages/esqueci_senha.jsx'
+import RedefinirSenha from './pages/redefinir_senha.jsx'
 
 // Páginas de serviços
 import Servicos from './pages/servicos/servicos.jsx'
@@ -57,6 +58,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/cadastro" element={<Cadastro />} />
                 <Route path="/recuperar-senha" element={<EsqueciSenha />} />
+                <Route path="/redefinir-senha" element={<RedefinirSenha />} />
 
                 {/* Serviços */}
                 <Route path="/servicos" element={<Servicos />}>

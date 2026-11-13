@@ -88,13 +88,32 @@ export default function EsqueciSenha() {
 
         setErro('')
         setEnviando(true)
+
         try {
-            // TODO: chamar a API que envia o link de redefinição
-            // (ex.: await fetch('/api/esqueci-senha', { method: 'POST', body: JSON.stringify({ email }) }))
-            // Enquanto a API não existe, a mensagem de sucesso abaixo aparece só para testar o visual.
+            const resposta = await fetch('/api/usuarios/solicitar-redefinicao-senha', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email.trim()
+                })
+            })
+
+            const dados = await resposta.json().catch(() => ({}))
+
+            if (!resposta.ok || !dados.sucesso) {
+                throw new Error(
+                    dados.mensagem || 'Não foi possível enviar o link agora.'
+                )
+            }
+
             setEnviado(true)
-        } catch {
-            setErro('Não foi possível enviar agora. Tente novamente em instantes.')
+        } catch (erroRequisicao) {
+            setErro(
+                erroRequisicao.message ||
+                'Não foi possível enviar agora. Tente novamente em instantes.'
+            )
         } finally {
             setEnviando(false)
         }

@@ -202,6 +202,36 @@
     font-size: 1.2rem;
 }
 
+/* erro geral (falha de rede, erro do servidor) */
+.cadastro-erro--geral {
+    min-height: 1.4em;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* ===== tela de sucesso ===== */
+.cadastro-sucesso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 8px;
+    text-align: center;
+}
+
+.cadastro-sucesso .cadastro-titulo {
+    margin-bottom: 0;
+}
+
+.cadastro-sucesso-texto {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 20px;
+    background: var(--cor-verde);
+    font-size: 1.2rem;
+}
+
 /* ===== mascote (sai do card, no canto inferior esquerdo) ===== */
 .cadastro-mascote {
     --larg: clamp(300px, 36vw, 480px);

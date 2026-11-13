@@ -104,6 +104,8 @@ export default function Cadastro() {
     const [dados, setDados] = useState(DADOS_INICIAIS)
     const [erros, setErros] = useState({})
     const [enviando, setEnviando] = useState(false)
+    const [erroGeral, setErroGeral] = useState('')
+    const [concluido, setConcluido] = useState(false)
 
     function atualizar(e) {
         const { name, type, value, checked } = e.target
@@ -126,10 +128,37 @@ export default function Cadastro() {
             return
         }
 
+        setErroGeral('')
         setEnviando(true)
         try {
-            // TODO: enviar os dados para a API de cadastro aqui
-            // (ex.: await fetch('/api/cadastro', { method: 'POST', body: JSON.stringify(dados) }))
+            // O tipo de usuário (cliente) é definido pelo back end, não enviamos daqui.
+            const resposta = await fetch('/api/usuarios/cadastro', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nome: dados.nome.trim(),
+                    email: dados.email.trim(),
+                    cpf: dados.cpf,
+                    senha: dados.senha,
+                }),
+            })
+
+            const resultado = await resposta.json().catch(() => ({}))
+
+            if (!resposta.ok) {
+                // O back end diz qual campo deu problema (ex.: e-mail ou CPF já cadastrado)
+                if (resultado.campo && ORDEM_CAMPOS.includes(resultado.campo)) {
+                    setErros({ [resultado.campo]: resultado.mensagem })
+                    document.getElementById(`cad-${resultado.campo}`)?.focus()
+                } else {
+                    setErroGeral(resultado.mensagem || 'Não foi possível concluir o cadastro.')
+                }
+                return
+            }
+
+            setConcluido(true)
+        } catch {
+            setErroGeral('Não foi possível conectar ao servidor. Tente novamente em instantes.')
         } finally {
             setEnviando(false)
         }
@@ -146,103 +175,120 @@ export default function Cadastro() {
 
             <div className="cadastro-area">
                 <section className="cadastro-card" aria-labelledby="cadastro-titulo">
-                    <form onSubmit={handleSubmit} noValidate>
-                        <div className="cadastro-coluna">
+                    {concluido ? (
+                        <div className="cadastro-coluna cadastro-sucesso" role="status">
                             <h1 id="cadastro-titulo" className="cadastro-titulo">
-                                Cadastro na PATAQUADA
+                                Cadastro realizado!
                             </h1>
-
-                            <Campo
-                                name="nome"
-                                label="Nome Completo"
-                                type="text"
-                                autoComplete="name"
-                                value={dados.nome}
-                                onChange={atualizar}
-                                erro={erros.nome}
-                            />
-                            <Campo
-                                name="email"
-                                label="E-Mail"
-                                type="email"
-                                autoComplete="email"
-                                value={dados.email}
-                                onChange={atualizar}
-                                erro={erros.email}
-                            />
-                            <Campo
-                                name="cpf"
-                                label="CPF"
-                                type="text"
-                                inputMode="numeric"
-                                placeholder="000.000.000-00"
-                                maxLength={14}
-                                value={dados.cpf}
-                                onChange={atualizar}
-                                erro={erros.cpf}
-                            />
+                            <p className="cadastro-sucesso-texto">
+                                Sua conta na PATAQUADA foi criada. Agora é só entrar com seu e-mail e sua senha.
+                            </p>
+                            <Link to="/login" className="btn cadastro-btn">
+                                Ir para o login
+                            </Link>
                         </div>
-
-                        <section className="cadastro-senha" aria-labelledby="cadastro-senha-titulo">
-                            <h2 id="cadastro-senha-titulo" className="cadastro-senha-titulo cadastro-coluna">
-                                <IconCadeadoCirculo />
-                                Crie sua senha
-                            </h2>
-
+                    ) : (
+                        <form onSubmit={handleSubmit} noValidate>
                             <div className="cadastro-coluna">
+                                <h1 id="cadastro-titulo" className="cadastro-titulo">
+                                    Cadastro na PATAQUADA
+                                </h1>
+
                                 <Campo
-                                    name="senha"
-                                    label="Senha"
-                                    type="password"
-                                    autoComplete="new-password"
-                                    value={dados.senha}
+                                    name="nome"
+                                    label="Nome Completo"
+                                    type="text"
+                                    autoComplete="name"
+                                    value={dados.nome}
                                     onChange={atualizar}
-                                    erro={erros.senha}
+                                    erro={erros.nome}
                                 />
                                 <Campo
-                                    name="confirmar"
-                                    label="Confirmar Senha"
-                                    type="password"
-                                    autoComplete="new-password"
-                                    value={dados.confirmar}
+                                    name="email"
+                                    label="E-Mail"
+                                    type="email"
+                                    autoComplete="email"
+                                    value={dados.email}
                                     onChange={atualizar}
-                                    erro={erros.confirmar}
+                                    erro={erros.email}
+                                />
+                                <Campo
+                                    name="cpf"
+                                    label="CPF"
+                                    type="text"
+                                    inputMode="numeric"
+                                    placeholder="000.000.000-00"
+                                    maxLength={14}
+                                    value={dados.cpf}
+                                    onChange={atualizar}
+                                    erro={erros.cpf}
                                 />
                             </div>
 
-                            <div className="cadastro-aceite">
-                                <input
-                                    id="cad-aceite"
-                                    name="aceite"
-                                    type="checkbox"
-                                    checked={dados.aceite}
-                                    onChange={atualizar}
-                                    aria-invalid={Boolean(erros.aceite)}
-                                    aria-describedby={erros.aceite ? 'cad-aceite-erro' : undefined}
-                                />
-                                <label htmlFor="cad-aceite">
-                                    Eu concordo com os <Link to="/termos">Termos de Uso</Link> e{' '}
-                                    <Link to="/privacidade">Política de Privacidade</Link>
-                                </label>
-                            </div>
-                            {erros.aceite && (
-                                <p className="cadastro-erro cadastro-erro--centro" id="cad-aceite-erro">
-                                    {erros.aceite}
-                                </p>
-                            )}
+                            <section className="cadastro-senha" aria-labelledby="cadastro-senha-titulo">
+                                <h2 id="cadastro-senha-titulo" className="cadastro-senha-titulo cadastro-coluna">
+                                    <IconCadeadoCirculo />
+                                    Crie sua senha
+                                </h2>
 
-                            <div className="cadastro-acoes">
-                                <button type="submit" className="btn cadastro-btn" disabled={enviando}>
-                                    <IconUsuario />
-                                    Cadastrar
-                                </button>
-                                <span className="cadastro-ou">ou</span>
-                                <Link to="/login" className="btn cadastro-btn">
-                                    ← Voltar para o login
-                                </Link>
-                            </div>
-                        </section>
-                    </form>
+                                <div className="cadastro-coluna">
+                                    <Campo
+                                        name="senha"
+                                        label="Senha"
+                                        type="password"
+                                        autoComplete="new-password"
+                                        value={dados.senha}
+                                        onChange={atualizar}
+                                        erro={erros.senha}
+                                    />
+                                    <Campo
+                                        name="confirmar"
+                                        label="Confirmar Senha"
+                                        type="password"
+                                        autoComplete="new-password"
+                                        value={dados.confirmar}
+                                        onChange={atualizar}
+                                        erro={erros.confirmar}
+                                    />
+                                </div>
+
+                                <div className="cadastro-aceite">
+                                    <input
+                                        id="cad-aceite"
+                                        name="aceite"
+                                        type="checkbox"
+                                        checked={dados.aceite}
+                                        onChange={atualizar}
+                                        aria-invalid={Boolean(erros.aceite)}
+                                        aria-describedby={erros.aceite ? 'cad-aceite-erro' : undefined}
+                                    />
+                                    <label htmlFor="cad-aceite">
+                                        Eu concordo com os <Link to="/termos">Termos de Uso</Link> e{' '}
+                                        <Link to="/privacidade">Política de Privacidade</Link>
+                                    </label>
+                                </div>
+                                {erros.aceite && (
+                                    <p className="cadastro-erro cadastro-erro--centro" id="cad-aceite-erro">
+                                        {erros.aceite}
+                                    </p>
+                                )}
+
+                                <div className="cadastro-acoes">
+                                    <button type="submit" className="btn cadastro-btn" disabled={enviando}>
+                                        <IconUsuario />
+                                        {enviando ? 'Cadastrando...' : 'Cadastrar'}
+                                    </button>
+                                    <p className="cadastro-erro cadastro-erro--geral" aria-live="polite">
+                                        {erroGeral}
+                                    </p>
+                                    <span className="cadastro-ou">ou</span>
+                                    <Link to="/login" className="btn cadastro-btn">
+                                        ← Voltar para o login
+                                    </Link>
+                                </div>
+                            </section>
+                        </form>
+                    )}
                 </section>
 
                 <img className="cadastro-mascote" src={mascotes} alt="" />

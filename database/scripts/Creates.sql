@@ -674,6 +674,9 @@ CREATE INDEX IF NOT EXISTS idx_enderecos_usuario
 CREATE INDEX IF NOT EXISTS idx_itens_carrinho
     ON itens_carrinho(id_carrinho);
 
+PRAGMA table_info(usuarios);
+
 -- =========================================================
 -- FIM DA ESTRUTURA DO BANCO DE DADOS
 -- =========================================================
+

@@ -1,0 +1,437 @@
+/* ========================================
+   REDEFINIR SENHA
+   Usa as variáveis do index.css (:root).
+   Header e footer vêm do layout geral.
+======================================== */
+
+.redefinir {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: var(--cor-bege);
+    padding: 48px 4% 64px;
+}
+
+.redefinir a:focus-visible,
+.redefinir button:focus-visible {
+    outline: 3px solid var(--cor-laranja);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+
+/* ===== card ===== */
+.redefinir-card {
+    position: relative;
+    z-index: 1;
+    width: min(1130px, 100%);
+    padding: 36px clamp(20px, 4vw, 56px) 48px;
+    border: 1px solid var(--cor-pessego);
+    border-radius: 40px;
+    background: var(--cor-bege);
+}
+
+/* ===== título ===== */
+.redefinir-topo {
+    text-align: center;
+}
+
+.redefinir-titulo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-size: clamp(2rem, 4.6vw, 3.4rem);
+    line-height: 1.1;
+}
+
+.redefinir-titulo-pata {
+    position: static;
+    flex: none;
+    width: clamp(44px, 6vw, 76px);
+    color: var(--cor-laranja);
+}
+
+.redefinir-brilhos {
+    flex: none;
+    align-self: flex-start;
+    width: 44px;
+    height: 40px;
+    color: var(--cor-preto);
+}
+
+.redefinir-subtitulo {
+    max-width: 520px;
+    margin: 10px auto 0;
+    font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+    line-height: 1.35;
+}
+
+/* ===== corpo (imagem + formulário) ===== */
+.redefinir-corpo {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(24px, 5vw, 64px);
+    margin-top: 28px;
+}
+
+.redefinir-imagem {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 280px;
+}
+
+.redefinir-mancha {
+    position: absolute;
+    inset: 6% 6% 0 10%;
+    background: var(--cor-pessego);
+    opacity: 0.55;
+    border-radius: 55% 45% 40% 60% / 60% 50% 50% 40%;
+}
+
+.redefinir-imagem img {
+    position: relative;
+    width: min(100%, 360px);
+    height: auto;
+}
+
+/* ===== formulário ===== */
+.redefinir-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 570px;
+}
+
+.redefinir-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.25rem;
+}
+
+.redefinir-label svg {
+    flex: none;
+    width: 26px;
+    height: 26px;
+}
+
+.redefinir-label span {
+    color: var(--cor-laranja);
+}
+
+.redefinir-campo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 60px;
+    padding: 0 12px 0 20px;
+    border: 1px solid var(--cor-pessego);
+    border-radius: 999px;
+    background: var(--cor-branco);
+}
+
+.redefinir-campo>svg {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    color: var(--cor-azul);
+}
+
+.redefinir-campo input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-family: var(--fonte-texto);
+    font-size: 1.15rem;
+    color: var(--cor-preto);
+}
+
+.redefinir-campo input::placeholder {
+    color: var(--cor-azul);
+    opacity: 0.85;
+}
+
+.redefinir-campo:focus-within {
+    outline: 3px solid var(--cor-laranja);
+}
+
+.redefinir-campo--erro {
+    border-color: var(--cor-marrom);
+    border-width: 2px;
+}
+
+/* botão de mostrar/ocultar senha */
+.redefinir-olho {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--cor-azul);
+    transition:
+        color var(--transicao-padrao),
+        background-color var(--transicao-padrao);
+}
+
+.redefinir-olho svg {
+    width: 24px;
+    height: 24px;
+}
+
+.redefinir-olho:hover {
+    color: var(--cor-laranja);
+    background: var(--cor-bege);
+}
+
+/* ===== requisitos da senha ===== */
+.redefinir-requisitos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    padding: 0 8px;
+    font-size: 1rem;
+}
+
+.redefinir-requisito {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--cor-azul);
+    transition: color var(--transicao-padrao);
+}
+
+.redefinir-requisito-marca {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid var(--cor-pessego);
+    border-radius: 50%;
+    background: var(--cor-branco);
+    font-size: 0.8rem;
+    line-height: 1;
+    color: var(--cor-preto);
+    transition:
+        background-color var(--transicao-padrao),
+        border-color var(--transicao-padrao);
+}
+
+.redefinir-requisito--ok {
+    color: var(--cor-preto);
+}
+
+.redefinir-requisito--ok .redefinir-requisito-marca {
+    border-color: var(--cor-verde);
+    background: var(--cor-verde);
+}
+
+/* texto só para leitores de tela */
+.redefinir-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* ===== botão principal ===== */
+.redefinir-enviar {
+    width: 100%;
+    height: 62px;
+    margin-top: 4px;
+    border-radius: 999px;
+    font-size: 1.4rem;
+}
+
+.redefinir-enviar svg {
+    width: 26px;
+    height: 26px;
+}
+
+.redefinir-enviar:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+/* mensagem de erro */
+.redefinir-status {
+    min-height: 1.4em;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.redefinir-status--erro {
+    color: var(--cor-marrom);
+}
+
+/* "ou" com linhas dos lados */
+.redefinir-ou {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 1.1rem;
+}
+
+.redefinir-ou::before,
+.redefinir-ou::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--cor-pessego);
+}
+
+.redefinir-voltar {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 8px;
+    font-size: 1.4rem;
+    color: var(--cor-laranja);
+    transition: color var(--transicao-padrao);
+}
+
+.redefinir-voltar svg {
+    width: 28px;
+    height: 28px;
+}
+
+.redefinir-voltar:hover {
+    color: var(--cor-marrom);
+}
+
+/* ===== tela de sucesso ===== */
+.redefinir-sucesso {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 570px;
+}
+
+.redefinir-sucesso-texto {
+    padding: 14px 20px;
+    border-radius: 20px;
+    background: var(--cor-verde);
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+/* ===== patinhas decorativas (ficam atrás do card) ===== */
+.redefinir-pata {
+    position: absolute;
+    z-index: 0;
+    color: var(--cor-pessego);
+    pointer-events: none;
+}
+
+.pata-redefinir-1 {
+    left: 5.5%;
+    top: 12%;
+    width: 70px;
+    transform: rotate(-10deg);
+}
+
+.pata-redefinir-2 {
+    left: 1%;
+    top: 29%;
+    width: 64px;
+    transform: rotate(20deg);
+}
+
+.pata-redefinir-3 {
+    left: 8%;
+    top: 72%;
+    width: 58px;
+    transform: rotate(-15deg);
+}
+
+.pata-redefinir-4 {
+    left: 5%;
+    top: 85%;
+    width: 58px;
+    transform: rotate(15deg);
+}
+
+.pata-redefinir-5 {
+    right: 4%;
+    top: 8%;
+    width: 92px;
+    transform: rotate(10deg);
+}
+
+.pata-redefinir-6 {
+    right: 2.5%;
+    top: 33%;
+    width: 70px;
+    transform: rotate(15deg);
+}
+
+.pata-redefinir-7 {
+    right: 6%;
+    top: 70%;
+    width: 62px;
+    transform: rotate(-10deg);
+}
+
+/* ===== responsivo ===== */
+@media (max-width: 1100px) {
+    .redefinir-pata {
+        display: none;
+    }
+}
+
+@media (max-width: 900px) {
+    .redefinir-corpo {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .redefinir-imagem {
+        min-height: 0;
+        width: min(100%, 300px);
+    }
+}
+
+@media (max-width: 600px) {
+    .redefinir {
+        padding: 28px 4% 48px;
+    }
+
+    .redefinir-card {
+        padding: 28px 18px 32px;
+        border-radius: 28px;
+    }
+
+    .redefinir-titulo {
+        gap: 10px;
+    }
+
+    .redefinir-brilhos {
+        display: none;
+    }
+
+    .redefinir-campo {
+        height: 54px;
+    }
+
+    .redefinir-enviar {
+        height: 56px;
+        font-size: 1.25rem;
+    }
+
+    .redefinir-voltar {
+        font-size: 1.2rem;
+    }
+}
