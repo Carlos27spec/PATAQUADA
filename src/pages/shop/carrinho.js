@@ -12,7 +12,7 @@ const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 export const CHAVE_CARRINHO_LOCAL = 'pataquada_carrinho';
 
 // Chaves onde o token do login pode estar salvo.
-const CHAVES_TOKEN = ['pataquada_token', 'token', 'authToken'];
+export const CHAVES_TOKEN = ['pataquada_token', 'token', 'authToken'];
 
 // Evento disparado quando o carrinho muda (use no header para
 // atualizar o contador do ícone do carrinho).

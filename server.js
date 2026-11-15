@@ -4602,6 +4602,10 @@ coluna => coluna.name
 
 app.use('/api/contato', criarRotasContato(limitar));
 
+import { registrarAdminInicio } from './src/pages/admin/adminInicio.js';
+
+registrarAdminInicio({ app, db, autenticar });
+
 // =====================================================
 
 // TRATAMENTO DE ROTAS NÃO ENCONTRADAS
