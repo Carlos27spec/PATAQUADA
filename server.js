@@ -56,7 +56,7 @@ app.use((req, res, next) => {
 
         'Access-Control-Allow-Origin',
 
-        'http://localhost:5173'
+        process.env.FRONTEND_URL || 'http://localhost:5173'
 
     );
 
@@ -276,6 +276,29 @@ function limitar(valor, tamanho) {
 
 
 const autenticar = criarMiddlewareAutenticacao(db);
+
+// Retorna o usuário logado (para restaurar a sessão ao recarregar a página)
+app.get('/api/me', autenticar, (req, res) => {
+    try {
+        const usuario = db.prepare(`
+            SELECT id, nome, email, id_tipo_usuario
+            FROM usuarios
+            WHERE id = ?
+            AND status = 1
+        `).get(req.usuario.id);
+
+        if (!usuario) {
+            return res.status(401).json({
+                sucesso: false,
+                mensagem: 'Usuário não encontrado.'
+            });
+        }
+
+        return res.json({ sucesso: true, usuario });
+    } catch (erro) {
+        return responderErro(res, erro, 'Erro ao consultar usuário logado.');
+    }
+});
 
 // =====================================================
 
@@ -2212,7 +2235,7 @@ app.post('/api/usuarios/login', async (req, res) => {
 
             FROM usuarios
 
-            WHERE email = ?
+            WHERE LOWER(email) = LOWER(?)
 
             AND status = 1
 

@@ -1,16 +1,17 @@
-
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import './login.css'
 import { PawIcon } from "../components/Icons.jsx"
 import mascoteGrande from '../assets/cachorro-cartoon-card.png'
 
+const API = import.meta.env.VITE_API_URL
+
 /* ---------- Ícones ---------- */
 
-function IconUsuario() {
+function IconEmail() {
     return (
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" />
         </svg>
     )
 }
@@ -26,7 +27,8 @@ function IconCadeado() {
 /* ---------- Página ---------- */
 
 export default function Login() {
-    const [usuario, setUsuario] = useState('')
+    const navigate = useNavigate()
+    const [email, setEmail] = useState('')
     const [senha, setSenha] = useState('')
     const [erro, setErro] = useState('')
     const [enviando, setEnviando] = useState(false)
@@ -34,8 +36,8 @@ export default function Login() {
     async function handleSubmit(e) {
         e.preventDefault()
 
-        if (!usuario.trim() || !senha) {
-            setErro('Preencha o nome e a senha para entrar.')
+        if (!email.trim() || !senha) {
+            setErro('Preencha o e-mail e a senha para entrar.')
             return
         }
 
@@ -43,9 +45,28 @@ export default function Login() {
         setEnviando(true)
 
         try {
-            // TODO: chamar a API de login aqui
+            const resposta = await fetch(`${API}/api/usuarios/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // O cadastro grava o e-mail em minúsculas, então o login envia igual
+                body: JSON.stringify({
+                    email: email.trim().toLowerCase(),
+                    senha
+                })
+            })
+
+            const dados = await resposta.json().catch(() => ({}))
+
+            if (!resposta.ok || !dados.sucesso) {
+                setErro(dados.mensagem || 'Não foi possível entrar agora. Tente novamente.')
+                return
+            }
+
+            localStorage.setItem('token', dados.token)
+            localStorage.setItem('usuario', JSON.stringify(dados.usuario))
+            navigate('/')
         } catch {
-            setErro('Não foi possível entrar agora. Tente novamente.')
+            setErro('Não foi possível conectar ao servidor. Tente novamente.')
         } finally {
             setEnviando(false)
         }
@@ -63,7 +84,6 @@ export default function Login() {
             </h1>
 
             <div className="login-area">
-                {/* Mascote mantido */}
                 <img
                     className="login-mascote"
                     src={mascoteGrande}
@@ -74,19 +94,19 @@ export default function Login() {
                     <form className="login-form" onSubmit={handleSubmit} noValidate>
 
                         <div className="login-campo">
-                            <label htmlFor="login-usuario" className="sr-only">
-                                Nome
+                            <label htmlFor="login-email" className="sr-only">
+                                E-mail
                             </label>
 
-                            <IconUsuario />
+                            <IconEmail />
 
                             <input
-                                id="login-usuario"
-                                type="text"
-                                placeholder="Nome"
-                                autoComplete="username"
-                                value={usuario}
-                                onChange={(e) => setUsuario(e.target.value)}
+                                id="login-email"
+                                type="email"
+                                placeholder="E-mail"
+                                autoComplete="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
 
@@ -116,10 +136,10 @@ export default function Login() {
                             className="btn login-entrar"
                             disabled={enviando}
                         >
-                            Entrar
+                            {enviando ? 'Entrando...' : 'Entrar'}
                         </button>
 
-                        <p className="login-status" aria-live="polite">
+                        <p className="login-status" role="alert">
                             {erro}
                         </p>
 
