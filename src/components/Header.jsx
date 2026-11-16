@@ -1,118 +1,184 @@
+
 import { useCallback, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+
 import insignea from "../assets/Insignea-mini.png";
 import { SearchIcon, CartIcon, UserIcon } from "./Icons";
 import BuscaGlobal from "../pages/search/BuscaGlobal";
+
 import "./Header.css";
 
 const links = [
-  { to: "/", label: "Home" },
-  { to: "/servicos", label: "Serviços" },
-  { to: "/shop", label: "Shop" },
-  { to: "/#sobre", label: "Sobre" },
-  { to: "/#contato", label: "Contato" },
+    { to: "/", label: "Home" },
+    { to: "/servicos", label: "Serviços" },
+    { to: "/shop", label: "Shop" },
+    { to: "/#sobre", label: "Sobre" },
+    { to: "/#contato", label: "Contato" },
+];
+
+// Páginas nas quais o Header não deve aparecer.
+const paginasSemHeader = [
+    "/admin"
 ];
 
 function separar(to) {
-  const [path, h = ""] = to.split("#");
-  return { path, hash: h ? `#${h}` : "" };
+    const [path, h = ""] = to.split("#");
+
+    return {
+        path,
+        hash: h ? `#${h}` : ""
+    };
 }
 
 export default function Header() {
-  const [open, setOpen] = useState(false);
-  // A pesquisa lembra em qual página foi aberta: se a rota mudar
-  // (botão voltar, por exemplo), ela deixa de aparecer sozinha.
-  const [busca, setBusca] = useState({ aberta: false, em: "" });
-  const { pathname, hash } = useLocation();
+    const [open, setOpen] = useState(false);
 
-  const buscaVisivel = busca.aberta && busca.em === pathname;
+    // Controle da pesquisa global.
+    const [busca, setBusca] = useState({
+        aberta: false,
+        em: ""
+    });
 
-  const abrirBusca = () => {
-    setOpen(false);
-    setBusca({ aberta: true, em: pathname });
-  };
+    const { pathname, hash } = useLocation();
 
-  const fecharBusca = useCallback(() => {
-    setBusca({ aberta: false, em: "" });
-  }, []);
+    // Pesquisa visível somente na página em que foi aberta.
+    const buscaVisivel = busca.aberta && busca.em === pathname;
 
-  const estaAtivo = (to) => {
-    const alvo = separar(to);
-    return pathname === alvo.path && hash === alvo.hash;
-  };
+    const abrirBusca = () => {
+        setOpen(false);
 
-  const aoClicar = (to) => {
-    setOpen(false);
-    const alvo = separar(to);
+        setBusca({
+            aberta: true,
+            em: pathname
+        });
+    };
 
-    if (pathname !== alvo.path) return;
+    const fecharBusca = useCallback(() => {
+        setBusca({
+            aberta: false,
+            em: ""
+        });
+    }, []);
 
-    if (alvo.hash) {
-      document
-        .getElementById(alvo.hash.slice(1))
-        ?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    const estaAtivo = (to) => {
+        const alvo = separar(to);
+
+        return pathname === alvo.path && hash === alvo.hash;
+    };
+
+    const aoClicar = (to) => {
+        setOpen(false);
+
+        const alvo = separar(to);
+
+        if (pathname !== alvo.path) return;
+
+        if (alvo.hash) {
+            document
+                .getElementById(alvo.hash.slice(1))
+                ?.scrollIntoView({ behavior: "smooth" });
+        } else {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
+    };
+
+    // Verifica se o Header deve ser ocultado.
+    const ocultarHeader = paginasSemHeader.some(
+        rota => pathname === rota || pathname.startsWith(`${rota}/`)
+    );
+
+    // Retorna somente depois da execução de todos os Hooks.
+    if (ocultarHeader) {
+        return null;
     }
-  };
 
-  return (
-    <header className="header">
-      <Link to="/" className="header__logo" onClick={() => aoClicar("/")}>
-        <div className="footer-logo">
-          <img src={insignea} alt="" />
-          <span>
-            Pata<span className="logo-destaque">Quada</span>
-          </span>
-        </div>
-      </Link>
+    return (
+        <header className="header">
 
-      <button
-        className="header__toggle"
-        aria-label="Abrir menu"
-        aria-expanded={open}
-        aria-controls="menu-principal"
-        onClick={() => setOpen((o) => !o)}
-      >
-        <span /><span /><span />
-      </button>
-
-      <div id="menu-principal" className={`header__menu ${open ? "is-open" : ""}`}>
-        <nav className="header__nav" aria-label="Principal">
-          {links.map(({ to, label }) => (
             <Link
-              key={to}
-              to={to}
-              className={estaAtivo(to) ? "is-active" : undefined}
-              onClick={() => aoClicar(to)}
+                to="/"
+                className="header__logo"
+                onClick={() => aoClicar("/")}
             >
-              {label}
+                <div className="footer-logo">
+                    <img src={insignea} alt="" />
+
+                    <span>
+                        Pata<span className="logo-destaque">Quada</span>
+                    </span>
+                </div>
             </Link>
-          ))}
-        </nav>
 
-        <div className="header__actions">
-          <button
-            type="button"
-            aria-label="Buscar"
-            aria-haspopup="dialog"
-            aria-expanded={buscaVisivel}
-            onClick={abrirBusca}
-          >
-            <SearchIcon />
-          </button>
+            <button
+                className="header__toggle"
+                aria-label="Abrir menu"
+                aria-expanded={open}
+                aria-controls="menu-principal"
+                onClick={() => setOpen(o => !o)}
+            >
+                <span />
+                <span />
+                <span />
+            </button>
 
-          <Link to="/carrinho" aria-label="Carrinho">
-            <CartIcon />
-          </Link>
+            <div
+                id="menu-principal"
+                className={`header__menu ${open ? "is-open" : ""}`}
+            >
+                <nav
+                    className="header__nav"
+                    aria-label="Principal"
+                >
+                    {links.map(({ to, label }) => (
+                        <Link
+                            key={to}
+                            to={to}
+                            className={
+                                estaAtivo(to) ? "is-active" : undefined
+                            }
+                            onClick={() => aoClicar(to)}
+                        >
+                            {label}
+                        </Link>
+                    ))}
+                </nav>
 
-          <Link to="/login" aria-label="Minha conta">
-            <UserIcon />
-          </Link>
-        </div>
-      </div>
+                <div className="header__actions">
 
-      {buscaVisivel && <BuscaGlobal aoFechar={fecharBusca} />}
-    </header>
-  );
+                    <button
+                        type="button"
+                        aria-label="Buscar"
+                        aria-haspopup="dialog"
+                        aria-expanded={buscaVisivel}
+                        onClick={abrirBusca}
+                    >
+                        <SearchIcon />
+                    </button>
+
+                    <Link
+                        to="/carrinho"
+                        aria-label="Carrinho"
+                    >
+                        <CartIcon />
+                    </Link>
+
+                    <Link
+                        to="/login"
+                        aria-label="Minha conta"
+                    >
+                        <UserIcon />
+                    </Link>
+
+                </div>
+            </div>
+
+            {buscaVisivel && (
+                <BuscaGlobal aoFechar={fecharBusca} />
+            )}
+
+        </header>
+    );
 }
