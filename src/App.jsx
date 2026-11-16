@@ -33,6 +33,9 @@ const AdminLayout = lazy(() => import('./pages/admin/AdminLayout.jsx'))
 const AdminInicio = lazy(() => import('./pages/admin/AdminInicio.jsx'))
 const AdminEmBreve = lazy(() => import('./pages/admin/AdminEmBreve.jsx'))
 
+// Usuários
+const Usuario = lazy(() => import('./pages/usuarios/Usuario.jsx'))
+
 // Página 404
 const Erro404 = lazy(() => import('./pages/404/404.jsx'))
 
@@ -173,6 +176,10 @@ function App() {
                     <Route index element={<Pagina><AdminInicio /></Pagina>} />
                     <Route path="*" element={<Pagina><AdminEmBreve /></Pagina>} />
                 </Route>
+
+                {/* Usuários */}
+                <Route path="/usuarios" element={<Pagina><Usuario /></Pagina>} />
+                <Route path="/usuarios/:id" element={<Pagina><Usuario /></Pagina>} />
 
                 {/* Página não encontrada */}
                 <Route path="*" element={<Erro404 />} />
