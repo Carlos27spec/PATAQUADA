@@ -2081,6 +2081,11 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
         const cpf = somenteDigitos(req.body.cpf);
         const senha = String(req.body.senha ?? '');
 
+        // Campos opcionais: nome de usuário e telefone.
+        // Se vierem preenchidos, são validados e gravados; se vierem vazios, ficam NULL no banco.
+        const usuario = limitar(req.body.usuario, 60).toLowerCase();
+        const telefone = somenteDigitos(req.body.telefone);
+
         // A tabela usuarios tem "nome" e "sobrenome" (os dois obrigatórios).
         // O formulário envia o nome completo: a primeira palavra vira nome e o resto, sobrenome.
         const [nome, ...resto] = nomeCompleto.split(/\s+/);
@@ -2099,6 +2104,18 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
 
         if (!cpfValido(cpf)) {
             return erro(400, 'cpf', 'Informe um CPF válido.');
+        }
+
+        if (usuario && !/^[a-z0-9_.]{3,30}$/.test(usuario)) {
+            return erro(
+                400,
+                'usuario',
+                'O usuário deve ter de 3 a 30 caracteres, usando letras, números, ponto ou _.'
+            );
+        }
+
+        if (telefone && !/^\d{10,11}$/.test(telefone)) {
+            return erro(400, 'telefone', 'Informe o telefone com DDD (10 ou 11 dígitos).');
         }
 
         if (senha.length < 8) {
@@ -2130,6 +2147,10 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
             return erro(409, 'cpf', 'Este CPF já está cadastrado.');
         }
 
+        if (usuario && db.prepare('SELECT id FROM usuarios WHERE usuario = ?').get(usuario)) {
+            return erro(409, 'usuario', 'Este nome de usuário já está em uso.');
+        }
+
         const senhaCriptografada = await bcrypt.hash(senha, 10);
 
         const resultado = db.prepare(`
@@ -2139,22 +2160,27 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
                 cpf,
                 email,
                 id_tipo_usuario,
-                senha
+                usuario,
+                senha,
+                telefone
             )
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
             nome,
             sobrenome,
             cpf,
             email,
             tipoCliente.id,
-            senhaCriptografada
+            usuario || null,
+            senhaCriptografada,
+            telefone || null
         );
 
         const novoUsuario = {
             id: resultado.lastInsertRowid,
             nome,
             email,
+            usuario: usuario || null,
             id_tipo_usuario: tipoCliente.id
         };
 
@@ -2164,19 +2190,26 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
             token: gerarToken(novoUsuario),
             usuario: novoUsuario
         });
-
     } catch (erro) {
         // Dois cadastros ao mesmo tempo podem passar pelas checagens acima;
         // o banco (UNIQUE) é a garantia final.
         if (erro.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-            const campo = /cpf/i.test(erro.message) ? 'cpf' : 'email';
+            const campo = /cpf/i.test(erro.message)
+                ? 'cpf'
+                : /usuarios\.usuario/i.test(erro.message)
+                    ? 'usuario'
+                    : 'email';
+
+            const mensagens = {
+                cpf: 'Este CPF já está cadastrado.',
+                usuario: 'Este nome de usuário já está em uso.',
+                email: 'Este e-mail já está cadastrado.'
+            };
 
             return res.status(409).json({
                 sucesso: false,
                 campo,
-                mensagem: campo === 'cpf'
-                    ? 'Este CPF já está cadastrado.'
-                    : 'Este e-mail já está cadastrado.'
+                mensagem: mensagens[campo]
             });
         }
 
@@ -2202,16 +2235,15 @@ app.post('/api/usuarios/login', async (req, res) => {
     try {
 
         const { email, senha } = req.body;
+        const identificador = String(email ?? '').trim();
 
-
-
-        if (!email || !senha) {
+        if (!identificador || !senha) {
 
             return res.status(400).json({
 
                 sucesso: false,
 
-                mensagem: 'Informe o e-mail e a senha.'
+                mensagem: 'Informe o e-mail (ou usuário) e a senha.'
 
             });
 
@@ -2235,11 +2267,11 @@ app.post('/api/usuarios/login', async (req, res) => {
 
             FROM usuarios
 
-            WHERE LOWER(email) = LOWER(?)
+            WHERE (LOWER(email) = LOWER(?) OR LOWER(usuario) = LOWER(?))
 
             AND status = 1
 
-        `).get(email);
+        `).get(identificador, identificador);
 
 
 
@@ -4624,10 +4656,6 @@ coluna => coluna.name
 
 
 app.use('/api/contato', criarRotasContato(limitar));
-
-import { registrarAdminInicio } from './src/pages/admin/adminInicio.js';
-
-registrarAdminInicio({ app, db, autenticar });
 
 // =====================================================
 

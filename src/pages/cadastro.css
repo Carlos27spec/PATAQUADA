@@ -21,8 +21,22 @@
 
 .cadastro-area {
     position: relative;
-    width: min(980px, 100%);
+    width: min(1180px, 100%);
     margin: 0 auto;
+}
+
+/* os dois cards ficam lado a lado, com a mesma altura */
+.cadastro-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+    align-items: stretch;
+}
+
+/* tela de sucesso: um card só, centralizado */
+.cadastro-area>.cadastro-card {
+    max-width: 760px;
+    margin-inline: auto;
 }
 
 .cadastro-card {
@@ -38,7 +52,7 @@
 }
 
 .cadastro-titulo {
-    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-size: clamp(1.9rem, 3.4vw, 3rem);
     line-height: 1.1;
     margin-bottom: 18px;
 }
@@ -88,13 +102,15 @@
     margin-bottom: 14px;
 }
 
-/* ===== caixa "Crie sua senha" ===== */
-.cadastro-senha {
-    margin-top: 22px;
-    padding: 28px clamp(16px, 5%, 54px) 150px;
+/* ===== card 1: dados pessoais ===== */
+.cadastro-card--dados {
     /* espaço embaixo para o mascote */
+    padding-bottom: 110px;
+}
+
+/* ===== card 2: "Contato e senha" ===== */
+.cadastro-card--senha {
     border: 1px solid var(--cor-laranja);
-    border-radius: 20px;
 }
 
 .cadastro-senha-titulo {
@@ -234,7 +250,7 @@
 
 /* ===== mascote (sai do card, no canto inferior esquerdo) ===== */
 .cadastro-mascote {
-    --larg: clamp(300px, 36vw, 480px);
+    --larg: clamp(220px, 25vw, 340px);
     position: absolute;
     left: calc(var(--larg) * -0.29);
     bottom: calc(var(--larg) * -0.34);
@@ -306,8 +322,12 @@
         display: none;
     }
 
-    .cadastro-senha {
-        padding-bottom: 28px;
+    .cadastro-form {
+        grid-template-columns: 1fr;
+    }
+
+    .cadastro-card--dados {
+        padding-bottom: 36px;
     }
 }
 
@@ -317,8 +337,12 @@
         padding: 28px 18px 32px;
     }
 
-    .cadastro-senha {
-        padding-inline: 14px;
+    .cadastro-form {
+        gap: 20px;
+    }
+
+    .cadastro-card--dados {
+        padding-bottom: 32px;
     }
 
     .cadastro-campo input {

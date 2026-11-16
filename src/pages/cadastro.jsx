@@ -39,6 +39,15 @@ function formatarCpf(valor) {
         .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
 }
 
+function formatarTelefone(valor) {
+    const d = valor.replace(/\D/g, '').slice(0, 11)
+    if (d.length === 0) return ''
+    if (d.length <= 2) return `(${d}`
+    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+    if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
+}
+
 function cpfValido(cpf) {
     const d = cpf.replace(/\D/g, '')
     if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false
@@ -58,18 +67,25 @@ function validar(dados) {
     if (dados.nome.trim().split(/\s+/).length < 2) erros.nome = 'Informe seu nome completo.'
     if (!/^\S+@\S+\.\S+$/.test(dados.email.trim())) erros.email = 'Informe um e-mail válido.'
     if (!cpfValido(dados.cpf)) erros.cpf = 'Informe um CPF válido.'
+    if (!/^[a-zA-Z0-9_.]{3,20}$/.test(dados.usuario.trim()))
+        erros.usuario = 'Use de 3 a 20 caracteres: letras, números, ponto ou _.'
+    const digitosTel = dados.telefone.replace(/\D/g, '')
+    if (digitosTel.length < 10 || digitosTel.length > 11)
+        erros.telefone = 'Informe um telefone com DDD.'
     if (dados.senha.length < 8) erros.senha = 'A senha precisa ter pelo menos 8 caracteres.'
     if (dados.confirmar !== dados.senha) erros.confirmar = 'As senhas não conferem.'
     if (!dados.aceite) erros.aceite = 'Aceite os termos para continuar.'
     return erros
 }
 
-const ORDEM_CAMPOS = ['nome', 'email', 'cpf', 'senha', 'confirmar', 'aceite']
+const ORDEM_CAMPOS = ['nome', 'email', 'cpf', 'telefone', 'usuario', 'senha', 'confirmar', 'aceite']
 
 const DADOS_INICIAIS = {
     nome: '',
     email: '',
     cpf: '',
+    usuario: '',
+    telefone: '',
     senha: '',
     confirmar: '',
     aceite: false,
@@ -109,8 +125,10 @@ export default function Cadastro() {
 
     function atualizar(e) {
         const { name, type, value, checked } = e.target
-        const novoValor =
-            type === 'checkbox' ? checked : name === 'cpf' ? formatarCpf(value) : value
+        let novoValor = value
+        if (type === 'checkbox') novoValor = checked
+        else if (name === 'cpf') novoValor = formatarCpf(value)
+        else if (name === 'telefone') novoValor = formatarTelefone(value)
 
         setDados((atual) => ({ ...atual, [name]: novoValor }))
         if (erros[name]) setErros((atual) => ({ ...atual, [name]: undefined }))
@@ -139,6 +157,8 @@ export default function Cadastro() {
                     nome: dados.nome.trim(),
                     email: dados.email.trim(),
                     cpf: dados.cpf,
+                    usuario: dados.usuario.trim(),
+                    telefone: dados.telefone,
                     senha: dados.senha,
                 }),
             })
@@ -174,8 +194,8 @@ export default function Cadastro() {
             <PawIcon className="cadastro-pata pata-cadastro-6" aria-hidden="true" />
 
             <div className="cadastro-area">
-                <section className="cadastro-card" aria-labelledby="cadastro-titulo">
-                    {concluido ? (
+                {concluido ? (
+                    <section className="cadastro-card" aria-labelledby="cadastro-titulo">
                         <div className="cadastro-coluna cadastro-sucesso" role="status">
                             <h1 id="cadastro-titulo" className="cadastro-titulo">
                                 Cadastro realizado!
@@ -187,11 +207,17 @@ export default function Cadastro() {
                                 Ir para o login
                             </Link>
                         </div>
-                    ) : (
-                        <form onSubmit={handleSubmit} noValidate>
+                    </section>
+                ) : (
+                    <form className="cadastro-form" onSubmit={handleSubmit} noValidate>
+                        {/* ---------- Card 1: dados pessoais ---------- */}
+                        <section
+                            className="cadastro-card cadastro-card--dados"
+                            aria-labelledby="cadastro-titulo"
+                        >
                             <div className="cadastro-coluna">
                                 <h1 id="cadastro-titulo" className="cadastro-titulo">
-                                    Cadastro na PATAQUADA
+                                    Dados Cadastrais
                                 </h1>
 
                                 <Campo
@@ -223,75 +249,101 @@ export default function Cadastro() {
                                     onChange={atualizar}
                                     erro={erros.cpf}
                                 />
+                                <Campo
+                                    name="telefone"
+                                    label="Telefone de Contato"
+                                    type="tel"
+                                    inputMode="tel"
+                                    autoComplete="tel"
+                                    placeholder="(00) 00000-0000"
+                                    maxLength={15}
+                                    value={dados.telefone}
+                                    onChange={atualizar}
+                                    erro={erros.telefone}
+                                />
+                            </div>
+                        </section>
+
+                        {/* ---------- Card 2: contato e senha ---------- */}
+                        <section
+                            className="cadastro-card cadastro-card--senha"
+                            aria-labelledby="cadastro-senha-titulo"
+                        >
+                            <h2 id="cadastro-senha-titulo" className="cadastro-senha-titulo cadastro-coluna">
+                                <IconCadeadoCirculo />
+                                Usuário e senha
+                            </h2>
+
+                            <div className="cadastro-coluna">
+                                <Campo
+                                    name="usuario"
+                                    label="Usuário"
+                                    type="text"
+                                    autoComplete="username"
+                                    maxLength={20}
+                                    value={dados.usuario}
+                                    onChange={atualizar}
+                                    erro={erros.usuario}
+                                />
+                                <Campo
+                                    name="senha"
+                                    label="Senha"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    value={dados.senha}
+                                    onChange={atualizar}
+                                    erro={erros.senha}
+                                />
+                                <Campo
+                                    name="confirmar"
+                                    label="Confirmar Senha"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    value={dados.confirmar}
+                                    onChange={atualizar}
+                                    erro={erros.confirmar}
+                                />
                             </div>
 
-                            <section className="cadastro-senha" aria-labelledby="cadastro-senha-titulo">
-                                <h2 id="cadastro-senha-titulo" className="cadastro-senha-titulo cadastro-coluna">
-                                    <IconCadeadoCirculo />
-                                    Crie sua senha
-                                </h2>
+                            <div className="cadastro-aceite">
+                                <input
+                                    id="cad-aceite"
+                                    name="aceite"
+                                    type="checkbox"
+                                    checked={dados.aceite}
+                                    onChange={atualizar}
+                                    aria-invalid={Boolean(erros.aceite)}
+                                    aria-describedby={erros.aceite ? 'cad-aceite-erro' : undefined}
+                                />
+                                <label htmlFor="cad-aceite">
+                                    Eu concordo com os <Link to="/termos">Termos de Uso</Link> e{' '}
+                                    <Link to="/privacidade">Política de Privacidade</Link>
+                                </label>
+                            </div>
+                            {erros.aceite && (
+                                <p className="cadastro-erro cadastro-erro--centro" id="cad-aceite-erro">
+                                    {erros.aceite}
+                                </p>
+                            )}
 
-                                <div className="cadastro-coluna">
-                                    <Campo
-                                        name="senha"
-                                        label="Senha"
-                                        type="password"
-                                        autoComplete="new-password"
-                                        value={dados.senha}
-                                        onChange={atualizar}
-                                        erro={erros.senha}
-                                    />
-                                    <Campo
-                                        name="confirmar"
-                                        label="Confirmar Senha"
-                                        type="password"
-                                        autoComplete="new-password"
-                                        value={dados.confirmar}
-                                        onChange={atualizar}
-                                        erro={erros.confirmar}
-                                    />
-                                </div>
+                            <div className="cadastro-acoes">
+                                <button type="submit" className="btn cadastro-btn" disabled={enviando}>
+                                    <IconUsuario />
+                                    {enviando ? 'Cadastrando...' : 'Cadastrar'}
+                                </button>
+                                <p className="cadastro-erro cadastro-erro--geral" aria-live="polite">
+                                    {erroGeral}
+                                </p>
+                                <span className="cadastro-ou">ou</span>
+                                <Link to="/login" className="btn cadastro-btn">
+                                    ← Voltar para o login
+                                </Link>
+                            </div>
+                        </section>
+                    </form>
+                )}
 
-                                <div className="cadastro-aceite">
-                                    <input
-                                        id="cad-aceite"
-                                        name="aceite"
-                                        type="checkbox"
-                                        checked={dados.aceite}
-                                        onChange={atualizar}
-                                        aria-invalid={Boolean(erros.aceite)}
-                                        aria-describedby={erros.aceite ? 'cad-aceite-erro' : undefined}
-                                    />
-                                    <label htmlFor="cad-aceite">
-                                        Eu concordo com os <Link to="/termos">Termos de Uso</Link> e{' '}
-                                        <Link to="/privacidade">Política de Privacidade</Link>
-                                    </label>
-                                </div>
-                                {erros.aceite && (
-                                    <p className="cadastro-erro cadastro-erro--centro" id="cad-aceite-erro">
-                                        {erros.aceite}
-                                    </p>
-                                )}
-
-                                <div className="cadastro-acoes">
-                                    <button type="submit" className="btn cadastro-btn" disabled={enviando}>
-                                        <IconUsuario />
-                                        {enviando ? 'Cadastrando...' : 'Cadastrar'}
-                                    </button>
-                                    <p className="cadastro-erro cadastro-erro--geral" aria-live="polite">
-                                        {erroGeral}
-                                    </p>
-                                    <span className="cadastro-ou">ou</span>
-                                    <Link to="/login" className="btn cadastro-btn">
-                                        ← Voltar para o login
-                                    </Link>
-                                </div>
-                            </section>
-                        </form>
-                    )}
-                </section>
-
-                <img className="cadastro-mascote" src={mascotes} alt="" />
+                {!concluido && <img className="cadastro-mascote" src={mascotes} alt="" />}
             </div>
         </main>
     )

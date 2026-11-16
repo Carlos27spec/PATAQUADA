@@ -37,7 +37,7 @@ export default function Login() {
         e.preventDefault()
 
         if (!email.trim() || !senha) {
-            setErro('Preencha o e-mail e a senha para entrar.')
+            setErro('Preencha o e-mail (ou usuário) e a senha para entrar.')
             return
         }
 
@@ -95,16 +95,16 @@ export default function Login() {
 
                         <div className="login-campo">
                             <label htmlFor="login-email" className="sr-only">
-                                E-mail
+                                E-mail ou usuário
                             </label>
 
                             <IconEmail />
 
                             <input
                                 id="login-email"
-                                type="email"
-                                placeholder="E-mail"
-                                autoComplete="email"
+                                type="text"
+                                placeholder="E-mail ou usuário"
+                                autoComplete="username"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
