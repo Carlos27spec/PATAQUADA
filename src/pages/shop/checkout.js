@@ -4,8 +4,6 @@ import {
     carregarCarrinho,
     chamarApi
 } from './carrinho.js';
-import { calcularFrete } from './shop.js';
-
 // ========================================
 // AJUSTE CONFORME O SEU PROJETO
 // ========================================
@@ -13,20 +11,20 @@ import { calcularFrete } from './shop.js';
 // Rota da tela de login (usada quando o cliente ainda não entrou).
 export const ROTA_LOGIN = '/login';
 
-// Onde o endereço de entrega fica salvo no navegador, para o
-// cliente não precisar digitar de novo na próxima compra.
-const CHAVE_ENTREGA = 'pataquada_entrega';
-
 // ========================================
 // TOTAIS
 // ========================================
 
 // Só para exibir: quem decide o valor cobrado é o servidor.
-export function totaisDoCarrinho(itens) {
+// frete = null significa "ainda não calculado" (falta o CEP).
+export function totaisDoCarrinho(itens, frete = null) {
     const subtotal = itens.reduce((soma, item) => soma + item.subtotal, 0);
-    const frete = calcularFrete(subtotal);
 
-    return { subtotal, frete, total: subtotal + frete };
+    return {
+        subtotal,
+        frete,
+        total: subtotal + (frete ?? 0)
+    };
 }
 
 // ========================================
@@ -73,20 +71,10 @@ export const ENTREGA_VAZIA = {
     uf: ''
 };
 
-export function lerEntregaSalva() {
-    try {
-        const salva = JSON.parse(
-            localStorage.getItem(CHAVE_ENTREGA) || '{}'
-        );
-
-        return { ...ENTREGA_VAZIA, ...salva };
-    } catch {
-        return { ...ENTREGA_VAZIA };
-    }
-}
-
-export function salvarEntrega(entrega) {
-    localStorage.setItem(CHAVE_ENTREGA, JSON.stringify(entrega));
+// Nome, telefone e endereços salvos do cliente logado.
+// Devolve { usuario: { nome, email, telefone }, enderecos: [...] }.
+export function carregarDadosEntrega() {
+    return chamarApi('/api/usuarios/me/entrega');
 }
 
 export function formatarCep(valor) {
@@ -113,15 +101,8 @@ export function formatarTelefone(valor) {
         : `(${ddd}) ${resto}`;
 }
 
-// Preenche rua, bairro, cidade e UF a partir do CEP (ViaCEP).
-// Se o serviço estiver fora do ar, devolve null e o cliente digita.
-export async function buscarCep(cep) {
-    const digitos = String(cep).replace(/\D/g, '');
-
-    if (digitos.length !== 8) {
-        return null;
-    }
-
+// Consulta direta ao ViaCEP (usada se o servidor não responder).
+async function buscarCepNoViaCep(digitos) {
     try {
         const resposta = await fetch(
             `https://viacep.com.br/ws/${digitos}/json/`
@@ -130,18 +111,84 @@ export async function buscarCep(cep) {
         const dados = await resposta.json();
 
         if (!resposta.ok || dados.erro) {
-            return null;
+            return { encontrado: false };
         }
 
         return {
-            logradouro: dados.logradouro || '',
-            bairro: dados.bairro || '',
-            cidade: dados.localidade || '',
-            uf: dados.uf || ''
+            encontrado: true,
+            endereco: {
+                cep: digitos,
+                logradouro: dados.logradouro || '',
+                bairro: dados.bairro || '',
+                cidade: dados.localidade || '',
+                uf: dados.uf || ''
+            }
         };
     } catch {
         return null;
     }
+}
+
+// Preenche rua, bairro, cidade e UF a partir do CEP.
+// Primeiro pergunta ao servidor (/api/cep); se ele não responder,
+// consulta o ViaCEP direto.
+// Devolve { encontrado: true, endereco }, { encontrado: false }
+// (CEP inexistente) ou null (nenhum serviço respondeu).
+export async function buscarCep(cep) {
+    const digitos = String(cep).replace(/\D/g, '');
+
+    if (digitos.length !== 8) {
+        return null;
+    }
+
+    try {
+        const resposta = await chamarApi(`/api/cep/${digitos}`, {
+            autenticado: false
+        });
+
+        return { encontrado: true, endereco: resposta.endereco };
+    } catch (erro) {
+        if (erro.status === 404 && erro.message === 'CEP não encontrado.') {
+            return { encontrado: false };
+        }
+
+        return buscarCepNoViaCep(digitos);
+    }
+}
+
+// ========================================
+// FRETE
+// ========================================
+
+// Devolve { opcoes: [{ codigo, nome, valor, gratis, prazo_dias,
+// data_prevista }], destino, regiao_nome, distancia_km, ... }.
+export function calcularFreteDoCarrinho({ cep, itens }) {
+    return chamarApi('/api/frete/calcular', {
+        metodo: 'POST',
+        autenticado: false,
+        corpo: {
+            cep: String(cep).replace(/\D/g, ''),
+            itens: itens.map(item => ({
+                id_produto: item.id,
+                quantidade: item.quantidade
+            }))
+        }
+    });
+}
+
+// "2026-11-20" -> "qui., 20 de nov."
+export function formatarDataEntrega(dataIso) {
+    if (!dataIso) {
+        return '';
+    }
+
+    const [ano, mes, dia] = dataIso.split('-').map(Number);
+
+    return new Date(ano, mes - 1, dia).toLocaleDateString('pt-BR', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short'
+    });
 }
 
 // ========================================
@@ -149,10 +196,24 @@ export async function buscarCep(cep) {
 // ========================================
 
 // Cria o pedido e devolve { pedido_id, init_point }.
-export function criarPagamento({ forma, entrega }) {
+// idEndereco: endereço salvo na conta (o servidor busca no banco).
+// salvarEndereco: guarda o endereço digitado na conta do cliente.
+export function criarPagamento({
+    forma,
+    entrega,
+    freteOpcao,
+    idEndereco = null,
+    salvarEndereco = false
+}) {
     return chamarApi('/api/pagamentos/preferencia', {
         metodo: 'POST',
-        corpo: { forma, entrega }
+        corpo: {
+            forma,
+            entrega,
+            frete_opcao: freteOpcao,
+            id_endereco: idEndereco ?? undefined,
+            salvar_endereco: salvarEndereco
+        }
     });
 }
 

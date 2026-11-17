@@ -912,3 +912,129 @@
     }
 
 }
+
+/* ========================================
+   ENDEREÇOS SALVOS E OPÇÕES DE ENVIO
+======================================== */
+
+.ck-subtitulo {
+    margin-top: 28px;
+}
+
+.ck-form--espaco {
+    margin-top: 16px;
+}
+
+.ck-mensagem-curta {
+    margin: 0 0 16px;
+    font-size: 15px;
+    opacity: 0.8;
+}
+
+.ck-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.ck-check input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--cor-laranja);
+}
+
+.ck-icone-endereco,
+.ck-icone-envio {
+    color: var(--cor-laranja);
+    font-size: 28px;
+}
+
+.ck-envio-destino {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 14px;
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+.ck-envio-destino i {
+    color: var(--cor-laranja);
+}
+
+.ck-forma--envio {
+    grid-template-columns: 28px 56px minmax(0, 1fr) auto;
+}
+
+.ck-envio-preco {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    font-size: 17px;
+    white-space: nowrap;
+}
+
+.ck-envio-preco s {
+    font-size: 13px;
+    opacity: 0.6;
+}
+
+.ck-envio-gratis {
+    color: #2E7D32;
+}
+
+.ck-resumo-envio {
+    display: block;
+    font-size: 13px;
+    opacity: 0.75;
+}
+
+@media (max-width: 640px) {
+    .ck-forma--envio {
+        grid-template-columns: 28px minmax(0, 1fr) auto;
+    }
+
+    .ck-forma--envio .ck-forma-icone {
+        display: none;
+    }
+}
+
+/* ========================================
+   PAGAMENTO ABERTO EM OUTRA ABA
+======================================== */
+
+.ck-pagamento-aberto {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px;
+    margin-top: 22px;
+    padding: 18px 20px;
+    border: 2px solid var(--cor-laranja);
+    border-radius: 20px;
+    background-color: var(--cor-branco);
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+.ck-pagamento-aberto > i {
+    color: var(--cor-laranja);
+    font-size: 22px;
+    margin-top: 2px;
+}
+
+.ck-pagamento-aberto p {
+    margin: 0;
+}
+
+.ck-pagamento-aberto-acoes {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+}

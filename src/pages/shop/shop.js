@@ -5,17 +5,10 @@ import patinha from '../../assets/paw.png';
 
 const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
-// Frete (em centavos). Mantenha iguais aos valores do servidor.
+// Frete grátis no envio Normal (em centavos), só para exibir nas telas.
+// O valor que vale é frete_gratis_a_partir_de em configuracoes_pataquada
+// (o servidor calcula o frete em /api/frete/calcular).
 export const FRETE_GRATIS_A_PARTIR_DE = 10000;
-export const FRETE_PADRAO = 1500;
-
-export function calcularFrete(subtotal) {
-    if (subtotal <= 0 || subtotal >= FRETE_GRATIS_A_PARTIR_DE) {
-        return 0;
-    }
-
-    return FRETE_PADRAO;
-}
 
 // ========================================
 // IMAGENS

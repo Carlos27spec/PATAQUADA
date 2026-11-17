@@ -7,6 +7,12 @@ import { db, arquivoBanco } from './src/config/database.js';
 import { gerarToken, criarMiddlewareAutenticacao } from './src/middlewares/auth.js';
 import { configuracaoPagamento, ErroPagamento } from './src/services/mercadoPagoConfig.js';
 import criarRotasContato from './src/routes/contato.js';
+import {
+    registrarRotasFrete,
+    calcularOpcoesFrete,
+    buscarEnderecoDoUsuario,
+    salvarEndereco
+} from './src/services/frete.js';
 import bcrypt from 'bcrypt';
 import crypto from 'node:crypto';
 import nodemailer from 'nodemailer';
@@ -748,6 +754,21 @@ CREATE INDEX IF NOT EXISTS idx_itens_pedido_pedido
 
 db.exec(SQL_TABELAS_PEDIDOS);
 
+// Colunas do frete (adicionadas em bancos já existentes).
+{
+    const colunasPedidos = db.prepare('PRAGMA table_info(pedidos)')
+        .all()
+        .map(coluna => coluna.name);
+
+    if (!colunasPedidos.includes('frete_opcao')) {
+        db.exec('ALTER TABLE pedidos ADD COLUMN frete_opcao TEXT');
+    }
+
+    if (!colunasPedidos.includes('frete_prazo_dias')) {
+        db.exec('ALTER TABLE pedidos ADD COLUMN frete_prazo_dias INTEGER');
+    }
+}
+
 
 
 // =====================================================
@@ -766,51 +787,6 @@ function reais(centavos) {
 
 
 
-function calcularTotais(itens) {
-
-    const {
-
-        fretePadrao,
-
-        freteGratisAPartirDe
-
-    } = configuracaoPagamento();
-
-
-
-    const subtotal = itens.reduce(
-
-        (soma, item) => soma + item.preco * item.quantidade,
-
-        0
-
-    );
-
-
-
-    const frete =
-
-        itens.length === 0 ||
-
-        subtotal >= freteGratisAPartirDe
-
-            ? 0
-
-            : fretePadrao;
-
-
-
-    return {
-
-        subtotal,
-
-        frete,
-
-        total: subtotal + frete
-
-    };
-
-}
 
 
 
@@ -934,9 +910,10 @@ function validarEntrega(entrega = {}) {
 
 
 
+// Tipos que podem ser escondidos no checkout. O saldo da conta
+// Mercado Pago (account_money) fica de fora: o Mercado Pago não
+// permite excluí-lo (erro "account_money cannot be excluded").
 const TIPOS_PAGAMENTO = [
-
-    'account_money',
 
     'ticket',
 
@@ -1148,6 +1125,8 @@ itens,
 
 frete,
 
+freteNome,
+
 forma
 
 }) {
@@ -1184,7 +1163,7 @@ forma
 
             id: 'frete',
 
-            title: 'Frete',
+            title: freteNome ? `Frete - ${freteNome}` : 'Frete',
 
             quantity: 1,
 
@@ -1306,7 +1285,7 @@ function criarPedido(
 
 db,
 
-    { usuarioId, forma, entrega, itens, totais }
+    { usuarioId, forma, entrega, itens, totais, frete = null }
 
 ) {
 
@@ -1342,11 +1321,15 @@ db,
 
                 entrega_cidade,
 
-                entrega_uf
+                entrega_uf,
+
+                frete_opcao,
+
+                frete_prazo_dias
 
             )
 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
         `).run(
 
@@ -1376,7 +1359,11 @@ db,
 
             entrega.cidade,
 
-            entrega.uf
+            entrega.uf,
+
+            frete?.codigo ?? null,
+
+            frete?.prazo_dias ?? null
 
         );
 
@@ -1465,6 +1452,10 @@ function buscarPedidoCompleto(db, pedidoId) {
             subtotal,
 
             frete,
+
+            frete_opcao,
+
+            frete_prazo_dias,
 
             total,
 
@@ -3488,112 +3479,130 @@ app.post(
 
 
 
-            const {
+            // Endereço: um salvo na conta (id_endereco) ou digitado.
+            const idEndereco = Number(req.body?.id_endereco);
+            let dadosEntrega = req.body?.entrega ?? {};
 
-                dados: entrega,
+            if (Number.isInteger(idEndereco) && idEndereco > 0) {
+                const salvo = buscarEnderecoDoUsuario(
+                    db,
+                    req.usuario.id,
+                    idEndereco
+                );
 
-                erros
+                if (!salvo) {
+                    throw new ErroPagamento(
+                        'Endereço de entrega não encontrado.',
+                        404
+                    );
+                }
 
-            } = validarEntrega(req.body?.entrega);
-
-
-
-            if (erros.length > 0) {
-
-                return res.status(400).json({
-
-                    sucesso: false,
-
-                    mensagem: erros[0],
-
-                    erros
-
-                });
-
+                dadosEntrega = {
+                    ...salvo,
+                    destinatario: dadosEntrega.destinatario,
+                    telefone: dadosEntrega.telefone
+                };
             }
 
+            const {
+                dados: entrega,
+                erros
+            } = validarEntrega(dadosEntrega);
 
+            if (erros.length > 0) {
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: erros[0],
+                    erros
+                });
+            }
 
             const carrinho = consultarCarrinho(req.usuario.id);
 
-
-
             if (carrinho.itens.length === 0) {
-
                 throw new ErroPagamento(
-
                     'Seu carrinho está vazio.'
-
                 );
-
             }
-
-
 
             for (const item of carrinho.itens) {
-
                 if (Number(item.status_produto) !== 1) {
-
                     throw new ErroPagamento(
-
                         `O produto "${item.nome}" não está mais disponível.`
-
                     );
-
                 }
-
-
 
                 if (item.quantidade > item.estoque) {
-
                     throw new ErroPagamento(
-
                         `Estoque insuficiente para "${item.nome}". ` +
-
                         `Disponível: ${item.estoque}.`
-
                     );
-
                 }
-
             }
 
-
-
-            const totais = calcularTotais(carrinho.itens);
-
-
-
-            pedidoId = criarPedido(db, {
-
-                usuarioId: req.usuario.id,
-
-                forma,
-
-                entrega,
-
-                itens: carrinho.itens,
-
-                totais
-
+            // O frete é sempre recalculado aqui no servidor.
+            const calculo = await calcularOpcoesFrete(db, {
+                cep: entrega.cep,
+                itens: carrinho.itens
             });
 
+            const codigoFrete = String(
+                req.body?.frete_opcao ?? 'NORMAL'
+            ).toUpperCase();
 
+            const opcaoFrete = calculo.opcoes.find(
+                opcao => opcao.codigo === codigoFrete
+            );
+
+            if (!opcaoFrete) {
+                throw new ErroPagamento(
+                    'Escolha uma opção de envio válida.'
+                );
+            }
+
+            const subtotal = carrinho.itens.reduce(
+                (soma, item) => soma + item.preco * item.quantidade,
+                0
+            );
+
+            const totais = {
+                subtotal,
+                frete: opcaoFrete.valor,
+                total: subtotal + opcaoFrete.valor
+            };
+
+            // Guarda o endereço digitado na conta do cliente.
+            if (
+                req.body?.salvar_endereco &&
+                !(Number.isInteger(idEndereco) && idEndereco > 0)
+            ) {
+                try {
+                    salvarEndereco(db, req.usuario.id, entrega);
+                } catch (erroEndereco) {
+                    console.warn(
+                        'Não foi possível salvar o endereço:',
+                        erroEndereco.message
+                    );
+                }
+            }
+
+            pedidoId = criarPedido(db, {
+                usuarioId: req.usuario.id,
+                forma,
+                entrega,
+                itens: carrinho.itens,
+                totais,
+                frete: opcaoFrete
+            });
 
             const preferencia = await criarPreferenciaMercadoPago({
-
                 pedidoId,
-
                 usuario: req.usuario,
-
                 entrega,
-
                 itens: carrinho.itens,
-
                 frete: totais.frete,
-
+                freteNome: opcaoFrete.nome,
                 forma
-
             });
 
 
@@ -4695,6 +4704,12 @@ app.use('/api/contato', criarRotasContato(limitar));
 import { registrarAreaCliente } from './src/pages/usuario/clienteInicio.js';
 
 registrarAreaCliente({ app, db, autenticar });
+
+registrarRotasFrete({ app, db, autenticar });
+
+import { registrarAdminInicio } from './src/pages/admin/adminInicio.js';
+
+registrarAdminInicio({ app, db, autenticar });
 
 // =====================================================
 

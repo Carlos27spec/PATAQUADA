@@ -31,6 +31,7 @@ const Produto = lazy(() => import("./pages/shop/Produto.jsx"));
 const Carrinho = lazy(() => import("./pages/shop/Carrinho.jsx"));
 
 // Pagamentos
+const Pagamento = lazy(() => import("./pages/shop/Pagamento.jsx"));
 const PedidoRetorno = lazy(() => import("./pages/shop/PedidoRetorno.jsx"));
 
 // Administração
@@ -234,7 +235,7 @@ function App() {
                     path="/pagamento"
                     element={
                         <Pagina>
-                            <PedidoRetorno />
+                            <Pagamento />
                         </Pagina>
                     }
                 />

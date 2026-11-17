@@ -2,8 +2,23 @@ import { FRETE_GRATIS_A_PARTIR_DE, formatarPreco } from './shop.js'
 
 // Quadro "Resumo do pedido", usado no carrinho e no pagamento.
 // Os botões da tela entram como children.
-function ResumoPedido({ itens = [], totais, mostrarItens = false, children }) {
-    const faltaParaFreteGratis = FRETE_GRATIS_A_PARTIR_DE - totais.subtotal
+// totais.frete = null -> frete ainda não calculado (falta o CEP).
+// envio: opção de frete escolhida ({ nome, prazo_dias, ... }).
+// freteGratisAPartirDe: limite vindo do servidor (se já calculado).
+function ResumoPedido({
+    itens = [],
+    totais,
+    mostrarItens = false,
+    envio = null,
+    freteGratisAPartirDe = FRETE_GRATIS_A_PARTIR_DE,
+    children
+}) {
+    const faltaParaFreteGratis =
+        freteGratisAPartirDe > 0
+            ? freteGratisAPartirDe - totais.subtotal
+            : 0
+
+    const freteCalculado = totais.frete !== null && totais.frete !== undefined
 
     return (
         <aside className="ck-painel ck-resumo">
@@ -41,11 +56,21 @@ function ResumoPedido({ itens = [], totais, mostrarItens = false, children }) {
                 </div>
 
                 <div>
-                    <dt>Entrega</dt>
+                    <dt>
+                        Entrega
+                        {envio && (
+                            <small className="ck-resumo-envio">
+                                {envio.nome} · até {envio.prazo_dias}{' '}
+                                {envio.prazo_dias === 1 ? 'dia útil' : 'dias úteis'}
+                            </small>
+                        )}
+                    </dt>
                     <dd>
-                        {itens.length > 0 && totais.frete === 0
-                            ? 'Grátis'
-                            : formatarPreco(totais.frete)}
+                        {!freteCalculado
+                            ? 'A calcular'
+                            : itens.length > 0 && totais.frete === 0
+                                ? 'Grátis'
+                                : formatarPreco(totais.frete)}
                     </dd>
                 </div>
             </dl>
@@ -54,6 +79,13 @@ function ResumoPedido({ itens = [], totais, mostrarItens = false, children }) {
                 <span>Total</span>
                 <strong>{formatarPreco(totais.total)}</strong>
             </div>
+
+            {!freteCalculado && itens.length > 0 && (
+                <p className="ck-resumo-dica">
+                    <i className="fa-solid fa-location-dot" />
+                    O frete é calculado pelo CEP na etapa de entrega.
+                </p>
+            )}
 
             {itens.length > 0 && faltaParaFreteGratis > 0 && (
                 <p className="ck-resumo-dica">
