@@ -485,3 +485,7 @@ CREATE TABLE IF NOT EXISTS configuracoes_pataquada (
     categoria TEXT NOT NULL DEFAULT 'GERAL',
     data_atualizacao TEXT
 ) STRICT;
+
+
+
+

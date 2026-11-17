@@ -1,8 +1,11 @@
+
 -- =========================================================
 -- PATAQUADA - INSERTS / CARGA INICIAL
 -- Banco: pataquadaDB
 -- Compatível com SQLite / DBeaver
+-- Estrutura baseada nos CREATE TABLE atuais
 -- =========================================================
+
 PRAGMA foreign_keys = ON;
 
 BEGIN TRANSACTION;
@@ -30,13 +33,7 @@ WHERE NOT EXISTS (
 -- =========================================================
 -- E-mail: admin@pataquada.com.br
 -- Usuário: admin
--- A senha NÃO fica em texto puro: o login usa bcrypt.compare, então um
--- valor como 'admin' nunca funcionaria. O admin é criado com um marcador
--- inválido (nenhuma senha confere) e você define a senha de verdade
--- com o UPDATE abaixo, usando o hash gerado por gerar_hash.js:
---
---   node gerar_hash.js "SuaSenhaAqui"
---   UPDATE usuarios SET senha = '<hash gerado>' WHERE email = 'admin@pataquada.com.br';
+-- Senha: Pataquada
 -- =========================================================
 
 INSERT INTO usuarios (
@@ -52,7 +49,7 @@ SELECT
     'admin@pataquada.com.br',
     tu.id,
     'admin',
-    '<HASH_BCRYPT_AQUI>',
+    '$2b$10$1vMin54mfeHPfkZlbaAuWeAADIVh0UjVsiCcNLzJMJF0inkOaEAdm',
     NULL
 FROM tipo_usuario tu
 WHERE tu.tipo = 'ADMIN'
@@ -108,8 +105,11 @@ WHERE NOT EXISTS (
 -- =========================================================
 -- 4. PERMISSÕES DO ADMINISTRADOR
 -- =========================================================
-INSERT INTO
-    permissao_tipo_usuario (id_tipo_usuario, id_permissao)
+
+INSERT INTO permissao_tipo_usuario (
+    id_tipo_usuario,
+    id_permissao
+)
 SELECT
     tu.id,
     pu.id
@@ -126,14 +126,17 @@ WHERE tu.tipo = 'ADMIN'
 -- =========================================================
 -- 5. PERMISSÕES DO CLIENTE
 -- =========================================================
-INSERT INTO
-    permissao_tipo_usuario (id_tipo_usuario, id_permissao)
+
+INSERT INTO permissao_tipo_usuario (
+    id_tipo_usuario,
+    id_permissao
+)
 SELECT
     tu.id,
     pu.id
-FROM
-    tipo_usuario tu
-    INNER JOIN permissao_usuario pu ON pu.chave IN (
+FROM tipo_usuario tu
+INNER JOIN permissao_usuario pu
+    ON pu.chave IN (
         'PRODUTO_VISUALIZAR',
         'SERVICO_VISUALIZAR',
         'PLANO_VISUALIZAR',
@@ -207,16 +210,16 @@ WHERE NOT EXISTS (
 -- 8. PRODUTOS
 -- Valores em centavos
 -- =========================================================
-INSERT INTO
-    produtos (
-        id_categoria_produto,
-        nome,
-        descricao,
-        preco,
-        estoque,
-        imagem,
-        id_usuario_cadastro
-    )
+
+INSERT INTO produtos (
+    id_categoria_produto,
+    nome,
+    descricao,
+    preco,
+    estoque,
+    imagem,
+    id_usuario_cadastro
+)
 SELECT
     cp.id,
     d.nome,
@@ -316,16 +319,16 @@ WHERE NOT EXISTS (
 -- Valores em centavos
 -- Duração em minutos
 -- =========================================================
-INSERT INTO
-    servicos (
-        id_categoria_produto,
-        nome,
-        descricao,
-        preco,
-        duracao_media,
-        imagem,
-        id_usuario_cadastro
-    )
+
+INSERT INTO servicos (
+    id_categoria_produto,
+    nome,
+    descricao,
+    preco,
+    duracao_media,
+    imagem,
+    id_usuario_cadastro
+)
 SELECT
     cp.id,
     d.nome,
@@ -498,63 +501,54 @@ WHERE NOT EXISTS (
 );
 
 -- =========================================================
--- 11. PLANOS DE ASSINATURA
+-- 11. PLANOS
 -- Valores em centavos
--- Cobrança recorrente mensal
+-- Periodicidade conforme CREATE TABLE
 -- =========================================================
-INSERT INTO
-    plano (
-        id_categoria_produto,
-        nome,
-        descricao,
-        preco,
-        tipo_cobranca,
-        intervalo_cobranca_meses,
-        duracao_meses,
-        permite_renovacao,
-        imagem,
-        id_usuario_cadastro
-    )
+
+INSERT INTO plano (
+    nome,
+    descricao,
+    valor,
+    periodicidade,
+    beneficios
+)
 SELECT
-    cp.id,
     d.nome,
     d.descricao,
-    d.preco,
-    'RECORRENTE',
-    1,
-    NULL,
-    1,
-    NULL,
-    u.id
+    d.valor,
+    d.periodicidade,
+    d.beneficios
 FROM (
     SELECT
         'Essencial' AS nome,
-        'Plano de entrada para quem deseja manter os cuidados básicos do pet em dia. Inclui benefícios e condições especiais nos serviços participantes.' AS descricao,
-        2990 AS preco
+        'Plano de entrada para quem deseja manter os cuidados básicos do pet em dia.' AS descricao,
+        2990 AS valor,
+        'MENSAL' AS periodicidade,
+        'Benefícios e condições especiais nos serviços participantes.' AS beneficios
 
     UNION ALL SELECT
         'Plus',
-        'Plano intermediário com benefícios ampliados, descontos em serviços de banho e tosa e condições especiais para consultas.',
-        4990
+        'Plano intermediário com benefícios ampliados para os cuidados do pet.',
+        4990,
+        'MENSAL',
+        'Descontos em serviços de banho e tosa e condições especiais para consultas.'
 
     UNION ALL SELECT
         'Premium',
-        'Plano completo com benefícios diferenciados, descontos ampliados e vantagens nos serviços e cuidados veterinários participantes.',
-        7990
+        'Plano completo com benefícios diferenciados para os cuidados do pet.',
+        7990,
+        'MENSAL',
+        'Descontos ampliados e vantagens nos serviços e cuidados veterinários participantes.'
 ) d
-INNER JOIN categorias_produto cp
-    ON cp.nome = 'Saúde e Bem-estar'
-INNER JOIN usuarios u
-    ON u.email = 'admin@pataquada.com.br'
 WHERE NOT EXISTS (
     SELECT 1
     FROM plano p
     WHERE p.nome = d.nome
-      AND p.id_categoria_produto = cp.id
 );
 
 -- =========================================================
--- 12. PERMISSÕES DOS NOVOS MÓDULOS ADMINISTRATIVOS
+-- 12. PERMISSÕES DOS MÓDULOS ADMINISTRATIVOS
 -- =========================================================
 
 INSERT OR IGNORE INTO permissao_usuario (chave, descricao)
@@ -569,8 +563,13 @@ VALUES
 ('CONFIGURACAO_EDITAR', 'Editar configurações da loja'),
 ('RELATORIO_VISUALIZAR', 'Visualizar relatórios administrativos');
 
-INSERT OR IGNORE INTO permissao_tipo_usuario (id_tipo_usuario, id_permissao)
-SELECT tu.id, pu.id
+INSERT OR IGNORE INTO permissao_tipo_usuario (
+    id_tipo_usuario,
+    id_permissao
+)
+SELECT
+    tu.id,
+    pu.id
 FROM tipo_usuario tu
 CROSS JOIN permissao_usuario pu
 WHERE tu.tipo = 'ADMIN'
@@ -584,12 +583,6 @@ WHERE tu.tipo = 'ADMIN'
       'DADOS_EMPRESA_EDITAR',
       'CONFIGURACAO_EDITAR',
       'RELATORIO_VISUALIZAR'
-  )
-  AND NOT EXISTS (
-      SELECT 1
-      FROM permissao_tipo_usuario ptx
-      WHERE ptx.id_tipo_usuario = tu.id
-        AND ptx.id_permissao = pu.id
   );
 
 -- =========================================================
@@ -631,12 +624,12 @@ VALUES
 -- =========================================================
 -- 15. FINALIZAÇÃO DA TRANSAÇÃO
 -- =========================================================
+
 COMMIT;
 
---RETURN;
 -- =========================================================
 -- 16. CONFERÊNCIA DOS DADOS
--- Execute os SELECTs abaixo separadamente, se desejar.
+-- Execute separadamente, se desejar.
 -- =========================================================
 
 /*
@@ -650,92 +643,97 @@ SELECT
     tu.nome AS tipo_usuario
 FROM usuarios u
 INNER JOIN tipo_usuario tu
-ON tu.id = u.id_tipo_usuario
+    ON tu.id = u.id_tipo_usuario
 WHERE u.email = 'admin@pataquada.com.br';
 
 -- Tipos de usuário
-SELECT *
-FROM tipo_usuario;
+SELECT * FROM tipo_usuario;
 
 -- Permissões
-SELECT *
-FROM permissao_usuario;
+SELECT * FROM permissao_usuario;
 
 -- Permissões por tipo de usuário
 SELECT
-tu.nome AS tipo_usuario,
-pu.chave AS permissao,
-pu.descricao
+    tu.nome AS tipo_usuario,
+    pu.chave AS permissao,
+    pu.descricao
 FROM permissao_tipo_usuario ptu
 INNER JOIN tipo_usuario tu
-ON tu.id = ptu.id_tipo_usuario
+    ON tu.id = ptu.id_tipo_usuario
 INNER JOIN permissao_usuario pu
-ON pu.id = ptu.id_permissao
+    ON pu.id = ptu.id_permissao
 ORDER BY tu.nome, pu.chave;
 
 -- Categorias
-SELECT *
-FROM categorias_produto;
+SELECT * FROM categorias_produto;
 
 -- Situações
-SELECT *
-FROM situacao;
+SELECT * FROM situacao;
 
 -- Produtos
 SELECT
-p.id,
-p.nome,
-p.descricao,
-p.preco,
-p.estoque,
-cp.nome AS categoria
+    p.id,
+    p.nome,
+    p.descricao,
+    p.preco,
+    p.estoque,
+    cp.nome AS categoria
 FROM produtos p
 INNER JOIN categorias_produto cp
-ON cp.id = p.id_categoria_produto
+    ON cp.id = p.id_categoria_produto
 ORDER BY cp.nome, p.nome;
 
 -- Serviços / Pet-care
 SELECT
-s.id,
-s.nome,
-s.descricao,
-s.preco,
-s.duracao_media,
-cp.nome AS categoria
+    s.id,
+    s.nome,
+    s.descricao,
+    s.preco,
+    s.duracao_media,
+    cp.nome AS categoria
 FROM servicos s
 INNER JOIN categorias_produto cp
-ON cp.id = s.id_categoria_produto
+    ON cp.id = s.id_categoria_produto
 ORDER BY cp.nome, s.nome;
 
 -- Consultas
 SELECT
-tc.id,
-tc.nome,
-tc.descricao,
-tc.preco_minimo,
-tc.preco_maximo,
-tc.duracao_media,
-cp.nome AS categoria
+    tc.id,
+    tc.nome,
+    tc.descricao,
+    tc.preco_fixo,
+    tc.preco_minimo,
+    tc.preco_maximo,
+    tc.duracao_media,
+    cp.nome AS categoria
 FROM tipos_consulta tc
 INNER JOIN categorias_produto cp
-ON cp.id = tc.id_categoria_produto
+    ON cp.id = tc.id_categoria_produto
 ORDER BY tc.nome;
 
 -- Planos
 SELECT
-p.id,
-p.nome,
-p.descricao,
-p.preco,
-p.tipo_cobranca,
-p.intervalo_cobranca_meses,
-p.duracao_meses,
-p.permite_renovacao,
-cp.nome AS categoria
+    p.id,
+    p.nome,
+    p.descricao,
+    p.valor,
+    p.periodicidade,
+    p.beneficios,
+    p.status
 FROM plano p
-INNER JOIN categorias_produto cp
-ON cp.id = p.id_categoria_produto
-ORDER BY p.preco;
+ORDER BY p.valor;
+
+-- Fornecedores
+SELECT * FROM fornecedores;
+
+-- Detalhes dos produtos
+SELECT * FROM produto_detalhes;
+
+-- Dados institucionais
+SELECT * FROM dados_pataquada;
+
+-- Configurações
+SELECT * FROM configuracoes_pataquada;
 
 */
 
