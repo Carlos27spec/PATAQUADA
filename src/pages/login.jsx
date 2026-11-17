@@ -64,7 +64,7 @@ export default function Login() {
 
             localStorage.setItem('token', dados.token)
             localStorage.setItem('usuario', JSON.stringify(dados.usuario))
-            navigate('/')
+            navigate('/usuarios', { replace: true })
         } catch {
             setErro('Não foi possível conectar ao servidor. Tente novamente.')
         } finally {

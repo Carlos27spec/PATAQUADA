@@ -33,8 +33,10 @@ const AdminLayout = lazy(() => import('./pages/admin/AdminLayout.jsx'))
 const AdminInicio = lazy(() => import('./pages/admin/AdminInicio.jsx'))
 const AdminEmBreve = lazy(() => import('./pages/admin/AdminEmBreve.jsx'))
 
-// // Usuários
-const Usuario = lazy(() => import('./pages/usuario/Usuarios.jsx'))
+// Usuários
+const UsuarioLayout = lazy(() => import('./pages/usuario/UsuarioLayout.jsx'))
+const UsuarioInicio = lazy(() => import('./pages/usuario/Usuarios.jsx'))
+const UsuarioEmBreve = lazy(() => import('./pages/usuario/UsuarioEmBreve.jsx'))
 
 // Página 404
 const Erro404 = lazy(() => import('./pages/404/404.jsx'))
@@ -177,9 +179,38 @@ function App() {
                     <Route path="*" element={<Pagina><AdminEmBreve /></Pagina>} />
                 </Route>
 
-                {/* Usuários
-                <Route path="/usuarios" element={<Pagina><Usuario /></Pagina>} />
-                <Route path="/usuarios/:id" element={<Pagina><Usuario /></Pagina>} /> */}
+                {/* ÁREA DO CLIENTE */}
+                <Route
+                    path="/usuarios"
+                    element={
+                        <Pagina>
+                            <UsuarioLayout />
+                        </Pagina>
+                    }
+                >
+                    <Route
+                        index
+                        element={
+                            <Pagina>
+                                <UsuarioInicio />
+                            </Pagina>
+                        }
+                    />
+
+                    <Route
+                        path="*"
+                        element={
+                            <Pagina>
+                                <UsuarioEmBreve />
+                            </Pagina>
+                        }
+                    />
+                </Route>
+
+                {/* ALIAS PARA A ÁREA DO CLIENTE */}
+                <Route path="/usuario"
+                    element={<Navigate to="/usuarios" replace />}
+                />
 
                 {/* Página não encontrada */}
                 <Route path="*" element={<Erro404 />} />

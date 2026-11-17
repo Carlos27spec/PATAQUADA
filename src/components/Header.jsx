@@ -18,7 +18,8 @@ const links = [
 
 // Páginas nas quais o Header não deve aparecer.
 const paginasSemHeader = [
-    "/admin"
+    "/admin",
+    "/usuarios",
 ];
 
 function separar(to) {

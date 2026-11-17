@@ -8,7 +8,7 @@ import mascote from '../../assets/cachorro-cartoon-card.png'
 function UsuarioInicio() {
     const { usuario } = useOutletContext()
 
-    const primeiroNome = String(usuario?.nome || 'Douglas')
+    const primeiroNome = String(usuario?.nome)
         .trim()
         .split(' ')[0]
 
@@ -241,3 +241,4 @@ function UsuarioInicio() {
 }
 
 export default UsuarioInicio
+
