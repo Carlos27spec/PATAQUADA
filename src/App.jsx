@@ -33,8 +33,8 @@ const AdminLayout = lazy(() => import('./pages/admin/AdminLayout.jsx'))
 const AdminInicio = lazy(() => import('./pages/admin/AdminInicio.jsx'))
 const AdminEmBreve = lazy(() => import('./pages/admin/AdminEmBreve.jsx'))
 
-// Usuários
-const Usuario = lazy(() => import('./pages/usuarios/Usuario.jsx'))
+// // Usuários
+// const Usuario = lazy(() => import('./pages/usuarios/Usuario.jsx'))
 
 // Página 404
 const Erro404 = lazy(() => import('./pages/404/404.jsx'))
