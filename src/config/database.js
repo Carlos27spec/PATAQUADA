@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 const databasePath = path.resolve(__dirname, '../../database');
 
-const databaseName = process.env.DB_NAME || 'pataquada.db';
+const databaseName = process.env.DB_NAME || 'pataquadaDB.db';
 import fs from 'fs';
 fs.mkdirSync(databasePath, { recursive: true });
 
