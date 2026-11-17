@@ -1,5 +1,7 @@
 import express from 'express';
 import nodemailer from 'nodemailer';
+import process from 'node:process';
+
 
 const router = express.Router();
 
@@ -157,39 +159,39 @@ router.post('/', async (req, res) => {
 
             html: `
 
-                \<h2>Nova solicitação de contato\</h2>
+                <h2>Nova solicitação de contato</h2>
 
 
 
-                \<p>
+                <p>
 
-                    \<strong>Nome:\</strong>
+                    <strong>Nome:</strong>
 
                     ${escaparHtml(nome)}
 
-                \</p>
+                </p>
 
 
 
-                \<p>
+                <p>
 
-                    \<strong>E-mail:\</strong>
+                    <strong>E-mail:</strong>
 
                     ${escaparHtml(email)}
 
-                \</p>
+                </p>
 
 
 
-                \<p>\<strong>Mensagem:\</strong>\</p>
+                <p><strong>Mensagem:</strong></p>
 
 
 
-                \<p>
+                <p>
 
-                    ${escaparHtml(mensagem).replace(/\n/g, '\<br>')}
+                    ${escaparHtml(mensagem).replace(/\n/g, '<br>')}
 
-                \</p>
+                </p>
 
             `
 

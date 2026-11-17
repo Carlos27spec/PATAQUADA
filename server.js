@@ -1696,7 +1696,6 @@ function aplicarPagamento(db, pagamento) {
                 }
 
 
-
                 break;
 
 
