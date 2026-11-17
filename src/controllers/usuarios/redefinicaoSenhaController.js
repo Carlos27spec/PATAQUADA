@@ -3,6 +3,8 @@ import crypto from 'node:crypto';
 import { db } from '../../config/database.js';
 import { emailTransporter } from '../../services/emailService.js';
 import { responderErro } from '../../utils/helpers.js';
+import process from 'node:process';
+import { Buffer } from 'node:buffer';
 
 // =====================================================
 // RECUPERAÇÃO DE SENHA - TABELA DE TOKENS

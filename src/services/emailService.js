@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import process from 'node:process';
 
 // =====================================================
 // ENVIO DE E-MAIL (NODEMAILER)

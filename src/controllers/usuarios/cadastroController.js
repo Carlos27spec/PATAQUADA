@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { db } from '../../config/database.js';
 import { gerarToken } from '../../middlewares/auth.js';
 import { responderErro, somenteDigitos, limitar } from '../../utils/helpers.js';
+import { Buffer } from 'node:buffer';
 
 // =====================================================
 // CADASTRO DE USUÁRIO
