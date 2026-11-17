@@ -2074,6 +2074,12 @@ function cpfValido(cpf) {
     return digito(9) === Number(d[9]) && digito(10) === Number(d[10]);
 }
 
+// Em alguns bancos a tabela usuarios não tem a coluna "sobrenome":
+// nesse caso o nome completo é gravado inteiro em "nome".
+const usuariosTemSobrenome = db
+    .prepare('PRAGMA table_info(usuarios)')
+    .all()
+    .some((coluna) => coluna.name === 'sobrenome');cd9123d (ajuste)
 
 app.post('/api/usuarios/cadastro', async (req, res) => {
     try {
@@ -2188,17 +2194,39 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `).run(
             nome,
+        const nomeGravado = usuariosTemSobrenome
+            ? nome
+            : `${nome} ${sobrenome}`.trim();
+
+        const colunas = ['nome', 'cpf', 'email', 'id_tipo_usuario', 'usuario', 'senha', 'telefone'];
+        const valores = [
+            nomeGravado,
+
             cpf,
             email,
             tipoCliente.id,
             usuario || null,
             senhaCriptografada,
             telefone || null
-        );
+        ];
+
+        if (usuariosTemSobrenome) {
+            colunas.splice(1, 0, 'sobrenome');
+            valores.splice(1, 0, sobrenome);
+        }
+
+        const resultado = db.prepare(`
+            INSERT INTO usuarios (${colunas.join(', ')})
+            VALUES (${colunas.map(() => '?').join(', ')})
+        `).run(...valores);
 
         const novoUsuario = {
+
             id: Number(resultado.lastInsertRowid),
             nome,
+
+            id: resultado.lastInsertRowid,
+            nome: nomeGravado,
             email,
             usuario: usuario || null,
             id_tipo_usuario: tipoCliente.id
