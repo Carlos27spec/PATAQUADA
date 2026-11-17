@@ -1,0 +1,565 @@
+/* ========================================
+   ÁREA DO CLIENTE - PATAQUADA
+   Usa as variáveis do css principal (:root).
+   Só o fundo da página (#FFF7EA, o mesmo da loja e do
+   carrinho) não existe no :root.
+======================================== */
+
+.cta-pagina {
+    --cta-fundo: #FFF7EA;
+    --cta-borda: rgba(128, 58, 27, 0.12);
+
+    width: 100%;
+    padding: 28px 0 72px;
+    background-color: var(--cta-fundo);
+    color: var(--cor-preto);
+}
+
+.cta-pagina *,
+.cta-pagina *::before,
+.cta-pagina *::after {
+    box-sizing: border-box;
+}
+
+.cta-container {
+    width: min(100% - 32px, 1200px);
+    margin-inline: auto;
+}
+
+.cta-estrutura {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+}
+
+.cta-pagina a:focus-visible,
+.cta-pagina button:focus-visible {
+    outline: 3px solid var(--cor-laranja);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   MENU LATERAL
+======================================== */
+
+.cta-menu {
+    position: sticky;
+    top: 108px;
+    display: flex;
+    flex-direction: column;
+    min-height: 480px;
+    overflow: hidden;
+    border-radius: 28px;
+    background-color: var(--cor-creme);
+}
+
+.cta-menu nav {
+    padding: 18px 14px 8px;
+}
+
+.cta-menu ul {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cta-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 12px 14px;
+    border: none;
+    border-radius: 14px;
+    background: none;
+    color: var(--cor-preto);
+    font-family: var(--fonte-texto);
+    font-size: 17px;
+    text-align: left;
+    transition:
+        background-color var(--transicao-padrao),
+        color var(--transicao-padrao);
+}
+
+.cta-link i {
+    width: 22px;
+    flex-shrink: 0;
+    font-size: 18px;
+    text-align: center;
+}
+
+.cta-link:hover {
+    background-color: rgba(255, 255, 255, 0.55);
+    color: var(--cor-laranja);
+}
+
+.cta-link.ativo {
+    background-color: rgba(255, 255, 255, 0.8);
+    color: var(--cor-laranja);
+}
+
+.cta-menu-sair {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--cta-borda);
+}
+
+.cta-menu-decoracao {
+    position: relative;
+    flex: 1;
+    min-height: 130px;
+    pointer-events: none;
+}
+
+.cta-pata {
+    position: absolute;
+    object-fit: contain;
+    opacity: 0.55;
+}
+
+.cta-pata--1 { left: 36px; bottom: 16px; width: 36px; height: 36px; transform: rotate(-14deg); }
+.cta-pata--2 { left: 120px; bottom: 56px; width: 30px; height: 30px; transform: rotate(16deg); }
+.cta-pata--3 { right: 26px; bottom: 18px; width: 42px; height: 42px; transform: rotate(8deg); }
+
+/* ========================================
+   CONTEÚDO
+======================================== */
+
+.cta-conteudo {
+    min-width: 0;
+}
+
+/* ========================================
+   BOAS-VINDAS
+======================================== */
+
+.cta-hero {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.cta-saudacao {
+    margin-bottom: 18px;
+}
+
+.cta-saudacao h1 {
+    font-size: clamp(34px, 4.4vw, 48px);
+    line-height: 1.05;
+}
+
+.cta-saudacao p {
+    margin-top: 4px;
+    font-size: 18px;
+}
+
+.cta-banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 170px;
+    padding: 30px 46% 30px 36px;
+    overflow: hidden;
+    border-radius: 30px;
+    background: linear-gradient(
+        100deg,
+        var(--cor-creme) 0%,
+        var(--cor-pessego) 100%
+    );
+}
+
+.cta-banner p {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(21px, 2.5vw, 30px);
+    line-height: 1.3;
+}
+
+.cta-banner-pata {
+    position: absolute;
+    left: 36%;
+    bottom: 18px;
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    opacity: 0.85;
+    transform: rotate(14deg);
+}
+
+/* o cachorro e o gato passam um pouco do topo do banner */
+.cta-ilustracao {
+    position: absolute;
+    right: 18px;
+    bottom: 0;
+    height: 270px;
+    width: auto;
+    max-width: 46%;
+    object-fit: contain;
+    object-position: bottom right;
+}
+
+.cta-coracao {
+    position: absolute;
+    top: 0;
+    right: 6%;
+    font-size: 44px;
+    line-height: 1;
+    transform: rotate(10deg);
+}
+
+/* ========================================
+   PEDIDOS RECENTES
+======================================== */
+
+.cta-secao {
+    margin-bottom: 26px;
+}
+
+.cta-secao-topo {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.cta-secao-topo h2 {
+    font-size: 26px;
+    line-height: 1.1;
+}
+
+.cta-ver-todos {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--cor-laranja);
+    font-size: 16px;
+}
+
+.cta-ver-todos:hover {
+    color: var(--cor-marrom);
+}
+
+.cta-pedidos {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cta-pedido {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) auto auto auto;
+    align-items: center;
+    gap: 16px 22px;
+    padding: 16px 22px;
+    border: 1px solid var(--cta-borda);
+    border-radius: 24px;
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+.cta-pedido-dados {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.cta-pedido-numero {
+    font-family: var(--fonte-titulo);
+    font-size: 24px;
+    font-weight: normal;
+    line-height: 1;
+}
+
+.cta-pedido-linha {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+}
+
+.cta-pedido-detalhe {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--cor-laranja);
+    font-size: 14px;
+}
+
+.cta-status {
+    padding: 1px 12px;
+    border-radius: 999px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.cta-status--entregue { background-color: var(--cor-verde); }
+.cta-status--andamento { background-color: var(--cor-amarelo-claro); }
+.cta-status--pendente { background-color: var(--cor-pessego); }
+.cta-status--cancelado { background-color: var(--cor-rosa); }
+
+.cta-miniaturas {
+    display: flex;
+    gap: 8px;
+}
+
+.cta-miniaturas li {
+    width: 52px;
+    height: 52px;
+    overflow: hidden;
+    border-radius: 14px;
+    background-color: var(--cor-creme);
+}
+
+.cta-miniaturas img {
+    width: 100%;
+    height: 100%;
+    padding: 4px;
+    object-fit: contain;
+}
+
+.cta-pedido-total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.1;
+}
+
+.cta-pedido-total small {
+    font-size: 13px;
+    opacity: 0.75;
+}
+
+.cta-pedido-total strong {
+    font-family: var(--fonte-titulo);
+    font-size: 22px;
+    font-weight: normal;
+}
+
+.cta-botao-suave {
+    padding: 9px 22px;
+    border-radius: 999px;
+    background-color: var(--cor-pessego);
+    color: var(--cor-laranja);
+    font-size: 15px;
+    white-space: nowrap;
+    transition:
+        background-color var(--transicao-padrao),
+        color var(--transicao-padrao);
+}
+
+.cta-botao-suave:hover {
+    background-color: var(--cor-laranja);
+    color: var(--cor-branco);
+}
+
+/* ========================================
+   ATALHOS
+======================================== */
+
+.cta-atalhos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.cta-atalho {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 22px 16px;
+    border: 1px solid var(--cta-borda);
+    border-radius: 24px;
+    background-color: rgba(255, 255, 255, 0.75);
+    text-align: center;
+    transition:
+        transform var(--transicao-padrao),
+        box-shadow var(--transicao-padrao);
+}
+
+.cta-atalho:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(128, 58, 27, 0.14);
+}
+
+.cta-atalho i {
+    margin-bottom: 4px;
+    color: var(--cor-laranja);
+    font-size: 30px;
+}
+
+.cta-atalho strong {
+    font-family: var(--fonte-titulo);
+    font-size: 21px;
+    font-weight: normal;
+    line-height: 1.1;
+}
+
+.cta-atalho span {
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+/* ========================================
+   MENSAGENS
+======================================== */
+
+.cta-mensagem,
+.cta-aviso-central {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 36px 20px;
+    border-radius: 28px;
+    background-color: var(--cor-creme);
+    text-align: center;
+}
+
+.cta-mensagem--erro {
+    border: 2px solid var(--cor-laranja);
+}
+
+.cta-mensagem-pata,
+.cta-aviso-central img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+}
+
+.cta-mensagem h1,
+.cta-aviso-central h1 {
+    font-size: 32px;
+    line-height: 1.1;
+}
+
+.cta-aviso-central {
+    width: min(100%, 460px);
+    margin: 40px auto;
+}
+
+/* ========================================
+   TABLETS E CELULARES
+======================================== */
+
+@media (max-width: 1000px) {
+
+    .cta-pedido {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .cta-miniaturas {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    .cta-pedido-total {
+        align-items: flex-start;
+        grid-row: 3;
+    }
+
+    .cta-botao-suave {
+        grid-row: 3;
+        justify-self: end;
+    }
+
+}
+
+@media (max-width: 860px) {
+
+    .cta-estrutura {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+    }
+
+    /* o menu vira uma faixa horizontal no topo */
+    .cta-menu {
+        position: static;
+        min-height: 0;
+        border-radius: 22px;
+    }
+
+    .cta-menu nav {
+        padding: 10px;
+        overflow-x: auto;
+    }
+
+    .cta-menu ul {
+        flex-direction: row;
+        gap: 6px;
+    }
+
+    .cta-menu li {
+        flex-shrink: 0;
+    }
+
+    .cta-link {
+        padding: 10px 14px;
+        font-size: 15px;
+        white-space: nowrap;
+    }
+
+    .cta-menu-sair {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+    }
+
+    .cta-menu-decoracao {
+        display: none;
+    }
+
+}
+
+@media (max-width: 640px) {
+
+    .cta-pagina {
+        padding-top: 16px;
+    }
+
+    .cta-banner {
+        min-height: 150px;
+        padding: 24px 42% 24px 22px;
+        border-radius: 24px;
+    }
+
+    .cta-banner-pata {
+        display: none;
+    }
+
+    .cta-ilustracao {
+        right: 6px;
+        height: 190px;
+        max-width: 44%;
+    }
+
+    .cta-coracao {
+        font-size: 32px;
+    }
+
+    .cta-atalhos {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cta-atalho {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 4px 14px;
+        text-align: left;
+    }
+
+    .cta-atalho i {
+        margin: 0;
+        width: 34px;
+        text-align: center;
+    }
+
+    .cta-atalho span {
+        flex-basis: 100%;
+        padding-left: 48px;
+    }
+
+}

@@ -4677,6 +4677,10 @@ coluna => coluna.name
 
 app.use('/api/contato', criarRotasContato(limitar));
 
+import { registrarAreaCliente } from './src/pages/usuario/clienteInicio.js';
+
+registrarAreaCliente({ app, db, autenticar });
+
 // =====================================================
 
 // TRATAMENTO DE ROTAS NÃO ENCONTRADAS

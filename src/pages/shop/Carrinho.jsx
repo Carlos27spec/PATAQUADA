@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -30,6 +31,18 @@ function Carrinho() {
     const comProblema = itens.some(
         item => !item.disponivel || item.quantidade > item.estoque
     )
+
+    // Volta para a página anterior ou para a loja se o carrinho
+    // tiver sido acessado diretamente.
+    function voltar() {
+        const indiceHistorico = window.history.state?.idx
+
+        if (typeof indiceHistorico === 'number' && indiceHistorico > 0) {
+            navigate(-1)
+        } else {
+            navigate('/shop')
+        }
+    }
 
     async function executar(item, acao) {
         setOcupado(item.id)
@@ -71,13 +84,14 @@ function Carrinho() {
             <div className="ck-container">
 
                 <header className="ck-titulo">
-                    <Link
-                        to="/shop"
+                    <button
+                        type="button"
                         className="ck-voltar"
-                        aria-label="Continuar comprando"
+                        aria-label="Voltar para a página anterior"
+                        onClick={voltar}
                     >
                         <i className="fa-solid fa-arrow-left" />
-                    </Link>
+                    </button>
 
                     <h1>Carrinho</h1>
                 </header>

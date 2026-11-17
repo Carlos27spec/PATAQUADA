@@ -5,6 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import insignea from "../assets/Insignea-mini.png";
 import { SearchIcon, CartIcon, UserIcon } from "./Icons";
 import BuscaGlobal from "../pages/search/BuscaGlobal";
+import { obterToken } from '../pages/shop/carrinho.js';
 
 import "./Header.css";
 
@@ -19,7 +20,6 @@ const links = [
 // Páginas nas quais o Header não deve aparecer.
 const paginasSemHeader = [
     "/admin",
-    "/usuarios",
 ];
 
 function separar(to) {
@@ -166,10 +166,7 @@ export default function Header() {
                         <CartIcon />
                     </Link>
 
-                    <Link
-                        to="/login"
-                        aria-label="Minha conta"
-                    >
+                    <Link to={obterToken() ? "/usuarios" : "/login"} aria-label="Minha conta">
                         <UserIcon />
                     </Link>
 
