@@ -177,9 +177,9 @@ function App() {
                     <Route path="*" element={<Pagina><AdminEmBreve /></Pagina>} />
                 </Route>
 
-                {/* Usuários */}
+                {/* Usuários
                 <Route path="/usuarios" element={<Pagina><Usuario /></Pagina>} />
-                <Route path="/usuarios/:id" element={<Pagina><Usuario /></Pagina>} />
+                <Route path="/usuarios/:id" element={<Pagina><Usuario /></Pagina>} /> */}
 
                 {/* Página não encontrada */}
                 <Route path="*" element={<Erro404 />} />
