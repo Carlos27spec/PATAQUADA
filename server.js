@@ -2074,16 +2074,16 @@ function cpfValido(cpf) {
     return digito(9) === Number(d[9]) && digito(10) === Number(d[10]);
 }
 
-// Em alguns bancos a tabela usuarios não tem a coluna "sobrenome":
-// nesse caso o nome completo é gravado inteiro em "nome".
+// Em alguns bancos a tabela usuarios tem a coluna "sobrenome";
+// em outros, o nome completo é gravado inteiro em "nome".
 const usuariosTemSobrenome = db
     .prepare('PRAGMA table_info(usuarios)')
     .all()
-    .some((coluna) => coluna.name === 'sobrenome');cd9123d (ajuste)
+    .some((coluna) => coluna.name === 'sobrenome');
 
 app.post('/api/usuarios/cadastro', async (req, res) => {
     try {
-        const nomeCompleto = limitar(req.body.nome, 120);
+        const nomeCompleto = limitar(req.body.nome, 120).replace(/\s+/g, ' ');
         const email = limitar(req.body.email, 160).toLowerCase();
         const cpf = somenteDigitos(req.body.cpf);
         const senha = String(req.body.senha ?? '');
@@ -2092,9 +2092,10 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
         const usuario = limitar(req.body.usuario, 60).toLowerCase();
         const telefone = somenteDigitos(req.body.telefone);
 
-        // A tabela possui somente a coluna "nome".
-        // Portanto, armazenamos o nome completo nela.
-        const nome = nomeCompleto;
+        // Separa primeiro nome e sobrenome (usado só se a coluna existir).
+        const partesNome = nomeCompleto.split(' ').filter(Boolean);
+        const primeiroNome = partesNome[0] ?? '';
+        const sobrenome = partesNome.slice(1).join(' ');
 
         const erro = (status, campo, mensagem) =>
             res.status(status).json({
@@ -2103,7 +2104,7 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
                 mensagem
             });
 
-        if (nome.trim().split(/\s+/).length < 2) {
+        if (partesNome.length < 2) {
             return erro(400, 'nome', 'Informe seu nome completo.');
         }
 
@@ -2180,28 +2181,18 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
 
         const senhaCriptografada = await bcrypt.hash(senha, 10);
 
-        // INSERT compatível com a estrutura atual da tabela usuarios.
-        const resultado = db.prepare(`
-            INSERT INTO usuarios (
-                nome,
-                cpf,
-                email,
-                id_tipo_usuario,
-                usuario,
-                senha,
-                telefone
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).run(
-            nome,
-        const nomeGravado = usuariosTemSobrenome
-            ? nome
-            : `${nome} ${sobrenome}`.trim();
+        const colunas = [
+            'nome',
+            'cpf',
+            'email',
+            'id_tipo_usuario',
+            'usuario',
+            'senha',
+            'telefone'
+        ];
 
-        const colunas = ['nome', 'cpf', 'email', 'id_tipo_usuario', 'usuario', 'senha', 'telefone'];
         const valores = [
-            nomeGravado,
-
+            usuariosTemSobrenome ? primeiroNome : nomeCompleto,
             cpf,
             email,
             tipoCliente.id,
@@ -2221,12 +2212,8 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
         `).run(...valores);
 
         const novoUsuario = {
-
             id: Number(resultado.lastInsertRowid),
-            nome,
-
-            id: resultado.lastInsertRowid,
-            nome: nomeGravado,
+            nome: nomeCompleto,
             email,
             usuario: usuario || null,
             id_tipo_usuario: tipoCliente.id
