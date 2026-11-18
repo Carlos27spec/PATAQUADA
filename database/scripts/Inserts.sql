@@ -25,6 +25,7 @@ FROM (
 WHERE NOT EXISTS (
     SELECT 1
     FROM tipo_usuario tu
+    
     WHERE tu.tipo = d.tipo
 );
 
@@ -117,7 +118,6 @@ FROM tipo_usuario tu
 CROSS JOIN permissao_usuario pu
 WHERE tu.tipo = 'ADMIN'
   AND NOT EXISTS (
-      SELECT 1
       FROM permissao_tipo_usuario ptu
       WHERE ptu.id_tipo_usuario = tu.id
         AND ptu.id_permissao = pu.id
@@ -592,13 +592,58 @@ WHERE tu.tipo = 'ADMIN'
 INSERT OR IGNORE INTO dados_pataquada (
     id,
     nome_fantasia,
+    telefone,
+    whatsapp,
+    cep,
+    logradouro,
+    numero,
+    bairro,
+    cidade,
+    uf,
     pais
-)
+)UPDATE dados_pataquada
+SET
+    nome_fantasia = 'PataQuada',
+    telefone = '11939051033',
+    whatsapp = '11939051033',
+    cep = '06437040',
+    logradouro = 'Alameda Marselha',
+    numero = '125',
+    bairro = 'Recanto Phrynea',
+    cidade = 'Barueri',
+    uf = 'SP',
+    pais = 'Brasil',
+    data_atualizacao = CURRENT_TIMESTAMP
+WHERE id = 1;
+
 VALUES (
     1,
     'PataQuada',
+    '11939051033',
+    '11939051033',
+    '06437040',
+    'Alameda Marselha',
+    '125',
+    'Recanto Phrynea',
+    'Barueri',
+    'SP',
     'Brasil'
 );
+SELECT * FROM dados_pataquada dp 
+UPDATE dados_pataquada
+SET
+    nome_fantasia = 'PataQuada',
+    telefone = '11939051033',
+    whatsapp = '11939051033',
+    cep = '06437040',
+    logradouro = 'Alameda Marselha',
+    numero = '125',
+    bairro = 'Recanto Phrynea',
+    cidade = 'Barueri',
+    uf = 'SP',
+    pais = 'Brasil',
+    data_atualizacao = CURRENT_TIMESTAMP
+WHERE id = 1;
 
 -- =========================================================
 -- 14. CONFIGURAÇÕES INICIAIS
