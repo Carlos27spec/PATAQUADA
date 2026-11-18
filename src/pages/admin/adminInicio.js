@@ -239,5 +239,4 @@ export function registrarAdminInicio({ app, db, autenticar }) {
         return res.json({ sucesso: true, dados: cartoes });
     });
 
-    console.log('Área administrativa: tela inicial disponível em /api/admin/*');
 }

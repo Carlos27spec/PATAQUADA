@@ -596,5 +596,4 @@ export function registrarAdminProdutos({ app, db, autenticar }) {
         return next(erro);
     });
 
-    console.log('Área administrativa: produtos disponíveis em /api/admin/produtos');
 }

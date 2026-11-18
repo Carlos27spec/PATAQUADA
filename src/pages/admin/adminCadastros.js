@@ -858,5 +858,4 @@ export function registrarAdminCadastros({ app, db, autenticar }) {
         return next(erro);
     });
 
-    console.log('Área administrativa: cadastros disponíveis em /api/admin/cadastros/*');
 }

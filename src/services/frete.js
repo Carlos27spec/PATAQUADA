@@ -789,5 +789,4 @@ export function registrarRotasFrete({ app, db, autenticar }) {
         }
     });
 
-    console.log('Frete: rotas /api/cep, /api/frete e /api/usuarios/me/* disponíveis');
 }

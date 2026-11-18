@@ -104,7 +104,6 @@ app.use((erro, req, res, next) => {
 
 const servidor = app.listen(PORT, () => {
     console.log(`Servidor PataQuada iniciado na porta ${PORT}`);
-    console.log(`Acesse: http://localhost:${PORT}`);
     console.log(`Banco utilizado: ${arquivoBanco}`);
 
     if (!process.env.MP_ACCESS_TOKEN) {

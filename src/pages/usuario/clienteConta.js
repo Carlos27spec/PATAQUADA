@@ -482,5 +482,4 @@ export function registrarContaCliente({ app, db, autenticar }) {
         }
     });
 
-    console.log('Área do cliente: pedidos, conta e endereços disponíveis em /api/cliente/*');
 }

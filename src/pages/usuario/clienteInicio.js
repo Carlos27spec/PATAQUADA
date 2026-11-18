@@ -112,5 +112,4 @@ export function registrarAreaCliente({ app, db, autenticar }) {
         }
     });
 
-    console.log('Área do cliente: /api/cliente/* disponível.');
 }
