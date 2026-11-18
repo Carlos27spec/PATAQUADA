@@ -574,19 +574,38 @@ function SecaoSobre() {
 
 /* ---------- 5. Contato ---------- */
 
+// "11987654321" -> "(11) 98765-4321"
+function mascararTelefone(valor) {
+    const digitos = valor.replace(/\D/g, '').slice(0, 11)
+
+    if (digitos.length <= 2) return digitos
+
+    const ddd = digitos.slice(0, 2)
+    const resto = digitos.slice(2)
+    const corte = resto.length > 8 ? 5 : 4
+
+    return resto.length > corte
+        ? `(${ddd}) ${resto.slice(0, corte)}-${resto.slice(corte)}`
+        : `(${ddd}) ${resto}`
+}
+
 function SecaoContato() {
     const [form, setForm] = useState({
         nome: '',
         email: '',
+        telefone: '',
         mensagem: '',
     })
 
     const [status, setStatus] = useState('')
+    const [erroEnvio, setErroEnvio] = useState('')
 
     const atualizar = (e) => {
+        const { name, value } = e.target
+
         setForm({
             ...form,
-            [e.target.name]: e.target.value,
+            [name]: name === 'telefone' ? mascararTelefone(value) : value,
         })
     }
 
@@ -595,7 +614,14 @@ function SecaoContato() {
 
         if (status === 'enviando') return
 
+        if (form.telefone.replace(/\D/g, '').length < 10) {
+            setErroEnvio('Informe um telefone válido com DDD.')
+            setStatus('erro')
+            return
+        }
+
         setStatus('enviando')
+        setErroEnvio('')
 
         try {
             await enviarContato(form)
@@ -605,10 +631,12 @@ function SecaoContato() {
             setForm({
                 nome: '',
                 email: '',
+                telefone: '',
                 mensagem: '',
             })
         } catch (error) {
             console.error('Erro ao enviar mensagem de contato:', error)
+            setErroEnvio(error.message)
             setStatus('erro')
         }
     }
@@ -677,6 +705,27 @@ function SecaoContato() {
                         />
                     </label>
 
+                    <label className="campo">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" />
+                        </svg>
+
+                        <input
+                            type="tel"
+                            name="telefone"
+                            placeholder="Telefone com DDD"
+                            inputMode="tel"
+                            autoComplete="tel"
+                            value={form.telefone}
+                            onChange={atualizar}
+                            required
+                        />
+                    </label>
+
                     <label className="campo campo-mensagem">
                         <svg
                             viewBox="0 0 24 24"
@@ -719,7 +768,8 @@ function SecaoContato() {
                             'Mensagem enviada! Responderemos em breve.'}
 
                         {status === 'erro' &&
-                            'Não foi possível enviar. Tente novamente.'}
+                            (erroEnvio ||
+                                'Não foi possível enviar. Tente novamente.')}
                     </p>
                 </form>
             </div>

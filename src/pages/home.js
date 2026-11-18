@@ -91,7 +91,7 @@ async function buscarProdutosAleatorios(signal) {
 
 /* ---------- Enviar formulário de contato ---------- */
 
-export async function enviarContato({ nome, email, mensagem }) {
+export async function enviarContato({ nome, email, telefone, mensagem }) {
     const resposta = await fetch(`${API_URL}/api/contato`, {
         method: 'POST',
         headers: {
@@ -101,6 +101,7 @@ export async function enviarContato({ nome, email, mensagem }) {
         body: JSON.stringify({
             nome: nome.trim(),
             email: email.trim(),
+            telefone: telefone.replace(/\D/g, ''),
             mensagem: mensagem.trim()
         })
     })

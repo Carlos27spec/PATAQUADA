@@ -47,11 +47,6 @@ export const FORMAS_PAGAMENTO = [
         codigo: 'DEBITO',
         nome: 'Cartão de Débito',
         descricao: 'Débito à vista'
-    },
-    {
-        codigo: 'BOLETO',
-        nome: 'Boleto Bancário',
-        descricao: 'Pague no seu banco'
     }
 ];
 

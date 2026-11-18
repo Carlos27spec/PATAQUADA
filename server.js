@@ -937,23 +937,27 @@ const TIPO_POR_FORMA = {
 
     CREDITO: 'credit_card',
 
-    DEBITO: 'debit_card',
-
-    BOLETO: 'ticket'
+    DEBITO: 'debit_card'
 
 };
 
 
 
+// Boleto (ticket) e pagamento em lotérica (atm) não são aceitos.
+const TIPOS_NAO_ACEITOS = ['ticket', 'atm'];
+
 function metodosDePagamento(forma) {
 
     const permitido = TIPO_POR_FORMA[forma];
 
-
-
+    // "TODAS": libera tudo, menos os tipos não aceitos.
     if (!permitido) {
 
-        return undefined;
+        return {
+
+            excluded_payment_types: TIPOS_NAO_ACEITOS.map(id => ({ id }))
+
+        };
 
     }
 
@@ -1463,6 +1467,8 @@ function buscarPedidoCompleto(db, pedidoId) {
 
             status,
 
+            mp_preference_id,
+
             mp_payment_id,
 
             mp_status,
@@ -1504,6 +1510,15 @@ function buscarPedidoCompleto(db, pedidoId) {
     }
 
 
+
+    // Link para pagar de novo enquanto o pedido não foi pago.
+    pedido.link_pagamento =
+        pedido.mp_preference_id &&
+        ['AGUARDANDO_PAGAMENTO', 'FALHOU'].includes(pedido.status)
+            ? `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${encodeURIComponent(pedido.mp_preference_id)}`
+            : null;
+
+    delete pedido.mp_preference_id;
 
     pedido.itens = db.prepare(`
 
@@ -2432,6 +2447,10 @@ const emailTransporter =
 
 const TEMPO_TOKEN_REDEFINICAO = 30 * 60 * 1000;
 
+// Fora de produção, o link de redefinição aparece no terminal quando o
+// e-mail não pode ser enviado.
+const EM_PRODUCAO = process.env.NODE_ENV === 'production';
+
 app.post('/api/usuarios/solicitar-redefinicao-senha', async (req, res) => {
     try {
         const email = String(req.body?.email ?? '').trim().toLowerCase();
@@ -2443,16 +2462,24 @@ app.post('/api/usuarios/solicitar-redefinicao-senha', async (req, res) => {
             });
         }
 
-        if (!emailTransporter) {
+        if (!emailTransporter && EM_PRODUCAO) {
+
             console.error(
+
                 'Recuperação de senha indisponível: configure EMAIL_HOST, EMAIL_USER e EMAIL_PASS no .env.'
+
             );
 
             return res.status(503).json({
+
                 sucesso: false,
+
                 mensagem: 'O envio de e-mails está temporariamente indisponível. Tente novamente mais tarde.'
+
             });
+
         }
+
 
         const usuario = db.prepare(`
             SELECT id, nome, email
@@ -2507,6 +2534,13 @@ app.post('/api/usuarios/solicitar-redefinicao-senha', async (req, res) => {
             `${urlFrontend}/redefinir-senha?token=${encodeURIComponent(token)}`;
 
         try {
+
+            if (!emailTransporter) {
+
+                throw new Error('EMAIL_HOST, EMAIL_USER e EMAIL_PASS não configurados no .env.');
+
+            }
+
             await emailTransporter.sendMail({
                 from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
                 to: usuario.email,
@@ -2534,9 +2568,27 @@ app.post('/api/usuarios/solicitar-redefinicao-senha', async (req, res) => {
                 `
             });
         } catch (erroEnvio) {
+
+            // Em desenvolvimento, sem e-mail funcionando, mostra o link no
+            // terminal para o fluxo poder ser testado.
+            if (!EM_PRODUCAO) {
+
+                console.warn(
+                    '\n[DESENVOLVIMENTO] Não foi possível enviar o e-mail de redefinição ' +
+                    `(${erroEnvio.code || erroEnvio.message}).\n` +
+                    `Link de redefinição para ${usuario.email}:\n${linkRedefinicao}\n`
+                );
+
+                return res.json(respostaGenerica);
+
+            }
+
             db.prepare(`
+
                 DELETE FROM tokens_redefinicao_senha
+
                 WHERE token_hash = ?
+
             `).run(tokenHash);
 
             console.error('Erro ao enviar e-mail de redefinição:', erroEnvio);
@@ -3638,6 +3690,19 @@ app.post(
 
             );
 
+            // Como no Mercado Livre: ao ir para o pagamento, os itens saem
+            // do carrinho. Se o pagamento falhar, o cliente paga de novo o
+            // mesmo pedido (link_pagamento em /api/pedidos/:id).
+            db.prepare(`
+                DELETE FROM itens_carrinho
+                WHERE id_carrinho IN (
+                    SELECT id
+                    FROM carrinho
+                    WHERE id_usuario_cliente = ?
+                    AND status = 'ABERTO'
+                )
+            `).run(req.usuario.id);
+
 
 
             return res.status(201).json({
@@ -4698,7 +4763,7 @@ coluna => coluna.name
 
 
 
-app.use('/api/contato', criarRotasContato(limitar));
+app.use('/api/contato', criarRotasContato(limitar, db));
 
 import { registrarAreaCliente } from './src/pages/usuario/clienteInicio.js';
 

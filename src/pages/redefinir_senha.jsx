@@ -4,6 +4,8 @@ import './redefinir_senha.css'
 import { PawIcon } from '../components/Icons'
 import dogCat from '../assets/dog-cat-3.png'
 
+const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+
 /* ---------- Ícones ---------- */
 
 function IconCadeado() {
@@ -201,7 +203,7 @@ export default function RedefinirSenha() {
         setEnviando(true)
 
         try {
-            const resposta = await fetch('/api/usuarios/redefinir-senha', {
+            const resposta = await fetch(`${API_URL}/api/usuarios/redefinir-senha`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

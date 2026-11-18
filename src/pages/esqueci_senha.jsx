@@ -4,6 +4,8 @@ import './esqueci_senha.css'
 import { PawIcon } from '../components/Icons'
 import dogCat from '../assets/dog-cat-3.png'
 
+const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+
 /* ---------- Ícones ---------- */
 
 function IconEmail() {
@@ -90,7 +92,7 @@ export default function EsqueciSenha() {
         setEnviando(true)
 
         try {
-            const resposta = await fetch('/api/usuarios/solicitar-redefinicao-senha', {
+            const resposta = await fetch(`${API_URL}/api/usuarios/solicitar-redefinicao-senha`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -18,6 +18,7 @@ const WHATSAPP_NUMERO = import.meta.env.VITE_WHATSAPP_NUMERO || '';
 // Os nomes dos arquivos são utilizados para identificar a categoria.
 
 import patinha from '../../assets/paw.png';
+import { PASTAS_IMAGEM, imagemDe } from '../../images/index.js';
 
 const imagensLocais = import.meta.glob(
     '../../assets/*.{png,jpg,jpeg,webp,svg}',
@@ -313,7 +314,7 @@ function tratarServico(item) {
         id: item.id,
         nome: item.nome,
         descricao: item.descricao || 'Confira os detalhes deste serviço.',
-        imagem: item.imagem || IMAGENS_PADRAO.servicos,
+        imagem: imagemDe(PASTAS_IMAGEM.servicos, item.imagem, IMAGENS_PADRAO.servicos),
         precoFormatado: formatarPreco(item.preco),
         duracaoFormatada: formatarDuracao(item.duracao_media)
     };
@@ -338,7 +339,7 @@ function tratarPlano(item) {
         id: item.id,
         nome: item.nome,
         descricao: item.descricao || 'Conheça os benefícios deste plano.',
-        imagem: item.imagem || IMAGENS_PADRAO.planos,
+        imagem: imagemDe(PASTAS_IMAGEM.planos, item.imagem, IMAGENS_PADRAO.planos),
         precoFormatado: formatarPreco(item.preco),
         cobrancaFormatada: formatarCobranca(item),
         periodoPreco: formatarPeriodoPreco(item),
@@ -373,7 +374,7 @@ function tratarConsulta(item) {
 
         // A tabela tipos_consulta não possui coluna imagem.
         // A imagem é definida localmente pelo JavaScript.
-        imagem: item.imagem || IMAGENS_PADRAO.consultas
+        imagem: imagemDe(PASTAS_IMAGEM.consultas, item.imagem, IMAGENS_PADRAO.consultas)
     };
 
     return {

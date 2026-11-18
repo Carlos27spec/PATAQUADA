@@ -118,17 +118,19 @@
     outline: 3px solid var(--cor-laranja);
 }
 
-/* ===== Esqueci minha senha ===== */
+/* ===== Esqueci minha senha (mesmo estilo do "Cadastre-se") ===== */
 
 .login-esqueci {
     align-self: flex-start;
     padding: 2px 0;
-    font-size: 1.15rem;
+    font-size: 1rem;
+    color: var(--cor-laranja);
+    text-decoration: underline;
     transition: color var(--transicao-padrao);
 }
 
 .login-esqueci:hover {
-    color: var(--cor-laranja);
+    color: var(--cor-marrom);
 }
 
 /* ===== Botão entrar ===== */

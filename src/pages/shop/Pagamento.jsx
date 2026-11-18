@@ -24,6 +24,9 @@ const PASSOS = ['Entrega', 'Pagamento', 'Confirmação']
 // Valor do seletor de endereço quando o cliente digita um novo.
 const NOVO_ENDERECO = 'novo'
 
+// O botão "Continuar" fica no resumo (fora do formulário) e o envia por este id.
+const ID_FORM_ENTREGA = 'ck-form-entrega'
+
 // ----- ícones das formas de pagamento -----
 
 function IconePix() {
@@ -40,10 +43,6 @@ function IconePix() {
 function iconeDaForma(codigo) {
     if (codigo === 'PIX') {
         return <IconePix />
-    }
-
-    if (codigo === 'BOLETO') {
-        return <i className="fa-solid fa-barcode ck-icone-boleto" />
     }
 
     return <i className="fa-solid fa-credit-card ck-icone-cartao" />
@@ -405,7 +404,8 @@ function Pagamento() {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
-    // Ao alterar os dados, um novo pagamento será criado.
+    // Só antes de abrir o Mercado Pago: depois disso os itens já saíram
+    // do carrinho e o pedido é pago pela tela do pedido.
     function voltarParaEntrega() {
         setPagamentoAberto(null)
         setPasso(1)
@@ -493,7 +493,7 @@ function Pagamento() {
                             className="ck-voltar"
                             aria-label="Voltar para a entrega"
                             onClick={voltarParaEntrega}
-                            disabled={enviando}
+                            disabled={enviando || Boolean(pagamentoAberto)}
                         >
                             <i className="fa-solid fa-arrow-left" />
                         </button>
@@ -556,6 +556,7 @@ function Pagamento() {
                                 {/* ETAPA 1 - ENTREGA */}
                                 {passo === 1 && (
                                     <form
+                                        id={ID_FORM_ENTREGA}
                                         onSubmit={continuarParaPagamento}
                                         noValidate
                                     >
@@ -934,20 +935,6 @@ function Pagamento() {
                                             </>
                                         )}
 
-                                        {erroEntrega && (
-                                            <p className="ck-aviso ck-aviso--erro" role="alert">
-                                                {erroEntrega}
-                                            </p>
-                                        )}
-
-                                        <button
-                                            type="submit"
-                                            className="btn ck-botao ck-botao--grande"
-                                            disabled={comProblema || frete.carregando}
-                                        >
-                                            Continuar
-                                            <i className="fa-solid fa-arrow-right" />
-                                        </button>
                                     </form>
                                 )}
 
@@ -980,7 +967,7 @@ function Pagamento() {
                                                 type="button"
                                                 className="ck-link"
                                                 onClick={voltarParaEntrega}
-                                                disabled={enviando}
+                                                disabled={enviando || Boolean(pagamentoAberto)}
                                             >
                                                 Alterar
                                             </button>
@@ -1032,70 +1019,6 @@ function Pagamento() {
                                             ))}
                                         </div>
 
-                                        <p className="ck-seguro">
-                                            <i className="fa-solid fa-shield-halved" />
-                                            Você será levado ao Mercado Pago para
-                                            concluir o pagamento com segurança.
-                                            Seus dados de cartão não passam
-                                            pelo nosso site.
-                                        </p>
-
-                                        {erroPagamento && (
-                                            <p className="ck-aviso ck-aviso--erro" role="alert">
-                                                {erroPagamento}
-                                            </p>
-                                        )}
-
-                                        {pagamentoAberto ? (
-                                            <div className="ck-pagamento-aberto" role="status">
-                                                <i className="fa-solid fa-up-right-from-square" />
-
-                                                <p>
-                                                    <strong>
-                                                        O pagamento foi aberto em uma nova aba.
-                                                    </strong>
-                                                    <br />
-                                                    Conclua o pagamento no Mercado Pago.
-                                                    Depois, volte aqui para ver o seu
-                                                    pedido.
-                                                </p>
-
-                                                <div className="ck-pagamento-aberto-acoes">
-                                                    <Link
-                                                        to={`/pedido/pendente?external_reference=${pagamentoAberto.pedidoId}`}
-                                                        className="btn ck-botao"
-                                                    >
-                                                        Já paguei, ver meu pedido
-                                                    </Link>
-
-                                                    <a
-                                                        href={pagamentoAberto.link}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="ck-link"
-                                                    >
-                                                        Abrir o Mercado Pago de novo
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <button
-                                                type="button"
-                                                className="btn ck-botao ck-botao--grande"
-                                                onClick={pagar}
-                                                disabled={enviando || comProblema}
-                                            >
-                                                {enviando
-                                                    ? 'Abrindo o Mercado Pago...'
-                                                    : (
-                                                        <>
-                                                            Continuar
-                                                            <i className="fa-solid fa-arrow-right" />
-                                                        </>
-                                                    )}
-                                            </button>
-                                        )}
-
                                     </div>
                                 )}
 
@@ -1109,7 +1032,97 @@ function Pagamento() {
                                     frete.resultado?.frete_gratis_a_partir_de
                                 }
                                 mostrarItens
-                            />
+                            >
+                                {/* ETAPA 1: o botão envia o formulário de entrega
+                                    (atributo form), mesmo estando fora dele. */}
+                                {passo === 1 && (
+                                    <>
+                                        {erroEntrega && (
+                                            <p className="ck-aviso ck-aviso--erro" role="alert">
+                                                {erroEntrega}
+                                            </p>
+                                        )}
+
+                                        <button
+                                            type="submit"
+                                            form={ID_FORM_ENTREGA}
+                                            className="btn ck-botao ck-botao--grande"
+                                            disabled={comProblema || frete.carregando}
+                                        >
+                                            Continuar
+                                            <i className="fa-solid fa-arrow-right" />
+                                        </button>
+                                    </>
+                                )}
+
+                                {passo === 2 && (
+                                    <>
+                                    <p className="ck-seguro">
+                                        <i className="fa-solid fa-shield-halved" />
+                                        Você será levado ao Mercado Pago para
+                                        concluir o pagamento com segurança.
+                                        Seus dados de cartão não passam
+                                        pelo nosso site.
+                                    </p>
+
+                                    {erroPagamento && (
+                                        <p className="ck-aviso ck-aviso--erro" role="alert">
+                                            {erroPagamento}
+                                        </p>
+                                    )}
+
+                                    {pagamentoAberto ? (
+                                        <div className="ck-pagamento-aberto" role="status">
+                                            <i className="fa-solid fa-up-right-from-square" />
+
+                                            <p>
+                                                <strong>
+                                                    O pagamento foi aberto em uma nova aba.
+                                                </strong>
+                                                <br />
+                                                Conclua o pagamento no Mercado Pago.
+                                                Depois, volte aqui para ver o seu
+                                                pedido.
+                                            </p>
+
+                                            <div className="ck-pagamento-aberto-acoes">
+                                                <Link
+                                                    to={`/pedido/pendente?external_reference=${pagamentoAberto.pedidoId}`}
+                                                    className="btn ck-botao"
+                                                >
+                                                    Já paguei, ver meu pedido
+                                                </Link>
+
+                                                <a
+                                                    href={pagamentoAberto.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="ck-link"
+                                                >
+                                                    Abrir o Mercado Pago de novo
+                                                </a>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            className="btn ck-botao ck-botao--grande"
+                                            onClick={pagar}
+                                            disabled={enviando || comProblema}
+                                        >
+                                            {enviando
+                                                ? 'Abrindo o Mercado Pago...'
+                                                : (
+                                                    <>
+                                                        Continuar
+                                                        <i className="fa-solid fa-arrow-right" />
+                                                    </>
+                                                )}
+                                        </button>
+                                    )}
+                                    </>
+                                )}
+                            </ResumoPedido>
 
                         </div>
                     </>

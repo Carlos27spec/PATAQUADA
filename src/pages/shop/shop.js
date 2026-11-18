@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 
 import patinha from '../../assets/paw.png';
+import { PASTAS_IMAGEM, imagemDe } from '../../images/index.js';
 
 const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
@@ -41,32 +42,15 @@ export function localizarImagem(palavras) {
     return achada ? achada[1] : null;
 }
 
+// Imagem de produto vinda do banco (só o nome do arquivo),
+// procurada em src/images/produtos/.
 export function resolverImagem(valor) {
-    if (!valor) {
-        return patinha;
-    }
+    return imagemDe(PASTAS_IMAGEM.produtos, valor, patinha);
+}
 
-    const texto = String(valor).trim();
-
-    if (/^(https?:|data:|blob:|\/)/i.test(texto)) {
-        return texto;
-    }
-
-    const base = nomeArquivo(texto);
-
-    const achada = Object.entries(imagensLocais).find(
-        ([caminho]) => nomeArquivo(caminho) === base
-    );
-
-    if (achada) {
-        return achada[1];
-    }
-
-    if (texto.includes('/')) {
-        return `/${texto}`;
-    }
-
-    return patinha;
+// Imagem de categoria vinda do banco, procurada em src/images/categorias/.
+export function resolverImagemCategoria(valor) {
+    return imagemDe(PASTAS_IMAGEM.categorias, valor, patinha);
 }
 
 // ========================================
@@ -118,7 +102,7 @@ function tratarCategoria(item) {
         ...item,
         id: item.id,
         nome: item.nome,
-        imagem: resolverImagem(item.imagem)
+        imagem: resolverImagemCategoria(item.imagem)
     };
 }
 

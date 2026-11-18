@@ -80,6 +80,13 @@ function ResumoPedido({
                 <strong>{formatarPreco(totais.total)}</strong>
             </div>
 
+            {/* Botões da tela: sempre logo abaixo do total. */}
+            {children && (
+                <div className="ck-resumo-acoes">
+                    {children}
+                </div>
+            )}
+
             {!freteCalculado && itens.length > 0 && (
                 <p className="ck-resumo-dica">
                     <i className="fa-solid fa-location-dot" />
@@ -94,8 +101,6 @@ function ResumoPedido({
                     frete grátis.
                 </p>
             )}
-
-            {children}
 
         </aside>
     )

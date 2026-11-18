@@ -58,8 +58,9 @@ const CONTEUDO = {
         titulo: 'Pagamento não concluído',
         subtitulo: 'Não foi possível concluir o pagamento.',
         detalhe:
-            'Nenhum valor foi cobrado e o seu carrinho foi mantido. ' +
-            'Você pode tentar novamente com outra forma de pagamento.'
+            'Nenhum valor foi cobrado e o seu pedido continua salvo. ' +
+            'Você pode tentar pagar de novo, inclusive com outra forma ' +
+            'de pagamento.'
     }
 }
 
@@ -244,17 +245,27 @@ function PedidoRetorno({ resultado }) {
                                 </button>
                             )}
 
-                            {situacao === 'falha' && (
-                                <Link
-                                    to="/pagamento"
+                            {/* Paga de novo o MESMO pedido (os itens já
+                                saíram do carrinho ao ir para o pagamento).
+                                Também aparece se o cliente saiu do Mercado
+                                Pago sem tentar pagar. */}
+                            {pedido.link_pagamento &&
+                                (situacao === 'falha' || !pedido.mp_status) && (
+                                <a
+                                    href={pedido.link_pagamento}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="btn ck-botao"
                                 >
-                                    Tentar novamente
-                                </Link>
+                                    <i className="fa-solid fa-credit-card" />
+                                    {situacao === 'falha'
+                                        ? 'Tentar novamente'
+                                        : 'Pagar agora'}
+                                </a>
                             )}
 
                             <Link
-                                to={situacao === 'falha' ? '/carrinho' : '/shop'}
+                                to="/shop"
                                 className={
                                     'btn ck-botao' +
                                     (situacao === 'aprovado'
@@ -262,16 +273,8 @@ function PedidoRetorno({ resultado }) {
                                         : ' ck-botao--contorno')
                                 }
                             >
-                                <i
-                                    className={
-                                        situacao === 'falha'
-                                            ? 'fa-solid fa-cart-shopping'
-                                            : 'fa-solid fa-house'
-                                    }
-                                />
-                                {situacao === 'falha'
-                                    ? 'Voltar ao carrinho'
-                                    : 'Voltar para a loja'}
+                                <i className="fa-solid fa-house" />
+                                Voltar para a loja
                             </Link>
 
                         </div>

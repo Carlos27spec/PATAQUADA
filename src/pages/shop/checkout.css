@@ -1038,3 +1038,15 @@
     align-items: center;
     gap: 16px;
 }
+
+/* ========================================
+   BOTÕES NO RESUMO (logo abaixo do total)
+======================================== */
+
+.ck-resumo-acoes > .ck-aviso {
+    margin-top: 16px;
+}
+
+.ck-resumo-acoes + .ck-resumo-dica {
+    margin-top: 18px;
+}
