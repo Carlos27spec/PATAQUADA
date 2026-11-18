@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import './redefinir_senha.css'
 import { PawIcon } from '../components/Icons'
 import dogCat from '../assets/dog-cat-3.png'
+import { REQUISITOS_SENHA } from '../utils/regrasCadastro.js'
 
 const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
@@ -151,11 +152,7 @@ function CampoSenha({ id, label, placeholder, autoComplete, value, onChange, inv
 
 /* ---------- Página ---------- */
 
-const REQUISITOS = [
-    { id: 'tamanho', texto: 'Pelo menos 8 caracteres', ok: (s) => s.length >= 8 },
-    { id: 'letra', texto: 'Uma letra', ok: (s) => /[A-Za-zÀ-ÿ]/.test(s) },
-    { id: 'numero', texto: 'Um número', ok: (s) => /\d/.test(s) },
-]
+const REQUISITOS = REQUISITOS_SENHA
 
 export default function RedefinirSenha() {
     const [searchParams] = useSearchParams()

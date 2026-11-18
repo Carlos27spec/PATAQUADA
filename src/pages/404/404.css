@@ -1,87 +1,150 @@
+/* ========================================
+   PÁGINA 404
+   Usa as cores e fontes do site (src/index.css).
+======================================== */
 
 .erro404 {
-    min-height: 70vh;
+    position: relative;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 48px 24px;
-    text-align: center;
-    box-sizing: border-box;
+    min-height: 70vh;
+    padding: 48px 16px;
+    overflow: hidden;
 }
 
-.erro404-conteudo {
-    width: 100%;
-    max-width: 560px;
+.erro404-cartao {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 18px;
+    gap: 16px;
+    width: min(100%, 560px);
+    padding: 40px 32px;
+    border-radius: 36px;
+    background-color: var(--cor-creme);
+    text-align: center;
+    box-shadow: 0 18px 40px rgba(128, 58, 27, 0.12);
 }
 
 .erro404-numero {
-    font-size: clamp(100px, 20vw, 180px);
-    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--cor-laranja);
+    font-family: var(--fonte-titulo);
+    font-size: clamp(96px, 20vw, 150px);
     line-height: 1;
-    color: var(--accent);
-    margin: 0;
-    opacity: 0.9;
+}
+
+/* A patinha faz o papel do "0". */
+.erro404-pata {
+    width: 0.75em;
+    height: 0.75em;
+    object-fit: contain;
+    transform: rotate(-14deg);
+    animation: erro404-balancar 2.4s ease-in-out infinite;
+}
+
+@keyframes erro404-balancar {
+    0%, 100% { transform: rotate(-14deg); }
+    50% { transform: rotate(10deg); }
 }
 
 .erro404-titulo {
-    font-size: clamp(24px, 5vw, 34px);
-    font-weight: 700;
-    color: var(--text-h);
-    margin: 0;
+    color: var(--cor-marrom);
+    font-size: clamp(26px, 5vw, 36px);
+    line-height: 1.1;
 }
 
 .erro404-descricao {
-    max-width: 440px;
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--text);
-    margin: 0;
+    max-width: 420px;
+    font-size: 17px;
+    line-height: 1.5;
+}
+
+.erro404-botoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 8px;
 }
 
 .erro404-botao {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 12px;
-    padding: 13px 26px;
-    border-radius: 8px;
-    background: var(--accent);
-    color: #fff;
-    font-size: 15px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: transform 0.2s, opacity 0.2s;
+    padding: 12px 26px;
+    font-size: 17px;
 }
 
-.erro404-botao:hover {
-    transform: translateY(-2px);
-    opacity: 0.9;
+.erro404-botao--suave {
+    background-color: var(--cor-pessego);
+    color: var(--cor-marrom);
 }
 
-.erro404-botao:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 4px;
+.erro404-botao--suave:hover {
+    color: var(--cor-branco);
+}
+
+/* Patinhas soltas no fundo */
+.erro404-decoracao {
+    position: absolute;
+    width: 56px;
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.erro404-decoracao--1 {
+    top: 12%;
+    left: 8%;
+    transform: rotate(-20deg);
+}
+
+.erro404-decoracao--2 {
+    right: 10%;
+    bottom: 14%;
+    width: 72px;
+    transform: rotate(18deg);
+}
+
+.erro404-decoracao--3 {
+    top: 20%;
+    right: 18%;
+    width: 40px;
+    transform: rotate(35deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .erro404-pata {
+        animation: none;
+    }
 }
 
 @media (max-width: 600px) {
     .erro404 {
         min-height: 60vh;
-        padding: 36px 20px;
+        padding: 32px 16px;
+    }
+
+    .erro404-cartao {
+        padding: 32px 20px;
+        border-radius: 28px;
     }
 
     .erro404-descricao {
-        font-size: 14px;
+        font-size: 15px;
+    }
+
+    .erro404-botoes {
+        flex-direction: column;
+        width: 100%;
     }
 
     .erro404-botao {
         width: 100%;
-        max-width: 280px;
-        box-sizing: border-box;
+    }
+
+    .erro404-decoracao {
+        display: none;
     }
 }

@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import CartaoProduto from '../../components/CartaoProduto.jsx'
 import { adicionarAoCarrinho } from './carrinho.js'
 import {
-    FRETE_GRATIS_A_PARTIR_DE,
+    useFreteGratis,
     formatarPreco,
     produtosSemelhantes,
     useShop
@@ -24,6 +24,7 @@ const ROTA_CARRINHO = '/carrinho'
 
 function DetalheProduto({ produto, semelhantes }) {
     const navigate = useNavigate()
+    const freteGratis = useFreteGratis()
 
     const [quantidade, setQuantidade] = useState(1)
     const [aviso, setAviso] = useState(null)
@@ -228,11 +229,13 @@ function DetalheProduto({ produto, semelhantes }) {
                         )}
 
                         <ul className="produto-vantagens">
-                            <li>
-                                <i className="fa-solid fa-truck-fast" />
-                                Frete grátis a partir de{' '}
-                                {formatarPreco(FRETE_GRATIS_A_PARTIR_DE)}
-                            </li>
+                            {freteGratis > 0 && (
+                                <li>
+                                    <i className="fa-solid fa-truck-fast" />
+                                    Frete grátis a partir de{' '}
+                                    {formatarPreco(freteGratis)}
+                                </li>
+                            )}
 
                             <li>
                                 <i className="fa-solid fa-shield-heart" />

@@ -131,21 +131,26 @@
 /* ===== aceite dos termos ===== */
 .cadastro-aceite {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* caixa e texto sempre lado a lado */
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
     margin: 8px 0 24px;
-    font-size: clamp(1rem, 1.9vw, 1.35rem);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.cadastro-aceite label {
+    min-width: 0;
 }
 
 .cadastro-aceite input {
     appearance: none;
     display: grid;
     place-content: center;
-    flex: 0 0 30px;
-    width: 30px;
-    height: 30px;
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
     border: 1px solid var(--cor-laranja);
     border-radius: 8px;
     background: #fff;
@@ -154,10 +159,10 @@
 
 .cadastro-aceite input::after {
     content: "";
-    width: 14px;
-    height: 7px;
-    border-left: 3px solid #fff;
-    border-bottom: 3px solid #fff;
+    width: 11px;
+    height: 6px;
+    border-left: 2.5px solid #fff;
+    border-bottom: 2.5px solid #fff;
     transform: rotate(-45deg) translate(1px, -1px);
     opacity: 0;
 }
@@ -357,4 +362,61 @@
     .pata-cadastro-3 {
         width: 44px;
     }
+}
+
+/* ===== requisitos da senha e usuário disponível ===== */
+.cadastro-ok {
+    margin: -8px 0 12px;
+    padding-left: 8px;
+    font-size: 0.95rem;
+    color: var(--cor-preto);
+}
+
+.cadastro-requisitos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin: -6px 0 14px;
+    padding: 0 8px;
+    list-style: none;
+    font-size: 0.95rem;
+}
+
+.cadastro-requisito {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--cor-azul);
+}
+
+.cadastro-requisito--ok {
+    color: var(--cor-preto);
+}
+
+.cadastro-requisito-marca {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--cor-pessego);
+    border-radius: 50%;
+    background: var(--cor-branco);
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+.cadastro-requisito--ok .cadastro-requisito-marca {
+    border-color: var(--cor-verde);
+    background: var(--cor-verde);
+    color: var(--cor-preto);
+}
+
+.cadastro-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }

@@ -563,3 +563,521 @@
     }
 
 }
+
+/* ========================================
+   TELAS: PEDIDOS, MINHA CONTA E ENDEREÇOS
+======================================== */
+
+.cta-titulo-pagina {
+    margin-bottom: 18px;
+}
+
+.cta-titulo-pagina h1 {
+    font-size: clamp(30px, 4vw, 40px);
+    line-height: 1.1;
+}
+
+.cta-titulo-pagina p {
+    margin-top: 4px;
+    font-size: 16px;
+}
+
+.cta-titulo-pagina--pedido,
+.cta-titulo-pagina--acao {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.cta-titulo-pagina--pedido {
+    margin-top: 14px;
+}
+
+.cta-titulo-pagina--acao .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cta-status--grande {
+    padding: 4px 16px;
+    font-size: 16px;
+}
+
+/* ----- filtros ----- */
+
+.cta-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.cta-filtro {
+    padding: 7px 16px;
+    border: 1px solid var(--cta-borda);
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.75);
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.cta-filtro.ativo {
+    border-color: var(--cor-laranja);
+    background-color: var(--cor-laranja);
+    color: var(--cor-branco);
+}
+
+/* ----- linha do tempo do pedido ----- */
+
+.cta-etapas {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin: 8px 0 20px;
+    list-style: none;
+}
+
+.cta-etapa {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+
+.cta-etapa::before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    right: 50%;
+    left: -50%;
+    height: 3px;
+    background-color: var(--cta-borda);
+}
+
+.cta-etapa:first-child::before {
+    display: none;
+}
+
+.cta-etapa.feita::before,
+.cta-etapa.atual::before {
+    background-color: var(--cor-laranja);
+}
+
+.cta-etapa-icone {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: var(--cor-creme);
+    font-size: 17px;
+}
+
+.cta-etapa.feita .cta-etapa-icone,
+.cta-etapa.atual .cta-etapa-icone {
+    background-color: var(--cor-laranja);
+    color: var(--cor-branco);
+}
+
+.cta-etapa-nome {
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+.cta-etapa.atual .cta-etapa-nome {
+    font-weight: bold;
+}
+
+/* ----- aviso para pagar ----- */
+
+.cta-aviso-pagamento {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding: 14px 18px;
+    border: 2px solid var(--cor-laranja);
+    border-radius: 20px;
+    background-color: var(--cor-pessego);
+}
+
+.cta-aviso-pagamento > i {
+    color: var(--cor-laranja);
+    font-size: 22px;
+}
+
+.cta-aviso-pagamento p {
+    flex: 1 1 220px;
+}
+
+.cta-aviso-pagamento .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ----- detalhe do pedido ----- */
+
+.cta-pedido-detalhes {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.cta-coluna {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cta-painel {
+    margin-bottom: 16px;
+    padding: 20px 22px;
+    border: 1px solid var(--cta-borda);
+    border-radius: 24px;
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+.cta-coluna .cta-painel,
+.cta-pedido-detalhes > .cta-painel {
+    margin-bottom: 0;
+}
+
+.cta-painel h2 {
+    margin-bottom: 14px;
+    font-size: 22px;
+    line-height: 1.1;
+}
+
+.cta-itens {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cta-item {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+}
+
+.cta-item img {
+    width: 56px;
+    height: 56px;
+    padding: 4px;
+    border-radius: 14px;
+    background-color: var(--cor-creme);
+    object-fit: contain;
+}
+
+.cta-item-nome {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    font-size: 15px;
+}
+
+.cta-item-nome a:hover {
+    color: var(--cor-laranja);
+}
+
+.cta-item-nome small {
+    opacity: 0.75;
+}
+
+.cta-valores {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--cta-borda);
+    font-size: 15px;
+}
+
+.cta-valores div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.cta-valores-total {
+    margin-top: 4px;
+    font-size: 20px;
+}
+
+.cta-valores-total dd {
+    font-family: var(--fonte-titulo);
+}
+
+.cta-texto {
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.cta-texto--suave {
+    margin-top: 10px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* ----- formulários ----- */
+
+.cta-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+}
+
+.cta-form--endereco {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cta-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    font-size: 15px;
+}
+
+.cta-campo--dobro {
+    grid-column: span 2;
+}
+
+.cta-campo--inteira {
+    grid-column: 1 / -1;
+}
+
+.cta-campo input,
+.cta-campo select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--cta-borda);
+    border-radius: 14px;
+    background-color: var(--cor-branco);
+    font: inherit;
+    font-size: 16px;
+}
+
+.cta-campo input:disabled {
+    background-color: var(--cor-creme);
+    cursor: not-allowed;
+}
+
+.cta-campo input:focus,
+.cta-campo select:focus {
+    outline: 3px solid var(--cor-laranja);
+    outline-offset: 0;
+}
+
+.cta-campo small {
+    font-size: 13px;
+    opacity: 0.75;
+}
+
+.cta-campo--erro input {
+    border-color: #B3261E;
+}
+
+.cta-campo--erro small {
+    color: #B3261E;
+    opacity: 1;
+}
+
+.cta-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.cta-check input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--cor-laranja);
+}
+
+.cta-retorno {
+    margin: 14px 0 0;
+    padding: 10px 16px;
+    border-radius: 14px;
+    font-size: 15px;
+}
+
+.cta-titulo-pagina + .cta-retorno {
+    margin: 0 0 16px;
+}
+
+.cta-retorno--ok {
+    background-color: var(--cor-verde);
+}
+
+.cta-retorno--erro {
+    background-color: var(--cor-rosa);
+}
+
+.cta-form-botoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+button.cta-botao-suave {
+    border: 0;
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+/* ----- endereços ----- */
+
+.cta-enderecos {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cta-endereco {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border: 1px solid var(--cta-borda);
+    border-radius: 24px;
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+.cta-endereco.principal {
+    border: 2px solid var(--cor-laranja);
+}
+
+.cta-endereco-icone {
+    color: var(--cor-laranja);
+    font-size: 24px;
+}
+
+.cta-endereco-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    font-size: 15px;
+}
+
+.cta-endereco-texto strong {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--fonte-titulo);
+    font-size: 20px;
+    font-weight: normal;
+}
+
+.cta-endereco-texto small {
+    opacity: 0.75;
+}
+
+.cta-endereco-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px 14px;
+}
+
+.cta-link-acao {
+    border: 0;
+    background: transparent;
+    color: var(--cor-laranja);
+    font: inherit;
+    font-size: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.cta-link-acao:hover {
+    color: var(--cor-marrom);
+}
+
+.cta-link-acao--perigo {
+    color: #B3261E;
+}
+
+@media (max-width: 900px) {
+    .cta-pedido-detalhes {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cta-endereco {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .cta-endereco-acoes {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 640px) {
+    .cta-form,
+    .cta-form--endereco {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cta-campo--dobro {
+        grid-column: auto;
+    }
+
+    .cta-painel {
+        padding: 18px 16px;
+    }
+
+    .cta-etapa-nome {
+        font-size: 11px;
+    }
+
+    .cta-etapa-icone {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+    }
+
+    .cta-etapa::before {
+        top: 16px;
+    }
+
+    .cta-form-botoes > * {
+        flex: 1 1 100%;
+        text-align: center;
+    }
+}
+
+/* Botao "Painel administrativo" (so para quem tem acesso ao painel) */
+.cta-link--admin {
+    margin-top: 6px;
+    background-color: var(--cor-pessego);
+    color: var(--cor-marrom);
+}
+
+.cta-link--admin:hover {
+    background-color: var(--cor-laranja);
+    color: var(--cor-branco);
+}

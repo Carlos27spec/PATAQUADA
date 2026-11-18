@@ -94,6 +94,9 @@ export async function chamarApi(
 
         erro.status = resposta.status;
 
+        // Campo do formulário com problema (quando o servidor informa).
+        erro.campo = dados.campo ?? null;
+
         throw erro;
     }
 

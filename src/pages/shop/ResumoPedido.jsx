@@ -1,4 +1,4 @@
-import { FRETE_GRATIS_A_PARTIR_DE, formatarPreco } from './shop.js'
+import { formatarPreco, useFreteGratis } from './shop.js'
 
 // Quadro "Resumo do pedido", usado no carrinho e no pagamento.
 // Os botões da tela entram como children.
@@ -10,9 +10,12 @@ function ResumoPedido({
     totais,
     mostrarItens = false,
     envio = null,
-    freteGratisAPartirDe = FRETE_GRATIS_A_PARTIR_DE,
+    freteGratisAPartirDe,
     children
 }) {
+    const freteGratisDaLoja = useFreteGratis()
+    freteGratisAPartirDe ??= freteGratisDaLoja ?? 0
+
     const faltaParaFreteGratis =
         freteGratisAPartirDe > 0
             ? freteGratisAPartirDe - totais.subtotal

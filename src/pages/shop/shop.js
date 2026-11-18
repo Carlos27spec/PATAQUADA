@@ -1,3 +1,4 @@
+import { useEmpresa } from '../../utils/empresa.js';
 
 import { useEffect, useState } from 'react';
 
@@ -6,10 +7,13 @@ import { PASTAS_IMAGEM, imagemDe } from '../../images/index.js';
 
 const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
-// Frete grátis no envio Normal (em centavos), só para exibir nas telas.
-// O valor que vale é frete_gratis_a_partir_de em configuracoes_pataquada
-// (o servidor calcula o frete em /api/frete/calcular).
-export const FRETE_GRATIS_A_PARTIR_DE = 10000;
+// Frete grátis (centavos) para exibir nas telas: vem de
+// frete_gratis_a_partir_de em Configurações da loja (0 = sem frete grátis).
+// null enquanto carrega.
+export function useFreteGratis() {
+    const empresa = useEmpresa();
+    return empresa ? Number(empresa.frete_gratis_a_partir_de) || 0 : null;
+}
 
 // ========================================
 // IMAGENS

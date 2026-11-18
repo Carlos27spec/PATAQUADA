@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 
 import { BASE_CONTA, linkSuporte } from './menuConta.js'
+import { useEmpresa } from '../../utils/empresa.js'
 import { chamarApi } from '../shop/carrinho.js'
-import { formatarPreco, localizarImagem, resolverImagem } from '../shop/shop.js'
+import { localizarImagem } from '../shop/shop.js'
+import CartaoPedido from './CartaoPedido.jsx'
 import './conta.css'
 
 import patinha from '../../assets/paw.png'
@@ -18,67 +20,9 @@ const ilustracao = localizarImagem([
     'pedido-confirmado'
 ])
 
-function formatarData(texto) {
-    const [ano, mes, dia] = String(texto ?? '').slice(0, 10).split('-')
-
-    return ano && mes && dia ? `${dia}/${mes}/${ano}` : '—'
-}
-
-function CartaoPedido({ pedido }) {
-    return (
-        <li className="cta-pedido">
-
-            <div className="cta-pedido-dados">
-                <strong className="cta-pedido-numero">#{pedido.id}</strong>
-
-                <span className="cta-pedido-linha">
-                    {formatarData(pedido.data_criacao)}
-                    {' · '}
-                    <span className={`cta-status cta-status--${pedido.grupo}`}>
-                        {pedido.rotulo}
-                    </span>
-                </span>
-
-                {pedido.detalhe && (
-                    <span className="cta-pedido-detalhe">
-                        <i className="fa-solid fa-box-open" aria-hidden="true" />
-                        {pedido.detalhe}
-                    </span>
-                )}
-            </div>
-
-            <ul className="cta-miniaturas" aria-label="Itens do pedido">
-                {pedido.itens.map((item, indice) => (
-                    <li key={`${item.nome}-${indice}`}>
-                        <img
-                            src={resolverImagem(item.imagem)}
-                            alt={item.nome}
-                            title={item.nome}
-                            loading="lazy"
-                        />
-                    </li>
-                ))}
-            </ul>
-
-            <div className="cta-pedido-total">
-                <small>Total</small>
-                <strong>{formatarPreco(pedido.total)}</strong>
-            </div>
-
-            <Link
-                to={`${BASE_CONTA}/pedidos/${pedido.id}`}
-                className="cta-botao-suave"
-                aria-label={`Ver o pedido ${pedido.id}`}
-            >
-                Ver pedido
-            </Link>
-
-        </li>
-    )
-}
-
 function AreaClienteInicio() {
     const { usuario } = useOutletContext()
+    const empresa = useEmpresa()
 
     const [versao, setVersao] = useState(0)
 
@@ -132,7 +76,7 @@ function AreaClienteInicio() {
     const { carregando, pedidos, total, erro } = estado
 
     const primeiroNome = String(usuario.nome ?? '').split(' ')[0]
-    const suporte = linkSuporte()
+    const suporte = linkSuporte(empresa?.whatsapp)
 
     const atalhoSuporte = (
         <>

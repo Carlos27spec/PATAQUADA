@@ -1,3 +1,5 @@
+import { linkWhatsapp } from '../../utils/empresa.js'
+
 // Rota da tela de login do site (para quem ainda não entrou).
 export const ROTA_LOGIN = '/login'
 
@@ -7,18 +9,12 @@ export const BASE_CONTA = '/usuarios'
 // Mensagem enviada ao WhatsApp em "Ajuda" e "Suporte".
 const MENSAGEM_SUPORTE = 'Olá! Preciso de ajuda com a minha conta na PataQuada.'
 
-// Mesmo número configurado no .env (VITE_WHATSAPP_NUMERO) que o
-// site já usa nos serviços e consultas.
-export function linkSuporte() {
-    const numero = String(import.meta.env.VITE_WHATSAPP_NUMERO || '').replace(/\D/g, '')
-
-    return numero
-        ? `https://wa.me/${numero}?text=${encodeURIComponent(MENSAGEM_SUPORTE)}`
-        : null
+// numero: WhatsApp da empresa (useEmpresa().whatsapp), vindo do banco.
+export function linkSuporte(numero) {
+    return linkWhatsapp(numero, MENSAGEM_SUPORTE)
 }
 
-// Itens do menu lateral. As telas de Meus Pedidos, Minha Conta e
-// Endereço serão feitas nas próximas etapas.
+// Itens do menu lateral (as rotas ficam em App.jsx, dentro de /usuarios).
 export const ITENS_MENU = [
     { chave: 'inicio', titulo: 'Início', icone: 'fa-house', to: BASE_CONTA, fim: true },
     { chave: 'pedidos', titulo: 'Meus Pedidos', icone: 'fa-list-ul', to: `${BASE_CONTA}/pedidos` },

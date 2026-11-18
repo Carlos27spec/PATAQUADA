@@ -8,7 +8,8 @@ const ENDPOINTS = {
     planos: '/api/planos'
 };
 
-const WHATSAPP_NUMERO = import.meta.env.VITE_WHATSAPP_NUMERO || '';
+// O WhatsApp vem do banco (Dados da empresa / Configurações da loja).
+import { carregarEmpresa, linkWhatsapp } from '../../utils/empresa.js';
 
 // ========================================
 // IMAGENS LOCAIS
@@ -241,19 +242,9 @@ function normalizarBeneficios(valor) {
 // WHATSAPP
 // ========================================
 
-function gerarLinkWhatsApp(tipo, item) {
-    if (!WHATSAPP_NUMERO) {
-        console.error(
-            'Número do WhatsApp não configurado no arquivo .env.'
-        );
-
-        return null;
-    }
-
-    const numero = WHATSAPP_NUMERO.replace(/\D/g, '');
-
+function gerarLinkWhatsApp(tipo, item, numero) {
     if (!numero) {
-        console.error('Número do WhatsApp inválido.');
+        console.warn('WhatsApp não cadastrado em Dados da empresa.');
         return null;
     }
 
@@ -277,7 +268,7 @@ function gerarLinkWhatsApp(tipo, item) {
         return null;
     }
 
-    return `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+    return linkWhatsapp(numero, mensagem);
 }
 
 // ========================================
@@ -308,7 +299,7 @@ function extrairLista(resposta, tipo) {
 // TRATAMENTO DOS SERVIÇOS - PET CARE
 // ========================================
 
-function tratarServico(item) {
+function tratarServico(item, whatsapp) {
     const dados = {
         ...item,
         id: item.id,
@@ -321,7 +312,7 @@ function tratarServico(item) {
 
     return {
         ...dados,
-        whatsappUrl: gerarLinkWhatsApp('servicos', dados)
+        whatsappUrl: gerarLinkWhatsApp('servicos', dados, whatsapp)
     };
 }
 
@@ -360,7 +351,7 @@ function tratarPlano(item) {
 // TRATAMENTO DAS CONSULTAS
 // ========================================
 
-function tratarConsulta(item) {
+function tratarConsulta(item, whatsapp) {
     const dados = {
         ...item,
         id: item.id,
@@ -379,7 +370,7 @@ function tratarConsulta(item) {
 
     return {
         ...dados,
-        whatsappUrl: gerarLinkWhatsApp('consultas', dados)
+        whatsappUrl: gerarLinkWhatsApp('consultas', dados, whatsapp)
     };
 }
 
@@ -418,13 +409,16 @@ export function useDadosPagina(tipo) {
                     throw new Error('Página não encontrada.');
                 }
 
-                const resposta = await fetch(`${API_URL}${endpoint}`, {
-                    method: 'GET',
-                    headers: {
-                        Accept: 'application/json'
-                    },
-                    signal: controller.signal
-                });
+                const [resposta, empresa] = await Promise.all([
+                    fetch(`${API_URL}${endpoint}`, {
+                        method: 'GET',
+                        headers: {
+                            Accept: 'application/json'
+                        },
+                        signal: controller.signal
+                    }),
+                    carregarEmpresa()
+                ]);
 
                 if (!resposta.ok) {
                     throw new Error(
@@ -441,7 +435,7 @@ export function useDadosPagina(tipo) {
                 }
 
                 const lista = extrairLista(resultado, tipo);
-                const dadosTratados = lista.map(tratador);
+                const dadosTratados = lista.map(item => tratador(item, empresa.whatsapp));
 
                 setDados(dadosTratados);
 

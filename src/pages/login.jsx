@@ -4,7 +4,7 @@ import './login.css'
 import { PawIcon } from "../components/Icons.jsx"
 import mascoteGrande from '../assets/cachorro-cartoon-card.png'
 
-const API = import.meta.env.VITE_API_URL
+const API = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
 /* ---------- Ícones ---------- */
 

@@ -3,6 +3,15 @@ import { Link } from 'react-router-dom'
 import './cadastro.css'
 import { PawIcon } from '../components/Icons'
 import mascotes from '../assets/arte-cadastro-mascotes-v2.png'
+import {
+    MENSAGEM_SENHA,
+    MENSAGEM_SENHA_LONGA,
+    MENSAGEM_USUARIO,
+    REGEX_USUARIO,
+    REQUISITOS_SENHA,
+    senhaAtendeRequisitos,
+    senhaLongaDemais,
+} from '../utils/regrasCadastro.js'
 
 /* ---------- Ícones ---------- */
 
@@ -67,12 +76,12 @@ function validar(dados) {
     if (dados.nome.trim().split(/\s+/).length < 2) erros.nome = 'Informe seu nome completo.'
     if (!/^\S+@\S+\.\S+$/.test(dados.email.trim())) erros.email = 'Informe um e-mail válido.'
     if (!cpfValido(dados.cpf)) erros.cpf = 'Informe um CPF válido.'
-    if (!/^[a-zA-Z0-9_.]{3,20}$/.test(dados.usuario.trim()))
-        erros.usuario = 'Use de 3 a 20 caracteres: letras, números, ponto ou _.'
+    if (!REGEX_USUARIO.test(dados.usuario.trim())) erros.usuario = MENSAGEM_USUARIO
     const digitosTel = dados.telefone.replace(/\D/g, '')
     if (digitosTel.length < 10 || digitosTel.length > 11)
         erros.telefone = 'Informe um telefone com DDD.'
-    if (dados.senha.length < 8) erros.senha = 'A senha precisa ter pelo menos 8 caracteres.'
+    if (!senhaAtendeRequisitos(dados.senha)) erros.senha = MENSAGEM_SENHA
+    else if (senhaLongaDemais(dados.senha)) erros.senha = MENSAGEM_SENHA_LONGA
     if (dados.confirmar !== dados.senha) erros.confirmar = 'As senhas não conferem.'
     if (!dados.aceite) erros.aceite = 'Aceite os termos para continuar.'
     return erros
@@ -122,6 +131,29 @@ export default function Cadastro() {
     const [enviando, setEnviando] = useState(false)
     const [erroGeral, setErroGeral] = useState('')
     const [concluido, setConcluido] = useState(false)
+    // Resultado da consulta do nome de usuário: { usuario, disponivel, mensagem }
+    const [disponibilidade, setDisponibilidade] = useState(null)
+
+    // Ao sair do campo, confere no servidor se o nome de usuário está livre.
+    async function conferirUsuario() {
+        const usuario = dados.usuario.trim()
+        if (!REGEX_USUARIO.test(usuario)) return
+
+        try {
+            const resposta = await fetch(
+                `/api/usuarios/disponibilidade?usuario=${encodeURIComponent(usuario)}`
+            )
+            const resultado = await resposta.json()
+            if (!resposta.ok) return
+
+            setDisponibilidade({ usuario, ...resultado })
+            if (!resultado.disponivel) {
+                setErros((atual) => ({ ...atual, usuario: resultado.mensagem }))
+            }
+        } catch {
+            // Sem conexão: a conferência final acontece ao cadastrar.
+        }
+    }
 
     function atualizar(e) {
         const { name, type, value, checked } = e.target
@@ -138,6 +170,13 @@ export default function Cadastro() {
         e.preventDefault()
 
         const novosErros = validar(dados)
+        if (
+            !novosErros.usuario &&
+            disponibilidade?.usuario.toLowerCase() === dados.usuario.trim().toLowerCase() &&
+            !disponibilidade.disponivel
+        ) {
+            novosErros.usuario = disponibilidade.mensagem
+        }
         setErros(novosErros)
 
         const primeiroComErro = ORDEM_CAMPOS.find((campo) => novosErros[campo])
@@ -283,8 +322,16 @@ export default function Cadastro() {
                                     maxLength={20}
                                     value={dados.usuario}
                                     onChange={atualizar}
+                                    onBlur={conferirUsuario}
                                     erro={erros.usuario}
                                 />
+                                {!erros.usuario &&
+                                    disponibilidade?.disponivel &&
+                                    disponibilidade.usuario === dados.usuario.trim() && (
+                                        <p className="cadastro-ok" role="status">
+                                            ✓ {disponibilidade.mensagem}
+                                        </p>
+                                    )}
                                 <Campo
                                     name="senha"
                                     label="Senha"
@@ -294,6 +341,29 @@ export default function Cadastro() {
                                     onChange={atualizar}
                                     erro={erros.senha}
                                 />
+                                <ul className="cadastro-requisitos" aria-label="Requisitos da senha">
+                                    {REQUISITOS_SENHA.map((requisito) => {
+                                        const atendido = requisito.ok(dados.senha)
+                                        return (
+                                            <li
+                                                key={requisito.id}
+                                                className={
+                                                    atendido
+                                                        ? 'cadastro-requisito cadastro-requisito--ok'
+                                                        : 'cadastro-requisito'
+                                                }
+                                            >
+                                                <span className="cadastro-requisito-marca" aria-hidden="true">
+                                                    {atendido ? '✓' : ''}
+                                                </span>
+                                                {requisito.texto}
+                                                <span className="cadastro-sr">
+                                                    {atendido ? ' (atendido)' : ' (pendente)'}
+                                                </span>
+                                            </li>
+                                        )
+                                    })}
+                                </ul>
                                 <Campo
                                     name="confirmar"
                                     label="Confirmar Senha"

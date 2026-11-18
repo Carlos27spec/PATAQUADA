@@ -25,7 +25,6 @@
 // e podem ser alterados sem mexer no código. Valores em centavos.
 // =====================================================
 
-/* global process */
 
 import { ErroPagamento } from './mercadoPagoConfig.js';
 
@@ -49,7 +48,7 @@ const CONFIG_FRETE = [
     ['frete_km_por_dia', 800, 'A cada quantos km o prazo aumenta 1 dia útil.'],
     ['frete_expresso_multiplicador', 1.7, 'Quanto o Expresso custa em relação ao Normal.'],
     ['frete_expresso_fator_prazo', 0.5, 'Fração do prazo do Normal usada no Expresso.'],
-    ['frete_gratis_a_partir_de', Number(process.env.FRETE_GRATIS_A_PARTIR_DE ?? 10000),
+    ['frete_gratis_a_partir_de', 10000,
         'Subtotal a partir do qual o envio Normal é grátis (centavos). 0 desativa.']
 ];
 
@@ -662,7 +661,7 @@ export function salvarEndereco(db, idUsuario, endereco, { principal = false } = 
     return salvar();
 }
 
-function validarEndereco(dados = {}) {
+export function validarEndereco(dados = {}) {
     const endereco = {
         apelido: texto(dados.apelido, 40),
         cep: somenteDigitos(dados.cep).slice(0, 8),

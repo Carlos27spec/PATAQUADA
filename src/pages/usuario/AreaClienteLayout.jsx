@@ -10,6 +10,7 @@ import {
 } from 'react-router-dom'
 
 import { ITENS_MENU, ROTA_LOGIN, linkSuporte } from './menuConta.js'
+import { useEmpresa } from '../../utils/empresa.js'
 import { CHAVES_TOKEN, chamarApi, obterToken } from '../shop/carrinho.js'
 import './conta.css'
 
@@ -28,6 +29,7 @@ function AreaClienteLayout() {
     }))
 
     const [tentativa, setTentativa] = useState(0)
+    const empresa = useEmpresa()
 
     useEffect(() => {
         const token = obterToken()
@@ -136,7 +138,7 @@ function AreaClienteLayout() {
         )
     }
 
-    const suporte = linkSuporte()
+    const suporte = linkSuporte(empresa?.whatsapp)
 
     const classeLink = ({ isActive }) =>
         'cta-link' + (isActive ? ' ativo' : '')
@@ -180,6 +182,16 @@ function AreaClienteLayout() {
                                     </Link>
                                 )}
                             </li>
+
+                            {/* Só para quem tem a permissão PAINEL_ACESSAR */}
+                            {acesso.usuario?.painel_admin && (
+                                <li>
+                                    <Link to="/admin" className="cta-link cta-link--admin">
+                                        <i className="fa-solid fa-screwdriver-wrench" aria-hidden="true" />
+                                        Painel administrativo
+                                    </Link>
+                                </li>
+                            )}
 
                             <li className="cta-menu-sair">
                                 <button type="button" className="cta-link" onClick={sair}>

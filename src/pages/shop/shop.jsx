@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import CartaoProduto from '../../components/CartaoProduto.jsx'
 
 import {
-    FRETE_GRATIS_A_PARTIR_DE,
+    useFreteGratis,
     formatarPreco,
     localizarImagem,
     normalizarTexto,
@@ -51,6 +51,7 @@ function reaisParaCentavos(valor) {
 
 function Shop() {
     const { produtos, categorias, carregando, erro } = useShop()
+    const freteGratis = useFreteGratis()
 
     const [busca, setBusca] = useState('')
     const [categoriaAtiva, setCategoriaAtiva] = useState(null)
@@ -574,8 +575,9 @@ function Shop() {
 
                     <div className="shop-frete-texto">
                         <h2>
-                            Frete Grátis nas compras a partir de{' '}
-                            {formatarPreco(FRETE_GRATIS_A_PARTIR_DE)}
+                            {freteGratis > 0
+                                ? <>Frete Grátis nas compras a partir de {formatarPreco(freteGratis)}</>
+                                : 'Entrega para todo o Brasil'}
                         </h2>
 
                         <p>

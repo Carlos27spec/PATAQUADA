@@ -682,3 +682,551 @@ a.adm-cartao:hover {
     }
 
 }
+
+/* ========================================
+   PRODUTOS — LISTA E FORMULÁRIO
+======================================== */
+
+.adm-app .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.adm-pagina-titulo--acoes {
+    flex-wrap: wrap;
+}
+
+.adm-pagina-titulo--acoes > div {
+    flex: 1;
+    min-width: 200px;
+}
+
+.adm-botao-principal,
+.adm-botao-secundario {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.adm-botao-secundario {
+    border: 2px solid var(--cor-laranja);
+    background-color: var(--cor-branco);
+    color: var(--cor-marrom);
+}
+
+.adm-botao-principal:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.adm-mensagem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0;
+    padding: 12px 18px;
+    border-radius: 16px;
+    font-size: 16px;
+}
+
+.adm-mensagem--ok {
+    background-color: var(--cor-verde);
+}
+
+.adm-mensagem--erro {
+    background-color: var(--cor-rosa);
+}
+
+.adm-mensagem-fechar {
+    margin-left: auto;
+    border: 0;
+    background: transparent;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.adm-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 22px 0 10px;
+}
+
+.adm-campo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid var(--adm-borda);
+    border-radius: 14px;
+    background-color: var(--cor-branco);
+}
+
+.adm-campo--busca {
+    flex: 1 1 260px;
+}
+
+.adm-campo input,
+.adm-campo select {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 16px;
+}
+
+.adm-campo:focus-within {
+    outline: 3px solid var(--cor-laranja);
+}
+
+.adm-carregando,
+.adm-vazio,
+.adm-contagem {
+    margin: 14px 0;
+    font-size: 16px;
+}
+
+.adm-contagem {
+    opacity: 0.75;
+}
+
+.adm-tabela-rolagem {
+    overflow-x: auto;
+    border-radius: 22px;
+    background-color: var(--cor-branco);
+    border: 1px solid var(--adm-borda);
+}
+
+.adm-tabela {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.adm-tabela th {
+    padding: 12px 14px;
+    background-color: var(--cor-creme);
+    font-family: var(--fonte-titulo);
+    font-size: 16px;
+    font-weight: normal;
+    text-align: left;
+}
+
+.adm-tabela td {
+    padding: 10px 14px;
+    border-top: 1px solid var(--adm-borda);
+    vertical-align: middle;
+}
+
+.adm-tabela tbody tr:hover {
+    background-color: rgba(250, 228, 202, 0.4);
+}
+
+.adm-num {
+    text-align: right !important;
+    white-space: nowrap;
+}
+
+.adm-miniatura {
+    display: block;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background-color: var(--cor-creme);
+    object-fit: contain;
+}
+
+.adm-sub {
+    display: block;
+    margin-top: 2px;
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.adm-estoque-baixo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--cor-marrom);
+    font-weight: bold;
+}
+
+.adm-selo {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.adm-selo--ativo {
+    background-color: var(--cor-verde);
+}
+
+.adm-selo--inativo {
+    background-color: var(--cor-rosa);
+}
+
+.adm-acoes-linha {
+    text-align: right;
+}
+
+.adm-link-acao {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: transparent;
+    color: var(--cor-laranja);
+    font: inherit;
+    font-size: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.adm-link-acao:hover {
+    color: var(--cor-marrom);
+}
+
+.adm-link-acao--perigo {
+    color: #B3261E;
+}
+
+.adm-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--cor-laranja);
+    text-decoration: underline;
+}
+
+/* ----- formulário ----- */
+
+.adm-form-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.adm-form-layout-largo {
+    grid-column: 1 / -1;
+}
+
+.adm-painel {
+    padding: 22px;
+    border-radius: 26px;
+    background-color: var(--cor-creme);
+}
+
+.adm-painel-titulo {
+    margin-bottom: 16px;
+    font-size: 24px;
+    line-height: 1.1;
+}
+
+.adm-form-grade {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+}
+
+.adm-form-grade--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.adm-form-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.adm-form-campo--inteira {
+    grid-column: 1 / -1;
+}
+
+.adm-form-rotulo {
+    font-size: 15px;
+}
+
+.adm-form-campo input,
+.adm-form-campo select,
+.adm-form-campo textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--adm-borda);
+    border-radius: 14px;
+    background-color: var(--cor-branco);
+    font: inherit;
+    font-size: 16px;
+}
+
+.adm-form-campo textarea {
+    resize: vertical;
+}
+
+.adm-form-campo input:focus,
+.adm-form-campo select:focus,
+.adm-form-campo textarea:focus {
+    outline: 3px solid var(--cor-laranja);
+    outline-offset: 0;
+}
+
+.adm-form-dica {
+    font-size: 13px;
+    line-height: 1.35;
+    opacity: 0.75;
+}
+
+.adm-imagem-caixa {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 20px;
+    background-color: var(--cor-branco);
+}
+
+.adm-imagem-caixa img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.adm-imagem-vazia {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.6;
+}
+
+.adm-imagem-vazia i {
+    font-size: 44px;
+}
+
+.adm-imagem-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0;
+}
+
+.adm-imagem-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.adm-imagem-info div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.adm-imagem-info dt {
+    font-weight: bold;
+}
+
+.adm-imagem-info dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-family: monospace;
+}
+
+.adm-form-botoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+@media (max-width: 960px) {
+    .adm-form-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .adm-form-grade--3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .adm-form-grade,
+    .adm-form-grade--3 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .adm-painel {
+        padding: 18px 16px;
+    }
+
+    .adm-form-botoes > * {
+        flex: 1 1 100%;
+    }
+}
+
+/* ----- cadastros genéricos ----- */
+
+.adm-form-coluna {
+    display: grid;
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.adm-mensagem--info {
+    background-color: var(--cor-pessego);
+}
+
+.adm-form-check span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.adm-form-check input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--cor-laranja);
+}
+
+.adm-acoes-linha .adm-link-acao + .adm-link-acao {
+    margin-left: 16px;
+}
+
+.adm-selo--neutro {
+    background-color: var(--cor-creme);
+}
+
+.adm-form-campo input:disabled {
+    background-color: var(--cor-bege);
+    color: inherit;
+    opacity: 0.85;
+}
+
+/* ========================================
+   PERMISSÕES DO TIPO DE USUÁRIO (caixas de marcar)
+======================================== */
+
+.adm-permissoes {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.adm-permissao {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--adm-borda);
+    border-radius: 14px;
+    background-color: var(--cor-branco);
+    cursor: pointer;
+    transition: border-color var(--transicao-padrao), background-color var(--transicao-padrao);
+}
+
+.adm-permissao.marcada {
+    border-color: var(--cor-laranja);
+    background-color: #FFF4E8;
+}
+
+.adm-permissao input {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: var(--cor-laranja);
+}
+
+.adm-permissao span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    font-size: 15px;
+}
+
+.adm-permissao strong {
+    font-weight: normal;
+}
+
+.adm-permissao small {
+    font-size: 12.5px;
+    opacity: 0.7;
+}
+
+.adm-permissao--painel {
+    border-width: 2px;
+    padding: 14px 16px;
+}
+
+.adm-permissao--painel strong {
+    font-family: var(--fonte-titulo);
+    font-size: 19px;
+}
+
+.adm-permissoes-grupos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    transition: opacity var(--transicao-padrao);
+}
+
+/* Sem acesso ao painel, as demais ficam apagadas (mas continuam editáveis). */
+.adm-permissoes-grupos.desligado {
+    opacity: 0.55;
+}
+
+.adm-permissoes-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 14px;
+    border: 1px solid var(--adm-borda);
+    border-radius: 18px;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.adm-permissoes-grupo legend {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 6px;
+    font-family: var(--fonte-titulo);
+    font-size: 18px;
+}
+
+.adm-permissoes-grupo legend i {
+    color: var(--cor-laranja);
+}
+
+.adm-permissoes-todas {
+    align-self: flex-end;
+    font-size: 13px;
+}

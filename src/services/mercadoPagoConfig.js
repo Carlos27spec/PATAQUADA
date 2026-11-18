@@ -22,23 +22,7 @@ export function configuracaoPagamento() {
 
             ''
 
-        ).replace(/\/$/, ''),
-
-
-
-        fretePadrao: Number(
-
-            process.env.FRETE_PADRAO ?? 1500
-
-        ),
-
-
-
-        freteGratisAPartirDe: Number(
-
-            process.env.FRETE_GRATIS_A_PARTIR_DE ?? 10000
-
-        )
+        ).replace(/\/$/, '')
 
     };
 

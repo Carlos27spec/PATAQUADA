@@ -7,7 +7,10 @@
 // Cada cliente só enxerga os próprios dados.
 // =====================================================
 
-const STATUS_DO_PEDIDO = {
+import { permissoesDoUsuario } from '../admin/adminInicio.js';
+import { PERMISSAO_PAINEL } from '../admin/permissoesAdmin.js';
+
+export const STATUS_DO_PEDIDO = {
     AGUARDANDO_PAGAMENTO: { grupo: 'pendente', rotulo: 'Aguardando pagamento', detalhe: null },
     PAGO: { grupo: 'andamento', rotulo: 'Em andamento', detalhe: 'Pagamento confirmado' },
     EM_SEPARACAO: { grupo: 'andamento', rotulo: 'Em andamento', detalhe: 'Em separação' },
@@ -38,7 +41,11 @@ export function registrarAreaCliente({ app, db, autenticar }) {
     app.get('/api/cliente/eu', autenticar, (req, res) => {
         return res.json({
             sucesso: true,
-            usuario: dadosDoUsuario(req.usuario)
+            usuario: {
+                ...dadosDoUsuario(req.usuario),
+                // Mostra o botão "Painel administrativo" no menu da conta.
+                painel_admin: permissoesDoUsuario(db, req.usuario).has(PERMISSAO_PAINEL)
+            }
         });
     });
 

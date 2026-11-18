@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 
 import { GRUPOS_MENU } from './menuAdmin.js'
+import { pode } from './permissoesAdmin.js'
 import { chamarApi } from '../shop/carrinho.js'
 import './admin.css'
 
@@ -12,7 +13,7 @@ function plural(quantidade, singular, pluralTexto) {
 }
 
 function AdminInicio() {
-    const { usuario } = useOutletContext()
+    const { usuario, permissoes } = useOutletContext()
 
     const [versao, setVersao] = useState(0)
 
@@ -181,7 +182,10 @@ function AdminInicio() {
                 </h2>
 
                 <div className="adm-areas">
-                    {GRUPOS_MENU.map(grupo => (
+                    {GRUPOS_MENU
+                        .map(grupo => ({ ...grupo, itens: grupo.itens.filter(item => pode(permissoes, item.rota, 'ver')) }))
+                        .filter(grupo => grupo.itens.length > 0)
+                        .map(grupo => (
                         <article key={grupo.chave} className="adm-area">
                             <h3>
                                 <i className={`fa-solid ${grupo.icone}`} />

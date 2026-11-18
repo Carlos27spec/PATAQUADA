@@ -1,6 +1,6 @@
 import express from 'express';
-import nodemailer from 'nodemailer';
 import process from 'node:process';
+import { configuracaoEmail, obterTransportadorEmail } from '../services/emailService.js';
 
 // =====================================================
 // CONTATO - ENVIO DE E-MAIL
@@ -10,8 +10,8 @@ import process from 'node:process';
 // Destinatário: e-mail da empresa cadastrado em dados_pataquada (id = 1).
 //
 // Como a mensagem chega (nada é gravado no banco):
-//   1. Se o .env tiver uma conta SMTP que funcione (EMAIL_HOST,
-//      EMAIL_USER, EMAIL_PASS), envia por ela.
+//   1. Se o SMTP funcionar (e-mail da empresa + EMAIL_PASS no .env;
+//      veja src/services/emailService.js), envia por ele.
 //   2. Se não tiver, ou se o login for recusado, envia pelo FormSubmit
 //      (https://formsubmit.co), que não precisa de senha.
 //      Na primeira vez o FormSubmit manda um e-mail de ativação para a
@@ -54,37 +54,12 @@ function emailDaEmpresa(db) {
 // ENVIO 1: SMTP DO .env
 // =====================================================
 
-let transportador = null;
-
 // Depois de um login recusado, não tenta mais o SMTP até reiniciar
 // o servidor (evita esperar a recusa a cada mensagem).
 let smtpRecusado = false;
 
 function obterTransportador() {
-    if (
-        smtpRecusado ||
-        !process.env.EMAIL_HOST ||
-        !process.env.EMAIL_USER ||
-        !process.env.EMAIL_PASS
-    ) {
-        return null;
-    }
-
-    if (!transportador) {
-        const porta = Number(process.env.EMAIL_PORT || 587);
-
-        transportador = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: porta,
-            secure: porta === 465,
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-    }
-
-    return transportador;
+    return smtpRecusado ? null : obterTransportadorEmail();
 }
 
 async function enviarPorSmtp({ destinatario, nome, email, telefoneFormatado, mensagem }) {
@@ -96,7 +71,7 @@ async function enviarPorSmtp({ destinatario, nome, email, telefoneFormatado, men
 
     try {
         await envio.sendMail({
-            from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+            from: configuracaoEmail().remetente,
             to: destinatario,
             replyTo: { name: nome, address: email },
             subject: `Solicitação de Contato do Cliente - ${nome}`,
@@ -127,7 +102,7 @@ async function enviarPorSmtp({ destinatario, nome, email, telefoneFormatado, men
         if (erro.code === 'EAUTH') {
             smtpRecusado = true;
             console.warn(
-                'Contato: login SMTP recusado (confira EMAIL_USER/EMAIL_PASS). ' +
+                'Contato: login SMTP recusado (confira o EMAIL_PASS no .env). ' +
                 'Usando o FormSubmit.'
             );
         } else {

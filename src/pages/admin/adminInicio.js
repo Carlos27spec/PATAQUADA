@@ -6,52 +6,95 @@
 //   GET /api/admin/resumo  -> números exibidos na tela inicial
 // =====================================================
 
-// Quem é administrador (qualquer uma das regras libera):
-//  1. o id do tipo de usuário está em ADMIN_TIPOS_USUARIO no .env
-//     (ex.: ADMIN_TIPOS_USUARIO=1,2)
-//  2. o nome ou o "tipo" do tipo_usuario contém "admin"
-//     (ex.: "Administrador", "ADMIN")
-//  3. o tipo de usuário tem a permissão ADMIN, ACESSO_ADMIN ou
-//     ADMIN_PAINEL em permissao_tipo_usuario
-export function criarExigirAdmin(db) {
-    function ehAdministrador(usuario) {
-        const idsConfigurados = String(process.env.ADMIN_TIPOS_USUARIO ?? '')
-            .split(',')
-            .map(valor => Number(valor.trim()))
-            .filter(Number.isInteger);
+import process from 'node:process';
 
-        if (idsConfigurados.includes(usuario.id_tipo_usuario)) {
-            return true;
-        }
+import { PERMISSAO_PAINEL, pode } from './permissoesAdmin.js';
 
-        const tipo = db.prepare(`
-            SELECT nome, tipo
-            FROM tipo_usuario
-            WHERE id = ?
-        `).get(usuario.id_tipo_usuario);
+// =====================================================
+// PERMISSÕES
+//
+// O acesso ao painel e a cada tela vem das tabelas permissao_usuario e
+// permissao_tipo_usuario, conforme o tipo do usuário logado.
+//
+// Emergência: ids de tipo em ADMIN_TIPOS_USUARIO no .env
+// (ex.: ADMIN_TIPOS_USUARIO=1) recebem todas as permissões, mesmo que
+// alguém tenha retirado o acesso pelo painel.
+// =====================================================
 
-        if (!tipo) {
-            return false;
-        }
+// Chaves (em maiúsculas) das permissões de um usuário.
+export function permissoesDoUsuario(db, usuario) {
+    const idsEmergencia = String(process.env.ADMIN_TIPOS_USUARIO ?? '')
+        .split(',')
+        .map(valor => Number(valor.trim()))
+        .filter(valor => Number.isInteger(valor) && valor > 0);
 
-        if (/admin/i.test(`${tipo.nome} ${tipo.tipo}`)) {
-            return true;
-        }
-
-        return Boolean(
-            db.prepare(`
-                SELECT 1
-                FROM permissao_tipo_usuario ptu
-                JOIN permissao_usuario pu ON pu.id = ptu.id_permissao
-                WHERE ptu.id_tipo_usuario = ?
-                AND UPPER(pu.chave) IN ('ADMIN', 'ACESSO_ADMIN', 'ADMIN_PAINEL')
-            `).get(usuario.id_tipo_usuario)
-        );
+    if (idsEmergencia.includes(usuario.id_tipo_usuario)) {
+        const todas = db.prepare('SELECT UPPER(chave) AS chave FROM permissao_usuario').all();
+        return new Set([PERMISSAO_PAINEL, ...todas.map(item => item.chave)]);
     }
 
+    const linhas = db.prepare(`
+        SELECT UPPER(pu.chave) AS chave
+        FROM permissao_tipo_usuario ptu
+        JOIN permissao_usuario pu ON pu.id = ptu.id_permissao
+        WHERE ptu.id_tipo_usuario = ?
+    `).all(usuario.id_tipo_usuario);
+
+    return new Set(linhas.map(item => item.chave));
+}
+
+// Cria a permissão de acesso ao painel na primeira vez e libera para
+// os tipos ADMIN. Depois disso, quem decide é a tela "Permissões por
+// tipo" (nada é recriado se alguém retirar o acesso).
+export function garantirPermissaoPainel(db) {
+    const existe = db.prepare('SELECT id FROM permissao_usuario WHERE UPPER(chave) = ?')
+        .get(PERMISSAO_PAINEL);
+
+    if (existe) {
+        return;
+    }
+
+    db.transaction(() => {
+        const { lastInsertRowid } = db.prepare(`
+            INSERT INTO permissao_usuario (chave, descricao)
+            VALUES (?, 'Acessar o painel administrativo')
+        `).run(PERMISSAO_PAINEL);
+
+        db.prepare(`
+            INSERT OR IGNORE INTO permissao_tipo_usuario (id_tipo_usuario, id_permissao)
+            SELECT id, ? FROM tipo_usuario WHERE UPPER(TRIM(tipo)) = 'ADMIN'
+        `).run(lastInsertRowid);
+    })();
+
+    console.log(`Permissões: "${PERMISSAO_PAINEL}" criada e liberada para os tipos ADMIN.`);
+}
+
+// Middleware: exige a permissão de uma ação numa tela do painel.
+// "tela" pode ser fixa ou vir da rota (ex.: req => req.params.tipo).
+export function exigirPermissao(tela, acao) {
+    return (req, res, next) => {
+        const nomeTela = typeof tela === 'function' ? tela(req) : tela;
+        const nomeAcao = typeof acao === 'function' ? acao(req) : acao;
+
+        if (!pode(req.permissoes, nomeTela, nomeAcao)) {
+            return res.status(403).json({
+                sucesso: false,
+                mensagem: 'Você não tem permissão para esta ação. Fale com um administrador.'
+            });
+        }
+
+        return next();
+    };
+}
+
+// Middleware: só entra no painel quem tem a permissão de acesso.
+// Deixa as permissões em req.permissoes para as próximas verificações.
+export function criarExigirAdmin(db) {
     return function exigirAdmin(req, res, next) {
         try {
-            if (!ehAdministrador(req.usuario)) {
+            req.permissoes = permissoesDoUsuario(db, req.usuario);
+
+            if (!req.permissoes.has(PERMISSAO_PAINEL)) {
                 return res.status(403).json({
                     sucesso: false,
                     mensagem: 'Acesso restrito a administradores.'
@@ -72,6 +115,8 @@ export function criarExigirAdmin(db) {
 }
 
 export function registrarAdminInicio({ app, db, autenticar }) {
+    garantirPermissaoPainel(db);
+
     const exigirAdmin = criarExigirAdmin(db);
     const protegido = [autenticar, exigirAdmin];
 
@@ -93,7 +138,9 @@ export function registrarAdminInicio({ app, db, autenticar }) {
                 id: req.usuario.id,
                 nome: req.usuario.nome,
                 email: req.usuario.email
-            }
+            },
+            // As telas usam para esconder menu e botões sem permissão.
+            permissoes: [...req.permissoes]
         });
     });
 

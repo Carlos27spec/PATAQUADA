@@ -1,7 +1,59 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import insignea from "../assets/Insignea-mini.png";
-import { InstagramIcon, FacebookIcon, YoutubeIcon, HeartIcon, PawIcon } from "./Icons";
+import {
+  InstagramIcon,
+  FacebookIcon,
+  YoutubeIcon,
+  TiktokIcon,
+  WhatsappIcon,
+  SiteIcon,
+  HeartIcon,
+  PawIcon,
+} from "./Icons";
 import "./Footer.css";
+import { carregarEmpresa } from "../utils/empresa.js";
+
+
+// Ícone de cada rede (o "tipo" vem de /api/empresa).
+const ICONES = {
+  whatsapp: WhatsappIcon,
+  instagram: InstagramIcon,
+  facebook: FacebookIcon,
+  tiktok: TiktokIcon,
+  youtube: YoutubeIcon,
+  site: SiteIcon,
+};
+
+// As redes vêm de dados_pataquada; só aparecem as que estão cadastradas.
+// Guardadas em memória para não buscar de novo a cada troca de página.
+let redesEmCache = null;
+
+function useRedesSociais() {
+  const [redes, setRedes] = useState(redesEmCache ?? []);
+
+  useEffect(() => {
+    if (redesEmCache) return undefined;
+
+    let ativo = true;
+
+    carregarEmpresa()
+      .then((dados) => {
+        const lista = (dados?.redes ?? []).filter((rede) => ICONES[rede.tipo]);
+        redesEmCache = lista;
+        if (ativo) setRedes(lista);
+      })
+      .catch(() => {
+        // Sem servidor: o rodapé aparece sem as redes.
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  return redes;
+}
 
 const links = [
   { to: "/", label: "Home" },
@@ -11,13 +63,9 @@ const links = [
   { to: "/contato", label: "Contato" },
 ];
 
-const socials = [
-  { href: "https://instagram.com/", label: "Instagram", Icon: InstagramIcon },
-  { href: "https://facebook.com/", label: "Facebook", Icon: FacebookIcon },
-  { href: "https://youtube.com/", label: "YouTube", Icon: YoutubeIcon },
-];
-
 export default function Footer() {
+  const redes = useRedesSociais();
+
   return (
     <footer className="site-footer">
       <PawIcon className="footer-paw footer-paw--top" />
@@ -54,19 +102,26 @@ export default function Footer() {
               ))}
             </nav>
 
-            <div className="footer-social">
-              {socials.map(({ href, label, Icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                >
-                  <Icon />
-                </a>
-              ))}
-            </div>
+            {redes.length > 0 && (
+              <div className="footer-social">
+                {redes.map(({ tipo, nome, url }) => {
+                  const Icone = ICONES[tipo];
+
+                  return (
+                    <a
+                      key={tipo}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={nome}
+                      title={nome}
+                    >
+                      <Icone />
+                    </a>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 

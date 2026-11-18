@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom'
 
 import { GRUPOS_MENU, ROTA_LOGIN } from './menuAdmin.js'
+import { pode } from './permissoesAdmin.js'
 import { CHAVES_TOKEN, chamarApi, obterToken } from '../shop/carrinho.js'
 import { localizarImagem } from '../shop/shop.js'
 import './admin.css'
@@ -56,7 +57,11 @@ function AdminLayout() {
                 const resposta = await chamarApi('/api/admin/eu')
 
                 if (vivo) {
-                    setAcesso({ situacao: 'liberado', usuario: resposta.usuario })
+                    setAcesso({
+                        situacao: 'liberado',
+                        usuario: resposta.usuario,
+                        permissoes: resposta.permissoes ?? []
+                    })
                 }
 
             } catch (erro) {
@@ -159,7 +164,12 @@ function AdminLayout() {
 
     // ----- painel liberado -----
 
-    const { usuario } = acesso
+    const { usuario, permissoes } = acesso
+
+    // Menu: só as telas que o tipo do usuário pode ver.
+    const gruposPermitidos = GRUPOS_MENU
+        .map(grupo => ({ ...grupo, itens: grupo.itens.filter(item => pode(permissoes, item.rota, 'ver')) }))
+        .filter(grupo => grupo.itens.length > 0)
 
     function grupoAtivo(grupo) {
         return grupo.itens.some(
@@ -253,7 +263,7 @@ function AdminLayout() {
                         Início
                     </NavLink>
 
-                    {GRUPOS_MENU.map(grupo => {
+                    {gruposPermitidos.map(grupo => {
                         // grupo com um único item vira link direto
                         if (grupo.itens.length === 1) {
                             return (
@@ -344,7 +354,7 @@ function AdminLayout() {
 
             {/* CONTEÚDO */}
             <main className="adm-conteudo">
-                <Outlet context={{ usuario }} />
+                <Outlet context={{ usuario, permissoes }} />
             </main>
 
             <footer className="adm-rodape">
