@@ -247,7 +247,8 @@ CREATE TABLE IF NOT EXISTS plano (
     beneficios TEXT,
     data_cadastro TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TEXT,
-    status INTEGER NOT NULL DEFAULT 1 CHECK (status IN (0,1))
+    status INTEGER NOT NULL DEFAULT 1 CHECK (status IN (0,1)),
+    destaque INTEGER NOT NULL DEFAULT 0 CHECK (destaque IN (0,1))
 ) STRICT;
 
 -- 15. ASSINATURAS

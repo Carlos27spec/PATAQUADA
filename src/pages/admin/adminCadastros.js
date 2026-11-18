@@ -485,6 +485,11 @@ export function registrarAdminCadastros({ app, db, autenticar }) {
     }
 
     function aposSalvar(tipo, config, id, dados, atual, usuarioId) {
+        // Só um plano "Mais escolhido".
+        if (tipo === 'planos' && dados.destaque === 1) {
+            db.prepare('UPDATE plano SET destaque = 0 WHERE id <> ?').run(id);
+        }
+
         // Só um fornecedor principal por produto.
         if (tipo === 'produto-fornecedor' && dados.fornecedor_principal === 1) {
             db.prepare(`

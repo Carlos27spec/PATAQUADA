@@ -9,7 +9,23 @@ import { db } from '../config/database.js';
 import { responderErro, consultarTabela } from '../utils/helpers.js';
 
 
+// Coluna "destaque" do plano (selo "Mais escolhido" na página de planos).
+// Criada aqui para que bancos antigos também passem a ter.
+function garantirColunaDestaquePlano() {
+    const temColuna = db.prepare('PRAGMA table_info(plano)').all()
+        .some(coluna => coluna.name === 'destaque');
+
+    if (!temColuna) {
+        db.exec(`
+            ALTER TABLE plano
+            ADD COLUMN destaque INTEGER NOT NULL DEFAULT 0 CHECK (destaque IN (0,1))
+        `);
+    }
+}
+
 export default function criarRotasCatalogo() {
+    garantirColunaDestaquePlano();
+
     const router = express.Router();
 
     // =====================================================

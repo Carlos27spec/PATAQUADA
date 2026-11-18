@@ -176,12 +176,10 @@ function Planos() {
             {!carregando && !erro && dados.length > 0 && (
                 <div className="servicos-grid planos-grid">
 
-                    {dados.map((plano, indice) => {
-                        /* "Mais escolhido": campo destaque do plano
-                           ou, com 3 planos, o do meio */
-                        const destaque =
-                            plano.destaque ??
-                            (dados.length === 3 && indice === 1)
+                    {dados.map(plano => {
+                        /* "Mais escolhido": plano marcado no painel
+                           (Planos > Mais escolhido) */
+                        const destaque = Boolean(plano.destaque)
 
                         return (
                             <article

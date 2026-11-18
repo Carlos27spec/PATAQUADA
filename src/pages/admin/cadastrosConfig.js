@@ -358,6 +358,7 @@ export const CADASTROS = {
                 ]
             },
             { nome: 'status', rotulo: 'Situação', tipo: 'status' },
+            { nome: 'destaque', rotulo: 'Mais escolhido', tipo: 'booleano', dica: 'Mostra o selo "Mais escolhido" na página de planos. Só um plano pode ter: marcar este desmarca os outros.' },
             { nome: 'descricao', rotulo: 'Descrição', tipo: 'textoLongo', max: 1000 },
             { nome: 'beneficios', rotulo: 'Benefícios', tipo: 'textoLongo', max: 2000, dica: 'Um benefício por linha.' }
         ],
@@ -365,6 +366,7 @@ export const CADASTROS = {
             { campo: 'nome', rotulo: 'Plano', destaque: true },
             { campo: 'valor', rotulo: 'Valor', tipo: 'dinheiro' },
             { campo: 'periodicidade', rotulo: 'Periodicidade', tipo: 'rotulo' },
+            { campo: 'destaque', rotulo: 'Mais escolhido', tipo: 'simNao' },
             { campo: 'total_assinaturas', rotulo: 'Assinaturas', tipo: 'numero' },
             { campo: 'status', rotulo: 'Situação', tipo: 'status' }
         ],

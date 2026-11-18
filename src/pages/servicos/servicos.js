@@ -165,12 +165,27 @@ function formatarPrecoConsulta(item) {
 // COBRANÇA DOS PLANOS
 // ========================================
 
+// Meses de cada periodicidade da tabela plano.
+const MESES_POR_PERIODICIDADE = {
+    MENSAL: 1,
+    TRIMESTRAL: 3,
+    SEMESTRAL: 6,
+    ANUAL: 12
+};
+
+function mesesDoPlano(plano) {
+    const pelaPeriodicidade =
+        MESES_POR_PERIODICIDADE[String(plano.periodicidade ?? '').toUpperCase()];
+
+    return pelaPeriodicidade || Number(plano.intervalo_cobranca_meses || 1);
+}
+
 function formatarCobranca(plano) {
     if (plano.tipo_cobranca === 'UNICA') {
         return 'Pagamento único';
     }
 
-    const intervalo = Number(plano.intervalo_cobranca_meses || 1);
+    const intervalo = mesesDoPlano(plano);
 
     if (intervalo === 1) {
         return 'Cobrança mensal';
@@ -190,7 +205,7 @@ function formatarPeriodoPreco(plano) {
         return '';
     }
 
-    const intervalo = Number(plano.intervalo_cobranca_meses || 1);
+    const intervalo = mesesDoPlano(plano);
 
     if (intervalo === 1) {
         return '/mês';
@@ -322,7 +337,7 @@ function tratarServico(item, whatsapp) {
 
 function tratarPlano(item) {
     // Plano marcado como "Mais escolhido" (se a API enviar).
-    // Sem o campo, a página destaca o plano do meio.
+    // Marcado pelo painel (coluna destaque da tabela plano).
     const marcado = item.destaque ?? item.mais_escolhido;
 
     return {
@@ -331,12 +346,13 @@ function tratarPlano(item) {
         nome: item.nome,
         descricao: item.descricao || 'Conheça os benefícios deste plano.',
         imagem: imagemDe(PASTAS_IMAGEM.planos, item.imagem, IMAGENS_PADRAO.planos),
-        precoFormatado: formatarPreco(item.preco),
+        // Na tabela plano o preço fica na coluna "valor" (em centavos).
+        precoFormatado: formatarPreco(item.valor ?? item.preco),
         cobrancaFormatada: formatarCobranca(item),
         periodoPreco: formatarPeriodoPreco(item),
         duracaoFormatada: item.duracao_meses
             ? `${item.duracao_meses} meses`
-            : 'Sem prazo definido',
+            : null,
         beneficios: normalizarBeneficios(
             item.beneficios ?? item.vantagens
         ),
