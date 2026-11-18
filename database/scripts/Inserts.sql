@@ -525,21 +525,21 @@ FROM (
         'Plano de entrada para quem deseja manter os cuidados básicos do pet em dia.' AS descricao,
         2990 AS valor,
         'MENSAL' AS periodicidade,
-        'Benefícios e condições especiais nos serviços participantes.' AS beneficios
+        '1 banho por mês; 1 corte de unhas por mês; 10% de desconto em tosa e hidratação; 5% de desconto em consultas; Lembrete das vacinas do pet' AS beneficios
 
     UNION ALL SELECT
         'Plus',
         'Plano intermediário com benefícios ampliados para os cuidados do pet.',
         4990,
         'MENSAL',
-        'Descontos em serviços de banho e tosa e condições especiais para consultas.'
+        '2 banhos por mês; 1 tosa higiênica por mês; Corte de unhas e limpeza de ouvidos em todo banho; 15% de desconto em hidratação e tosa completa; 10% de desconto em consultas e vacinas; 1 avaliação preventiva por ano; Lembrete das vacinas do pet'
 
     UNION ALL SELECT
         'Premium',
         'Plano completo com benefícios diferenciados para os cuidados do pet.',
         7990,
         'MENSAL',
-        'Descontos ampliados e vantagens nos serviços e cuidados veterinários participantes.'
+        '4 banhos por mês (Banho Premium); 1 tosa completa por mês; Hidratação e escovação dos pelos em todo banho; Corte de unhas e limpeza de ouvidos em todo banho; 1 consulta geral por mês; 20% de desconto nas demais consultas e vacinas; 1 avaliação de saúde por semestre; Prioridade no agendamento; Lembrete das vacinas do pet'
 ) d
 WHERE NOT EXISTS (
     SELECT 1
